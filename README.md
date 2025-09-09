@@ -118,11 +118,23 @@ curl -X POST http://localhost:3000/api/verify \
 
 ## Deployment
 
-### Local Docker
+### Using Pre-built Image from DockerHub
+
+Pull and run the latest image:
+```bash
+docker pull hashwarlock/the-accountant:latest
+docker run -d \
+  --name the-accountant \
+  -p 3000:3000 \
+  -e DATABASE_URL=file:./dev.db \
+  hashwarlock/the-accountant:latest
+```
+
+### Local Docker Build
 
 1. Build the image:
 ```bash
-docker build -t dstack-demo .
+docker build -t the-accountant .
 ```
 
 2. Run with docker-compose:

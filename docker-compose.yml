@@ -2,9 +2,7 @@ version: '3.8'
 
 services:
   web:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: hashwarlock/the-accountant:latest
     container_name: dstack-js-sdk-demo
     ports:
       - "3000:3000"

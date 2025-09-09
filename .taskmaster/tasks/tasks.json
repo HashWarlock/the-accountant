@@ -568,11 +568,24 @@
         ],
         "priority": "high",
         "subtasks": []
+      },
+      {
+        "id": 16,
+        "title": "Publish Docker Image to DockerHub",
+        "description": "Build and push production Docker image to DockerHub registry",
+        "details": "Build the Docker image for linux/amd64 platform with proper tagging. Login to DockerHub using docker login. Tag the image with DockerHub username and repository name. Push the image to DockerHub with version tags (latest and v1.0.0). Verify the image is publicly accessible on DockerHub.",
+        "testStrategy": "Build image, push to DockerHub, verify image appears in registry, test pulling the image from DockerHub",
+        "status": "done",
+        "dependencies": [
+          15
+        ],
+        "priority": "high",
+        "subtasks": []
       }
     ],
     "metadata": {
       "created": "2025-09-09T04:45:44.364Z",
-      "updated": "2025-09-09T07:17:17.633Z",
+      "updated": "2025-09-09T07:21:02.313Z",
       "description": "Tasks for master context"
     }
   }
