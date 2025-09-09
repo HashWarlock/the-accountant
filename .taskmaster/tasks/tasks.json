@@ -592,11 +592,75 @@
         "dependencies": [],
         "priority": "high",
         "subtasks": []
+      },
+      {
+        "id": 18,
+        "title": "Implement remote attestation quote generation for key access",
+        "description": "Add TEE remote attestation quotes whenever a key is accessed or generated",
+        "details": "Implement functionality to generate a remote attestation quote from the TEE (dstack) every time a user's key is accessed. This includes key generation during signup and key retrieval during signing operations. The quote should include the public key/address in the application data field for cryptographic proof of key access within the TEE.",
+        "testStrategy": "Test quote generation during signup, signing, and verification operations. Verify quotes contain correct application data. Test quote format and attestation chain validity.",
+        "status": "done",
+        "dependencies": [],
+        "priority": "high",
+        "subtasks": []
+      },
+      {
+        "id": 19,
+        "title": "Create audit log system for key access events",
+        "description": "Design and implement database schema and API for storing attestation quotes as audit logs",
+        "details": "Create a comprehensive audit logging system that stores remote attestation quotes for each key access event. This includes: database schema for audit logs (timestamp, userId, operation type, quote hex, attestation data), API endpoints to retrieve audit history, and integration with existing user operations.",
+        "testStrategy": "Test database migrations, verify audit log creation on key operations, test query performance with large datasets, validate audit trail completeness",
+        "status": "pending",
+        "dependencies": [
+          18
+        ],
+        "priority": "high",
+        "subtasks": []
+      },
+      {
+        "id": 20,
+        "title": "Add quote verification endpoint and UI",
+        "description": "Create API endpoint and UI components to verify attestation quotes",
+        "details": "Implement a verification system that allows users to validate attestation quotes. This includes: API endpoint to verify quote signatures and integrity, UI component to display quote details and verification status, integration with Intel/AMD attestation services for quote validation, and display of attestation report details.",
+        "testStrategy": "Test quote verification with valid and invalid quotes, test UI display of attestation details, verify integration with attestation services, test error handling for malformed quotes",
+        "status": "pending",
+        "dependencies": [
+          18,
+          19
+        ],
+        "priority": "medium",
+        "subtasks": []
+      },
+      {
+        "id": 21,
+        "title": "Add attestation quote to API responses",
+        "description": "Include attestation quotes in signup, signing, and key retrieval API responses",
+        "details": "Modify existing API endpoints to return attestation quotes alongside normal responses. This includes: Adding quote field to signup response with hex-encoded attestation, Including quote in signing operations response, Returning quote data in key retrieval endpoints, Ensuring backward compatibility with existing clients.",
+        "testStrategy": "Test API response structure includes quote fields, verify quote format and encoding, test backward compatibility, validate quote data corresponds to the operation performed",
+        "status": "pending",
+        "dependencies": [
+          18
+        ],
+        "priority": "high",
+        "subtasks": []
+      },
+      {
+        "id": 22,
+        "title": "Create audit log viewer UI component",
+        "description": "Build UI component to display user's key access audit trail with attestation quotes",
+        "details": "Develop a comprehensive audit log viewer that shows all key access events for a user. Features include: Chronological display of key access events with timestamps, Display of operation types (signup, sign, verify), Hex display of attestation quotes with copy functionality, Expandable details for each audit entry, Filtering and search capabilities, Export audit trail as JSON/CSV.",
+        "testStrategy": "Test UI rendering with various audit log sizes, verify quote display and copy functionality, test filtering and search features, validate export formats",
+        "status": "pending",
+        "dependencies": [
+          19
+        ],
+        "priority": "medium",
+        "subtasks": []
       }
     ],
     "metadata": {
       "created": "2025-09-09T04:45:44.364Z",
-      "updated": "2025-09-09T08:56:42.948Z",
+      "updated": "2025-09-09T19:51:27.022Z",
       "description": "Tasks for master context"
     }
   }

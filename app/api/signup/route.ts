@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { prisma } from '@/lib/db'
-import { createWallet } from '@/lib/wallet'
+import { createWallet, createWalletWithAttestation } from '@/lib/wallet'
 
 // Validation schema for signup request
 const signupSchema = z.object({
@@ -38,13 +38,20 @@ export async function POST(request: NextRequest) {
       )
     }
     
-    // Generate deterministic wallet using dstack
+    // Generate deterministic wallet using dstack with attestation
     console.log(`\n🔐 ========== WALLET CREATION STARTED ==========`)
     console.log(`👤 User ID: ${validatedData.userId}`)
     console.log(`📧 Email: ${validatedData.email}`)
     console.log(`⏰ Timestamp: ${new Date().toISOString()}`)
     
-    const wallet = await createWallet(validatedData.userId)
+    // Try to create wallet with attestation, fall back to regular if it fails
+    let wallet
+    try {
+      wallet = await createWalletWithAttestation(validatedData.userId, 'signup')
+    } catch (error) {
+      console.warn(`⚠️ Failed to create wallet with attestation, falling back to regular:`, error)
+      wallet = await createWallet(validatedData.userId)
+    }
     
     console.log(`\n✅ ========== WALLET GENERATED SUCCESSFULLY ==========`)
     console.log(`🔑 PUBLIC KEY: ${wallet.publicKey}`)
@@ -78,21 +85,30 @@ export async function POST(request: NextRequest) {
     console.log(`⏱️  Total signup time: ${duration}ms`)
     console.log(`========================================\n`)
     
-    // Return success response
-    return NextResponse.json(
-      {
-        success: true,
-        user: {
-          id: user.id,
-          email: user.email,
-          userId: user.userId,
-          address: user.address,
-          publicKey: user.pubKeyHex
-        },
-        message: 'User created successfully'
+    // Return success response with attestation if available
+    const response: any = {
+      success: true,
+      user: {
+        id: user.id,
+        email: user.email,
+        userId: user.userId,
+        address: user.address,
+        publicKey: user.pubKeyHex
       },
-      { status: 201 }
-    )
+      message: 'User created successfully'
+    }
+    
+    // Add attestation quote if available
+    if (wallet.attestationQuote) {
+      response.attestation = {
+        quote: wallet.attestationQuote,
+        eventLog: wallet.eventLog,
+        timestamp: new Date().toISOString()
+      }
+      console.log(`📜 Attestation quote included in response`)
+    }
+    
+    return NextResponse.json(response, { status: 201 })
     
   } catch (error) {
     console.error('Signup error:', error)

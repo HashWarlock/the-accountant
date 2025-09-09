@@ -178,3 +178,66 @@ export async function getWalletKey(userId: string): Promise<GetKeyResponse> {
 export function keyToHex(keyResponse: GetKeyResponse): string {
   return '0x' + Buffer.from(keyResponse.key).toString('hex')
 }
+
+/**
+ * Get wallet key with remote attestation quote
+ * @param userId - Unique user identifier
+ * @param operation - Operation type for audit logging
+ * @returns Object with key response and attestation quote
+ */
+export async function getWalletKeyWithAttestation(
+  userId: string, 
+  operation: 'signup' | 'sign' | 'verify'
+): Promise<{
+  keyResponse: GetKeyResponse
+  attestationQuote?: string
+  eventLog?: string
+}> {
+  try {
+    // Get the wallet key first
+    const keyResponse = await getUserWalletKey(userId)
+    
+    // Convert key to get the address for attestation
+    const privateKeyHex = keyToHex(keyResponse)
+    const { privateKeyToAccount } = await import('viem/accounts')
+    const account = privateKeyToAccount(privateKeyHex as `0x${string}`)
+    
+    // Generate attestation quote with application data
+    console.log(`\n🔏 [dstack] Generating attestation quote for operation: ${operation}`)
+    
+    const applicationData = {
+      userId,
+      address: account.address,
+      publicKey: account.publicKey,
+      operation,
+      timestamp: new Date().toISOString(),
+      namespace: process.env.APP_NAMESPACE || 'the-accountant-v1'
+    }
+    
+    try {
+      const quoteResponse = await generateAttestationQuote(applicationData)
+      
+      // Convert quote to hex for storage and display
+      const quoteHex = Buffer.from(quoteResponse.quote).toString('hex')
+      const eventLogHex = quoteResponse.event_log ? 
+        Buffer.from(quoteResponse.event_log).toString('hex') : 
+        undefined
+      
+      console.log(`✅ [dstack] Attestation quote generated`)
+      console.log(`📜 [dstack] Quote size: ${quoteResponse.quote.length} bytes`)
+      console.log(`🔍 [dstack] Quote (first 32 chars): ${quoteHex.substring(0, 32)}...`)
+      
+      return {
+        keyResponse,
+        attestationQuote: quoteHex,
+        eventLog: eventLogHex
+      }
+    } catch (quoteError) {
+      // If quote generation fails, still return the key (backward compatibility)
+      console.error(`⚠️ [dstack] Quote generation failed, continuing without attestation:`, quoteError)
+      return { keyResponse }
+    }
+  } catch (error) {
+    throw error
+  }
+}

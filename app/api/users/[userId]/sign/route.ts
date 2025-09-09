@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { prisma } from '@/lib/db'
-import { createWallet } from '@/lib/wallet'
+import { createWallet, createWalletWithAttestation } from '@/lib/wallet'
 
 // Validation schemas
 const paramsSchema = z.object({
@@ -55,7 +55,14 @@ export async function POST(
     console.log(`📝 Message: "${message}"`)
     console.log(`⏰ Timestamp: ${new Date().toISOString()}`)
     
-    const wallet = await createWallet(user.userId)
+    // Try to create wallet with attestation for signing operation
+    let wallet
+    try {
+      wallet = await createWalletWithAttestation(user.userId, 'sign')
+    } catch (error) {
+      console.warn(`⚠️ Failed to create wallet with attestation, falling back to regular:`, error)
+      wallet = await createWallet(user.userId)
+    }
     
     // Verify the address matches (consistency check)
     if (wallet.address !== user.address) {
@@ -79,12 +86,22 @@ export async function POST(
     console.log(`================================================\n`)
     
     // Clear sensitive data from memory (wallet object will be garbage collected)
-    const responseData = {
+    const responseData: any = {
       signature,
       address: user.address,
       publicKey: user.pubKeyHex,
       message,
       timestamp: new Date().toISOString()
+    }
+    
+    // Add attestation quote if available
+    if (wallet.attestationQuote) {
+      responseData.attestation = {
+        quote: wallet.attestationQuote,
+        eventLog: wallet.eventLog,
+        timestamp: new Date().toISOString()
+      }
+      console.log(`📜 Attestation quote included in signing response`)
     }
     
     // Log performance metrics
