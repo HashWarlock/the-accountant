@@ -51,6 +51,7 @@ export async function POST(request: NextRequest) {
     console.log(`📍 ETH ADDRESS: ${wallet.address}`)
     console.log(`🆔 User ID: ${wallet.userId}`)
     console.log(`📝 Public Key Hex: ${wallet.pubKeyHex}`)
+    console.log(`🔍 Public Key === PubKeyHex: ${wallet.publicKey === wallet.pubKeyHex}`)
     console.log(`================================================\n`)
     
     // Save user to database
@@ -58,7 +59,7 @@ export async function POST(request: NextRequest) {
       data: {
         email: validatedData.email,
         userId: validatedData.userId,
-        pubKeyHex: wallet.publicKey,
+        pubKeyHex: wallet.pubKeyHex,  // Use the correct field
         address: wallet.address
       },
       select: {

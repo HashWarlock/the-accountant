@@ -9,6 +9,7 @@ export interface DstackWallet {
   userId: string
   address: string
   publicKey: string
+  pubKeyHex: string  // Add this for consistency with database
   signMessage: (message: string) => Promise<string>
   signTransaction: (tx: any) => Promise<string>
   keyResponse: GetKeyResponse
@@ -46,10 +47,14 @@ export async function createWallet(userId: string): Promise<DstackWallet> {
   console.log(`⏰ [Wallet] Completed at: ${new Date().toISOString()}`)
   console.log(`================================================\n`)
   
+  // Ensure both publicKey and pubKeyHex are available
+  const pubKeyHex = account.publicKey
+  
   return {
     userId,
     address: account.address,
     publicKey: account.publicKey,
+    pubKeyHex: pubKeyHex,
     keyResponse,
     
     // Sign a message using viem's account

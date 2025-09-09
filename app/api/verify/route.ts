@@ -17,16 +17,30 @@ const verifyRequestSchema = z.object({
 export async function POST(request: NextRequest) {
   const startTime = Date.now()
   
+  console.log(`\n🔍 ========== SIGNATURE VERIFICATION STARTED ==========`)
+  console.log(`⏰ Timestamp: ${new Date().toISOString()}`)
+  
   try {
     // Parse and validate request body
     const body = await request.json()
+    console.log(`📝 Request body received:`)
+    console.log(`  - Has message: ${!!body.message} (length: ${body.message?.length || 0})`)
+    console.log(`  - Has signature: ${!!body.signature} (${body.signature?.substring(0, 10)}...)`)
+    console.log(`  - Has address: ${!!body.address} (${body.address || 'none'})`)
+    console.log(`  - Has userId: ${!!body.userId} (${body.userId || 'none'})`)
+    
     const { message, signature, address, userId } = verifyRequestSchema.parse(body)
+    
+    console.log(`\n✅ Request validation passed`)
+    console.log(`📋 Message to verify: "${message.substring(0, 100)}${message.length > 100 ? '...' : ''}"`)
+    console.log(`🖊️  Signature: ${signature}`)
     
     let expectedAddress = address
     let userData = null
     
     // If userId provided, look up the address
     if (userId) {
+      console.log(`\n👤 Looking up user: ${userId}`)
       userData = await prisma.user.findUnique({
         where: { userId },
         select: { 
@@ -38,20 +52,34 @@ export async function POST(request: NextRequest) {
       })
       
       if (!userData) {
+        console.error(`❌ User not found: ${userId}`)
         return NextResponse.json(
           { error: 'User not found' },
           { status: 404 }
         )
       }
       
+      console.log(`✅ User found:`)
+      console.log(`  - Database ID: ${userData.id}`)
+      console.log(`  - User ID: ${userData.userId}`)
+      console.log(`  - Address: ${userData.address}`)
+      console.log(`  - Public Key: ${userData.pubKeyHex}`)
+      
       expectedAddress = userData.address
     }
+    
+    console.log(`\n🎯 Expected signer address: ${expectedAddress}`)
     
     // Verify the signature using viem
     let isValid = false
     let recoveredAddress: string | null = null
     
     try {
+      console.log(`\n🔐 Verifying signature with viem...`)
+      console.log(`  - Address to verify: ${expectedAddress}`)
+      console.log(`  - Message: "${message.substring(0, 50)}${message.length > 50 ? '...' : ''}"`)
+      console.log(`  - Signature length: ${signature.length} chars`)
+      
       // Verify and recover the address from signature
       isValid = await verifyMessage({
         address: expectedAddress as `0x${string}`,
@@ -59,25 +87,67 @@ export async function POST(request: NextRequest) {
         signature: signature as `0x${string}`
       })
       
+      console.log(`\n${isValid ? '✅' : '❌'} Verification result: ${isValid ? 'VALID' : 'INVALID'}`)
+      
       // For debugging, we can also recover the address
       // This helps identify who actually signed if verification fails
       if (!isValid) {
+        console.log(`\n🔎 Attempting to recover actual signer address...`)
         const { recoverAddress } = await import('viem')
         const { hashMessage } = await import('viem')
         
+        const messageHash = hashMessage(message)
+        console.log(`  - Message hash: ${messageHash}`)
+        
+        recoveredAddress = await recoverAddress({
+          hash: messageHash,
+          signature: signature as `0x${string}`
+        })
+        
+        console.log(`\n⚠️  SIGNATURE MISMATCH DETECTED!`)
+        console.log(`  - Expected address: ${expectedAddress}`)
+        console.log(`  - Recovered address: ${recoveredAddress}`)
+        console.log(`  - Match: ${expectedAddress?.toLowerCase() === recoveredAddress?.toLowerCase()}`)
+        
+        if (expectedAddress?.toLowerCase() === recoveredAddress?.toLowerCase()) {
+          console.log(`\n🤔 Addresses match but verification failed - possible signature format issue`)
+        }
+      }
+    } catch (verifyError) {
+      console.error(`\n❌ SIGNATURE VERIFICATION ERROR:`)
+      console.error(`  - Error type: ${verifyError instanceof Error ? verifyError.constructor.name : 'Unknown'}`)
+      console.error(`  - Error message: ${verifyError instanceof Error ? verifyError.message : verifyError}`)
+      console.error(`  - Full error:`, verifyError)
+      isValid = false
+      
+      // Try to recover address anyway for debugging
+      try {
+        const { recoverAddress } = await import('viem')
+        const { hashMessage } = await import('viem')
         recoveredAddress = await recoverAddress({
           hash: hashMessage(message),
           signature: signature as `0x${string}`
         })
+        console.log(`  - Recovered address despite error: ${recoveredAddress}`)
+      } catch (recoverError) {
+        console.error(`  - Could not recover address: ${recoverError}`)
       }
-    } catch (verifyError) {
-      console.error('Signature verification error:', verifyError)
-      isValid = false
     }
     
     // Log performance metrics
     const duration = Date.now() - startTime
-    console.log(`Signature verification completed in ${duration}ms`)
+    
+    console.log(`\n📊 ========== VERIFICATION SUMMARY ==========`)
+    console.log(`⏱️  Duration: ${duration}ms`)
+    console.log(`✅ Valid: ${isValid}`)
+    console.log(`📍 Expected Address: ${expectedAddress}`)
+    if (recoveredAddress) {
+      console.log(`🔍 Recovered Address: ${recoveredAddress}`)
+    }
+    if (userData) {
+      console.log(`👤 User ID: ${userData.userId}`)
+    }
+    console.log(`===========================================\n`)
     
     // Prepare response
     const response = {
