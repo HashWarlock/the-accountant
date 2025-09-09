@@ -656,11 +656,25 @@
         ],
         "priority": "medium",
         "subtasks": []
+      },
+      {
+        "id": 23,
+        "title": "Refactor attestation data to include only public key for Intel TDX 64-byte limit compliance",
+        "description": "Modify the attestation quote application data structure to only include the public key, removing other fields to comply with Intel TDX's 64-byte limit on application data.",
+        "details": "The current `getWalletKeyWithAttestation` function in `/lib/dstack.ts:208-215` includes extensive application data (userId, address, publicKey, operation, timestamp, namespace) which may exceed Intel TDX's 64-byte limit. Refactor the `applicationData` object to contain only the public key (33 bytes for compressed secp256k1), leaving room for minimal additional data if needed. This change affects: 1) Update `applicationData` structure in `getWalletKeyWithAttestation` to only include publicKey, 2) Update any dependent code that expects the full application data structure in audit logging or verification, 3) Ensure backward compatibility by updating the audit log system to still capture full context but only send minimal data to TEE, 4) Update tests and documentation to reflect the simplified attestation data structure, 5) Consider adding a separate metadata field for audit purposes that doesn't go into the TEE attestation.",
+        "testStrategy": "Test attestation quote generation with new minimal application data structure, verify quote size stays within 64-byte limit, test backward compatibility with existing audit log viewing functionality, validate that public key verification still works correctly, test integration with Intel TDX attestation service if available, ensure audit logs still capture necessary information for compliance.",
+        "status": "in-progress",
+        "dependencies": [
+          18,
+          21
+        ],
+        "priority": "medium",
+        "subtasks": []
       }
     ],
     "metadata": {
       "created": "2025-09-09T04:45:44.364Z",
-      "updated": "2025-09-09T20:06:45.726Z",
+      "updated": "2025-09-09T22:23:16.610Z",
       "description": "Tasks for master context"
     }
   }

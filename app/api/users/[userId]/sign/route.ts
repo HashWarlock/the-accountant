@@ -114,7 +114,7 @@ export async function POST(
       console.warn(`⚠️  Signing took ${duration}ms, exceeding 50ms target`)
     }
     
-    // Create audit log entry for signing operation
+    // Create audit log entry for signing operation with full context
     await createAuditLog({
       userId: user.userId,
       operation: 'sign',
@@ -123,7 +123,8 @@ export async function POST(
       applicationData: {
         namespace: process.env.APP_NAMESPACE || 'the-accountant-v1',
         timestamp: new Date().toISOString(),
-        messageLength: message.length
+        messageLength: message.length,
+        note: 'Attestation quote contains only public key (Intel TDX 64-byte limit)'
       },
       address: user.address,
       publicKey: user.pubKeyHex,

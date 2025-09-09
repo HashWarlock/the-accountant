@@ -109,7 +109,7 @@ export async function POST(request: NextRequest) {
       console.log(`📜 Attestation quote included in response`)
     }
     
-    // Create audit log entry
+    // Create audit log entry with full context (even though attestation only contains public key)
     await createAuditLog({
       userId: user.userId,
       operation: 'signup',
@@ -118,7 +118,8 @@ export async function POST(request: NextRequest) {
       applicationData: {
         email: user.email,
         namespace: process.env.APP_NAMESPACE || 'the-accountant-v1',
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
+        note: 'Attestation quote contains only public key (Intel TDX 64-byte limit)'
       },
       address: user.address,
       publicKey: user.pubKeyHex

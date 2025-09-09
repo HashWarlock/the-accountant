@@ -1,5 +1,6 @@
 version: '3.8'
 
+# The Accountant v1.2.0 - TEE-backed key management with attestation & audit logging
 services:
   web:
     image: hashwarlock/the-accountant:v1.2.0
@@ -12,9 +13,9 @@ services:
       - EXPOSE_INFO=true
       - APP_NAMESPACE=the-accountant-v1  # Ensures unique key derivation namespace
     volumes:
-      # Mount dstack socket for TEE access
+      # Mount dstack socket for TEE access (required for dstack key generation & attestation)
       - /var/run/dstack.sock:/var/run/dstack.sock
-      # Persist SQLite database - use a directory mount instead of file
+      # Persist SQLite database including audit logs - use a directory mount instead of file
       - prisma:/app/prisma
     networks:
       - dstack-network

@@ -89,10 +89,13 @@ export async function getUserWalletKey(userId: string): Promise<GetKeyResponse> 
  * @param data - Application data to include in quote
  * @returns GetQuoteResponse with quote and event log
  */
-export async function generateAttestationQuote(data: any): Promise<GetQuoteResponse> {
+export async function generateAttestationQuote(publicKey: string): Promise<GetQuoteResponse> {
   try {
     const client = getDstackClient()
-    const applicationData = JSON.stringify(data)
+    // Pass the public key directly as a string (it's already hex encoded)
+    // Remove 0x prefix if present to minimize size
+    const applicationData = publicKey.startsWith('0x') ? publicKey.slice(2) : publicKey
+    console.log(`📏 [dstack] Application data size: ${applicationData.length} chars (${applicationData.length / 2} bytes)`)
     return await client.getQuote(applicationData)
   } catch (error) {
     throw new Error(`Failed to generate attestation quote: ${error instanceof Error ? error.message : 'Unknown error'}`)
@@ -202,17 +205,13 @@ export async function getWalletKeyWithAttestation(
     const { privateKeyToAccount } = await import('viem/accounts')
     const account = privateKeyToAccount(privateKeyHex as `0x${string}`)
     
-    // Generate attestation quote with application data
+    // Generate attestation quote with ONLY the public key (64-byte limit for Intel TDX)
     console.log(`\n🔏 [dstack] Generating attestation quote for operation: ${operation}`)
     
-    const applicationData = {
-      userId,
-      address: account.address,
-      publicKey: account.publicKey,
-      operation,
-      timestamp: new Date().toISOString(),
-      namespace: process.env.APP_NAMESPACE || 'the-accountant-v1'
-    }
+    // Intel TDX has a 64-byte limit for application data
+    // Public key is 66 characters (33 bytes) when compressed: 0x04... (uncompressed is 130 chars)
+    // We'll use just the public key to fit within the limit
+    const applicationData = account.publicKey // This is the hex string of the public key
     
     try {
       const quoteResponse = await generateAttestationQuote(applicationData)
