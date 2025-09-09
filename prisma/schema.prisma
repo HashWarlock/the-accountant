@@ -11,14 +11,38 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  userId    String   @unique
-  pubKeyHex String   // Uncompressed public key (0x04... or compressed 0x02/0x03...)
-  address   String   // Ethereum-style address (keccak of pubkey)
-  createdAt DateTime @default(now())
+  id        String      @id @default(cuid())
+  email     String      @unique
+  userId    String      @unique
+  pubKeyHex String      // Uncompressed public key (0x04... or compressed 0x02/0x03...)
+  address   String      // Ethereum-style address (keccak of pubkey)
+  createdAt DateTime    @default(now())
+  auditLogs AuditLog[]  // One-to-many relationship with audit logs
   
   @@index([email])
   @@index([userId])
   @@index([address])
+}
+
+model AuditLog {
+  id               String   @id @default(cuid())
+  userId           String   // User ID for the operation
+  operation        String   // Operation type: signup, sign, verify
+  attestationQuote String?  // Hex-encoded attestation quote (SQLite TEXT can handle large strings)
+  eventLog         String?  // Hex-encoded event log
+  applicationData  String?  // JSON stringified application data
+  address          String?  // Ethereum address at time of operation
+  publicKey        String?  // Public key at time of operation
+  message          String?  // Message that was signed (for sign operations)
+  signature        String?  // Signature generated (for sign operations)
+  createdAt        DateTime @default(now())
+  
+  // Relations
+  user             User     @relation(fields: [userId], references: [userId], onDelete: Cascade)
+  
+  // Indexes for performance
+  @@index([userId])
+  @@index([operation])
+  @@index([createdAt])
+  @@index([userId, createdAt])
 }

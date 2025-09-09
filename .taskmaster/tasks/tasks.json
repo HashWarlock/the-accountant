@@ -610,7 +610,7 @@
         "description": "Design and implement database schema and API for storing attestation quotes as audit logs",
         "details": "Create a comprehensive audit logging system that stores remote attestation quotes for each key access event. This includes: database schema for audit logs (timestamp, userId, operation type, quote hex, attestation data), API endpoints to retrieve audit history, and integration with existing user operations.",
         "testStrategy": "Test database migrations, verify audit log creation on key operations, test query performance with large datasets, validate audit trail completeness",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
           18
         ],
@@ -623,7 +623,7 @@
         "description": "Create API endpoint and UI components to verify attestation quotes",
         "details": "Implement a verification system that allows users to validate attestation quotes. This includes: API endpoint to verify quote signatures and integrity, UI component to display quote details and verification status, integration with Intel/AMD attestation services for quote validation, and display of attestation report details.",
         "testStrategy": "Test quote verification with valid and invalid quotes, test UI display of attestation details, verify integration with attestation services, test error handling for malformed quotes",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
           18,
           19
@@ -637,7 +637,7 @@
         "description": "Include attestation quotes in signup, signing, and key retrieval API responses",
         "details": "Modify existing API endpoints to return attestation quotes alongside normal responses. This includes: Adding quote field to signup response with hex-encoded attestation, Including quote in signing operations response, Returning quote data in key retrieval endpoints, Ensuring backward compatibility with existing clients.",
         "testStrategy": "Test API response structure includes quote fields, verify quote format and encoding, test backward compatibility, validate quote data corresponds to the operation performed",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
           18
         ],
@@ -650,7 +650,7 @@
         "description": "Build UI component to display user's key access audit trail with attestation quotes",
         "details": "Develop a comprehensive audit log viewer that shows all key access events for a user. Features include: Chronological display of key access events with timestamps, Display of operation types (signup, sign, verify), Hex display of attestation quotes with copy functionality, Expandable details for each audit entry, Filtering and search capabilities, Export audit trail as JSON/CSV.",
         "testStrategy": "Test UI rendering with various audit log sizes, verify quote display and copy functionality, test filtering and search features, validate export formats",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
           19
         ],
@@ -660,7 +660,7 @@
     ],
     "metadata": {
       "created": "2025-09-09T04:45:44.364Z",
-      "updated": "2025-09-09T19:51:27.022Z",
+      "updated": "2025-09-09T20:06:45.726Z",
       "description": "Tasks for master context"
     }
   }

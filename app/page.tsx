@@ -4,6 +4,8 @@ import { SignupForm } from '@/components/signup-form'
 import { SignMessage } from '@/components/sign-message'
 import { VerifySignature } from '@/components/verify-signature'
 import { UserList } from '@/components/user-list'
+import { AuditLogViewer } from '@/components/audit-log-viewer'
+import { AttestationVerifier } from '@/components/attestation-verifier'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Shield, Key, Server } from 'lucide-react'
@@ -46,11 +48,13 @@ export default function Home() {
           </Card>
 
           <Tabs defaultValue="signup" className="w-full">
-            <TabsList className="grid w-full grid-cols-4">
+            <TabsList className="grid w-full grid-cols-6">
               <TabsTrigger value="signup">Create Wallet</TabsTrigger>
               <TabsTrigger value="sign">Sign Message</TabsTrigger>
               <TabsTrigger value="verify">Verify</TabsTrigger>
               <TabsTrigger value="users">Users</TabsTrigger>
+              <TabsTrigger value="audit">Audit Logs</TabsTrigger>
+              <TabsTrigger value="attestation">Attestation</TabsTrigger>
             </TabsList>
 
             <TabsContent value="signup" className="flex justify-center mt-8">
@@ -67,6 +71,41 @@ export default function Home() {
 
             <TabsContent value="users" className="mt-8">
               <UserList />
+            </TabsContent>
+
+            <TabsContent value="audit" className="mt-8">
+              {currentUserId ? (
+                <AuditLogViewer userId={currentUserId} />
+              ) : (
+                <div className="text-center py-8">
+                  <p className="text-gray-600 mb-4">Please create an account or enter a User ID to view audit logs</p>
+                  <input
+                    type="text"
+                    placeholder="Enter User ID"
+                    className="px-3 py-2 border rounded mr-2"
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' && e.currentTarget.value) {
+                        setCurrentUserId(e.currentTarget.value)
+                      }
+                    }}
+                  />
+                  <button
+                    onClick={(e) => {
+                      const input = e.currentTarget.previousElementSibling as HTMLInputElement
+                      if (input?.value) {
+                        setCurrentUserId(input.value)
+                      }
+                    }}
+                    className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700"
+                  >
+                    View Logs
+                  </button>
+                </div>
+              )}
+            </TabsContent>
+
+            <TabsContent value="attestation" className="flex justify-center mt-8">
+              <AttestationVerifier />
             </TabsContent>
           </Tabs>
 

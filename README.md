@@ -2,12 +2,23 @@
 
 A secure TEE-backed key management system demonstrating the dstack SDK for deterministic wallet generation and cryptographic operations in a Confidential VM environment.
 
+## 🚀 Version 1.2.0 - Remote Attestation & Audit Logging
+
+### New Features in v1.2.0
+- **Remote Attestation**: Intel TDX attestation quote generation for all key operations
+- **Audit Logging System**: Comprehensive audit trail with attestation tracking
+- **Attestation Verifier**: UI and API for verifying attestation quotes
+- **Audit Log Viewer**: Interactive UI with filtering, search, and export (JSON/CSV)
+- **Enhanced Security**: Fixed critical key derivation issue ensuring unique keys per user
+
 ## Features
 
 - **TEE-Backed Security**: Leverages Trusted Execution Environment for secure key generation
 - **Deterministic Wallets**: Same user ID always generates the same wallet address
 - **Message Signing**: Sign messages with TEE-protected private keys
 - **Signature Verification**: Verify signatures against addresses or user IDs
+- **Remote Attestation**: Generate and verify Intel TDX attestation quotes
+- **Audit Trail**: Complete audit logging of all key operations with attestation
 - **User Management**: Browse and search registered users with pagination
 - **Modern UI**: Built with Next.js 15 and shadcn/ui components
 
@@ -109,10 +120,17 @@ Visit http://localhost:3000
 
 - `POST /api/signup` - Create new user wallet
 - `POST /api/users/{userId}/sign` - Sign message
+- `POST /api/users/{userId}/verify` - Verify signature for specific user
 - `POST /api/verify` - Verify signature
 - `GET /api/users/me/keys` - Get user's public key
 - `GET /api/health` - Health check
 - `GET /api/admin/users` - List all users (admin)
+
+### Attestation & Audit APIs (v1.2.0)
+
+- `GET /api/audit/{userId}` - Get audit logs for specific user
+- `GET /api/audit` - Get all audit logs (admin)
+- `POST /api/attestation/verify` - Verify attestation quote
 
 ### Request Examples
 
@@ -145,14 +163,27 @@ curl -X POST http://localhost:3000/api/verify \
 
 ### Using Pre-built Image from DockerHub
 
-Pull and run the latest image:
+Pull and run the latest image (v1.2.0):
 ```bash
-docker pull hashwarlock/the-accountant:latest
+docker pull hashwarlock/the-accountant:v1.2.0
 docker run -d \
   --name the-accountant \
   -p 3000:3000 \
   -e DATABASE_URL=file:./dev.db \
-  hashwarlock/the-accountant:latest
+  -e APP_NAMESPACE=the-accountant-v1 \
+  hashwarlock/the-accountant:v1.2.0
+```
+
+For TEE-enabled environments:
+```bash
+docker pull hashwarlock/the-accountant:tee-amd64-latest
+docker run -d \
+  --name the-accountant-tee \
+  -p 3000:3000 \
+  -v /var/run/dstack.sock:/var/run/dstack.sock:ro \
+  -e DATABASE_URL=file:./dev.db \
+  -e APP_NAMESPACE=the-accountant-prod \
+  hashwarlock/the-accountant:tee-amd64-latest
 ```
 
 ### Local Docker Build
@@ -213,6 +244,8 @@ The app will be available at: https://dstack-demo.phala.network
 | Variable | Description | Default |
 |----------|-------------|---------|
 | `DATABASE_URL` | Prisma database connection | `file:./dev.db` |
+| `APP_NAMESPACE` | Namespace for key derivation (CRITICAL) | `the-accountant-v1` |
+| `DSTACK_SOCKET_PATH` | Path to dstack TEE socket | `/var/run/dstack.sock` |
 | `EXPOSE_INFO` | Show detailed info in health endpoint | `false` |
 | `NODE_ENV` | Environment mode | `development` |
 | `PORT` | Server port | `3000` |

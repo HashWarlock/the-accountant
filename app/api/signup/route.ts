@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { prisma } from '@/lib/db'
 import { createWallet, createWalletWithAttestation } from '@/lib/wallet'
+import { createAuditLog } from '@/lib/audit'
 
 // Validation schema for signup request
 const signupSchema = z.object({
@@ -107,6 +108,21 @@ export async function POST(request: NextRequest) {
       }
       console.log(`📜 Attestation quote included in response`)
     }
+    
+    // Create audit log entry
+    await createAuditLog({
+      userId: user.userId,
+      operation: 'signup',
+      attestationQuote: wallet.attestationQuote,
+      eventLog: wallet.eventLog,
+      applicationData: {
+        email: user.email,
+        namespace: process.env.APP_NAMESPACE || 'the-accountant-v1',
+        timestamp: new Date().toISOString()
+      },
+      address: user.address,
+      publicKey: user.pubKeyHex
+    })
     
     return NextResponse.json(response, { status: 201 })
     

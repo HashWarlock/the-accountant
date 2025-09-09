@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { prisma } from '@/lib/db'
 import { createWallet, createWalletWithAttestation } from '@/lib/wallet'
+import { createAuditLog } from '@/lib/audit'
 
 // Validation schemas
 const paramsSchema = z.object({
@@ -112,6 +113,23 @@ export async function POST(
     if (duration > 50) {
       console.warn(`⚠️  Signing took ${duration}ms, exceeding 50ms target`)
     }
+    
+    // Create audit log entry for signing operation
+    await createAuditLog({
+      userId: user.userId,
+      operation: 'sign',
+      attestationQuote: wallet.attestationQuote,
+      eventLog: wallet.eventLog,
+      applicationData: {
+        namespace: process.env.APP_NAMESPACE || 'the-accountant-v1',
+        timestamp: new Date().toISOString(),
+        messageLength: message.length
+      },
+      address: user.address,
+      publicKey: user.pubKeyHex,
+      message: message,
+      signature: signature
+    })
     
     return NextResponse.json(responseData, { status: 200 })
     
