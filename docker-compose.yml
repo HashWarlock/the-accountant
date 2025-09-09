@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   web:
-    image: hashwarlock/the-accountant:latest
+    image: hashwarlock/the-accountant:v1.0.1
     container_name: dstack-js-sdk-demo
     ports:
       - "3000:3000"
@@ -12,9 +12,9 @@ services:
       - EXPOSE_INFO=true
     volumes:
       # Mount dstack socket for TEE access
-      - /var/run/dstack.sock:/var/run/dstack.sock:ro
-      # Persist SQLite database
-      - ./prisma/dev.db:/app/prisma/dev.db
+      - /var/run/dstack.sock:/var/run/dstack.sock
+      # Persist SQLite database - use a directory mount instead of file
+      - prisma:/app/prisma
     networks:
       - dstack-network
     restart: unless-stopped
@@ -62,9 +62,6 @@ services:
 networks:
   dstack-network:
     driver: bridge
-    ipam:
-      config:
-        - subnet: 172.20.0.0/16
 
 volumes:
-  db-data:
+  prisma:

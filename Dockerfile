@@ -1,7 +1,10 @@
 # Multi-stage Dockerfile for dstack JS SDK Demo
 # Stage 1: Dependencies
-FROM node:20-alpine AS deps
-RUN apk add --no-cache libc6-compat
+FROM node:20-slim AS deps
+# Install xz-utils and other necessary packages using apt
+RUN apt-get update && apt-get install -y \
+    xz-utils \
+    && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
 
 # Copy package files
@@ -13,7 +16,11 @@ RUN npm ci --only=production && \
     npm install prisma @prisma/client
 
 # Stage 2: Builder
-FROM node:20-alpine AS builder
+FROM node:20-slim AS builder
+# Install xz-utils and other build dependencies using apt
+RUN apt-get update && apt-get install -y \
+    xz-utils \
+    && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
 
 # Copy dependencies from deps stage
@@ -28,20 +35,25 @@ ENV NEXT_TELEMETRY_DISABLED 1
 RUN npm run build
 
 # Stage 3: Runner
-FROM node:20-alpine AS runner
+FROM node:20-slim AS runner
 WORKDIR /app
 
 # Create non-root user
-RUN addgroup -g 1001 -S nodejs && \
-    adduser -S nextjs -u 1001
+RUN groupadd -g 1001 nodejs && \
+    useradd -r -u 1001 -g nodejs nextjs
 
-# Install dumb-init for proper signal handling
-RUN apk add --no-cache dumb-init
+# Install dumb-init and xz-utils for runtime using apt
+RUN apt-get update && apt-get install -y \
+    dumb-init \
+    xz-utils \
+    && rm -rf /var/lib/apt/lists/*
 
 # Copy necessary files from builder
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/.next/standalone ./
 COPY --from=builder /app/.next/static ./.next/static
+# Copy server files including manifests
+COPY --from=builder /app/.next/server ./.next/server
 COPY --from=builder /app/prisma ./prisma
 COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
 COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
