@@ -85,18 +85,41 @@ export function SignupForm({ onSuccess }: SignupFormProps) {
           </Button>
         </form>
 
-        {userData && (
-          <div className="mt-6 p-4 bg-muted rounded-lg space-y-2">
+        {userData && userData.user && (
+          <div className="mt-6 p-4 bg-muted rounded-lg space-y-3">
             <div className="flex items-center gap-2 text-green-600">
               <CheckCircle className="h-4 w-4" />
-              <span className="font-medium">Wallet Created!</span>
+              <span className="font-medium">Wallet Created Successfully!</span>
             </div>
-            <div className="space-y-1 text-sm">
-              <p className="font-mono break-all">
-                <span className="text-muted-foreground">Address:</span> {userData.address}
-              </p>
-              <p>
-                <span className="text-muted-foreground">User ID:</span> {userData.userId}
+            <div className="space-y-2 text-sm">
+              <div>
+                <span className="text-muted-foreground block mb-1">User ID:</span>
+                <p className="font-mono bg-background p-2 rounded border">
+                  {userData.user.userId}
+                </p>
+              </div>
+              <div>
+                <span className="text-muted-foreground block mb-1">Email:</span>
+                <p className="font-mono bg-background p-2 rounded border">
+                  {userData.user.email}
+                </p>
+              </div>
+              <div>
+                <span className="text-muted-foreground block mb-1">ETH Address:</span>
+                <p className="font-mono break-all bg-background p-2 rounded border text-xs">
+                  {userData.user.address}
+                </p>
+              </div>
+              <div>
+                <span className="text-muted-foreground block mb-1">Public Key:</span>
+                <p className="font-mono break-all bg-background p-2 rounded border text-xs">
+                  {userData.user.publicKey}
+                </p>
+              </div>
+            </div>
+            <div className="mt-3 p-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded">
+              <p className="text-xs text-yellow-800 dark:text-yellow-200">
+                <strong>⚠️ Important:</strong> Save your credentials! Your private key is derived deterministically from your User ID in the TEE.
               </p>
             </div>
           </div>

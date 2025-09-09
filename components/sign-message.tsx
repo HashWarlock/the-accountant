@@ -16,7 +16,7 @@ export function SignMessage({ userId: defaultUserId }: SignMessageProps) {
   const [loading, setLoading] = useState(false)
   const [userId, setUserId] = useState(defaultUserId || '')
   const [message, setMessage] = useState('')
-  const [signature, setSignature] = useState('')
+  const [signatureData, setSignatureData] = useState<any>(null)
 
   const handleSign = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -35,8 +35,8 @@ export function SignMessage({ userId: defaultUserId }: SignMessageProps) {
         throw new Error(data.error || 'Signing failed')
       }
 
-      setSignature(data.signature)
-      toast.success('Message signed successfully!')
+      setSignatureData(data)
+      toast.success('✅ Message signed successfully!')
     } catch (error: any) {
       toast.error(error.message)
     } finally {
@@ -82,13 +82,54 @@ export function SignMessage({ userId: defaultUserId }: SignMessageProps) {
           </Button>
         </form>
 
-        {signature && (
-          <div className="mt-6 p-4 bg-muted rounded-lg space-y-2">
-            <div className="flex items-center gap-2 text-blue-600">
-              <PenTool className="h-4 w-4" />
-              <span className="font-medium">Signature Generated</span>
+        {signatureData && (
+          <div className="mt-6 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg space-y-3">
+            <div className="flex items-center gap-2 text-blue-600 dark:text-blue-400">
+              <PenTool className="h-5 w-5" />
+              <span className="font-bold">✅ Message Signed Successfully</span>
             </div>
-            <p className="font-mono text-xs break-all">{signature}</p>
+            
+            <div className="space-y-2 text-sm">
+              <div>
+                <span className="text-muted-foreground">Message:</span>
+                <p className="font-mono bg-background/50 p-2 rounded mt-1">
+                  "{signatureData.message}"
+                </p>
+              </div>
+              
+              <div>
+                <span className="text-muted-foreground">Signature:</span>
+                <p className="font-mono text-xs bg-background/50 p-2 rounded mt-1 break-all">
+                  {signatureData.signature}
+                </p>
+              </div>
+              
+              <div>
+                <span className="text-muted-foreground">Signer Address:</span>
+                <p className="font-mono text-xs bg-background/50 p-2 rounded mt-1 break-all">
+                  {signatureData.address}
+                </p>
+              </div>
+              
+              {signatureData.publicKey && (
+                <div>
+                  <span className="text-muted-foreground">Public Key:</span>
+                  <p className="font-mono text-xs bg-background/50 p-2 rounded mt-1 break-all">
+                    {signatureData.publicKey}
+                  </p>
+                </div>
+              )}
+              
+              <div className="text-xs text-muted-foreground pt-2">
+                Signed at: {new Date(signatureData.timestamp).toLocaleString()}
+              </div>
+            </div>
+            
+            <div className="mt-3 p-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded">
+              <p className="text-xs text-yellow-800 dark:text-yellow-200">
+                <strong>💡 Tip:</strong> Copy the signature and use it in the Verify tab to test verification!
+              </p>
+            </div>
           </div>
         )}
       </CardContent>
