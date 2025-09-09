@@ -581,11 +581,22 @@
         ],
         "priority": "high",
         "subtasks": []
+      },
+      {
+        "id": 17,
+        "title": "Fix critical key derivation security issue",
+        "description": "TEE key derivation was using the same path for all users, causing identical keys",
+        "details": "The getKey function was using 'wallet/ethereum' as the path for all users, with userId as the second parameter. According to dstack SDK docs, only the first parameter (path) affects key derivation. Fixed by incorporating userId into the path: 'wallet/ethereum/{userId}'",
+        "testStrategy": "",
+        "status": "done",
+        "dependencies": [],
+        "priority": "high",
+        "subtasks": []
       }
     ],
     "metadata": {
       "created": "2025-09-09T04:45:44.364Z",
-      "updated": "2025-09-09T08:34:29.559Z",
+      "updated": "2025-09-09T08:56:42.948Z",
       "description": "Tasks for master context"
     }
   }

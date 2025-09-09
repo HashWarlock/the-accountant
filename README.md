@@ -24,6 +24,24 @@ This project uses security-hardened dependencies to avoid known vulnerabilities:
 
 All dependencies are pinned to exact versions for reproducible builds.
 
+### Key Derivation Security
+
+**CRITICAL**: This application ensures unique key derivation for each user through:
+
+1. **Application Namespace**: Uses `APP_NAMESPACE` environment variable (default: `the-accountant-v1`) to prevent cross-application key collisions
+2. **User ID Hashing**: SHA256 hashes the userId to create a consistent, unique identifier
+3. **Hierarchical Path Structure**: `wallet/{namespace}/eth/{userIdHash}` ensures globally unique paths
+
+This prevents the critical security issue where multiple users could receive the same private key. The derivation path is:
+```
+wallet/the-accountant-v1/eth/{sha256(userId)}
+```
+
+To customize the namespace for your deployment:
+```bash
+export APP_NAMESPACE="my-app-v1"
+```
+
 ## Tech Stack
 
 - **Framework**: Next.js 15.5.2 (App Router)

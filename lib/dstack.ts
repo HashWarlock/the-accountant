@@ -43,8 +43,30 @@ export async function getUserWalletKey(userId: string): Promise<GetKeyResponse> 
     // The SDK returns GetKeyResponse with:
     // - key: Uint8Array (32 bytes for secp256k1 private key)
     // - signature_chain: Uint8Array[] (attestation signatures)
-    console.log(`📡 [dstack] Calling TEE getKey('wallet/ethereum', '${userId}')...`)
-    const keyResponse = await client.getKey('wallet/ethereum', userId)
+    // CRITICAL: The 'path' parameter (first param) determines the derived key
+    // We MUST ensure absolute uniqueness to prevent key collisions
+    
+    // Create a truly unique path using:
+    // 1. Application namespace to prevent cross-app collisions
+    // 2. SHA256 hash of userId to handle any special characters and ensure consistent length
+    // 3. Include part of the original userId for debugging visibility
+    const crypto = await import('crypto')
+    const userIdHash = crypto.createHash('sha256').update(userId).digest('hex')
+    
+    // Use app-specific namespace + hash to guarantee uniqueness
+    // Even if two apps have same userId, the hash will be unique to this app's context
+    const appNamespace = process.env.APP_NAMESPACE || 'the-accountant-v1'
+    const uniquePath = `wallet/${appNamespace}/eth/${userIdHash}`
+    
+    const subject = userId // Keep original userId in subject for certificate/logging
+    
+    console.log(`📡 [dstack] Calling TEE getKey with unique path...`)
+    console.log(`🔑 [dstack] User ID: ${userId}`)
+    console.log(`#️⃣ [dstack] User ID Hash: ${userIdHash.substring(0, 16)}...`)
+    console.log(`🔐 [dstack] Unique Path: ${uniquePath}`)
+    console.log(`📛 [dstack] App Namespace: ${appNamespace}`)
+    
+    const keyResponse = await client.getKey(uniquePath, subject)
     
     console.log(`✅ [dstack] Key received from TEE`)
     console.log(`📏 [dstack] Key size: ${keyResponse.key.length} bytes`)

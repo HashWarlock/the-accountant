@@ -10,6 +10,7 @@ services:
       - NODE_ENV=production
       - DATABASE_URL=file:./dev.db
       - EXPOSE_INFO=true
+      - APP_NAMESPACE=the-accountant-v1  # Ensures unique key derivation namespace
     volumes:
       # Mount dstack socket for TEE access
       - /var/run/dstack.sock:/var/run/dstack.sock
