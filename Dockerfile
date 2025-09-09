@@ -4,6 +4,7 @@ FROM node:20-slim AS deps
 # Install xz-utils and other necessary packages using apt
 RUN apt-get update && apt-get install -y \
     xz-utils \
+    openssl \
     && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
 
@@ -20,6 +21,7 @@ FROM node:20-slim AS builder
 # Install xz-utils and other build dependencies using apt
 RUN apt-get update && apt-get install -y \
     xz-utils \
+    openssl \
     && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
 
@@ -46,21 +48,23 @@ RUN groupadd -g 1001 nodejs && \
 RUN apt-get update && apt-get install -y \
     dumb-init \
     xz-utils \
+    openssl \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy necessary files from builder
-COPY --from=builder /app/public ./public
-COPY --from=builder /app/.next/standalone ./
-COPY --from=builder /app/.next/static ./.next/static
-# Copy server files including manifests
-COPY --from=builder /app/.next/server ./.next/server
-COPY --from=builder /app/prisma ./prisma
-COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
-COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
+# Copy necessary files from builder - order matters!
+# First copy the standalone output which includes the server files
+COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
+# Then copy static files which are not included in standalone
+COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+# Copy public assets
+COPY --from=builder --chown=nextjs:nodejs /app/public ./public
+# Copy Prisma files with correct ownership
+COPY --from=builder --chown=nextjs:nodejs /app/prisma ./prisma
+COPY --from=builder --chown=nextjs:nodejs /app/node_modules/.prisma ./node_modules/.prisma
+COPY --from=builder --chown=nextjs:nodejs /app/node_modules/@prisma ./node_modules/@prisma
 
-# Create SQLite database directory with proper permissions
-RUN mkdir -p /app/prisma && \
-    chown -R nextjs:nodejs /app/prisma
+# Ensure proper permissions for runtime directories
+RUN chown -R nextjs:nodejs /app
 
 # Set environment variables
 ENV NODE_ENV production
