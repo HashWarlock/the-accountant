@@ -1,0 +1,49 @@
+# Task ID: 7
+# Title: Implement Message Signing API
+# Status: pending
+# Dependencies: 4, 5
+# Priority: high
+# Description: Create POST /api/users/[userId]/sign endpoint for message signing
+# Details:
+Create app/api/users/[userId]/sign/route.ts implementing POST handler. Validate userId parameter and message body with Zod. Re-derive private key via dstack for the userId, sign the message using crypto utilities. Return signature hex and optional signature_chain from dstack response. Implement proper error handling for missing users, signing failures, and dstack connectivity issues. Add structured logging and performance monitoring for 50ms p95 target. Ensure private key is immediately cleared from memory after use.
+
+# Test Strategy:
+Integration tests for successful signing, performance benchmarks, user validation, memory safety verification, and error handling for various failure scenarios
+
+# Subtasks:
+## 1. Create API Route Structure [pending]
+### Dependencies: None
+### Description: Set up the basic Next.js API route file and POST handler structure
+### Details:
+Create app/api/users/[userId]/sign/route.ts with proper Next.js API route structure. Implement basic POST handler function with NextRequest/NextResponse types. Set up proper HTTP method handling and basic response structure.
+
+## 2. Implement Input Validation [pending]
+### Dependencies: 7.1
+### Description: Add Zod schema validation for userId parameter and message body
+### Details:
+Create Zod schemas for validating userId parameter from URL and message body from request. Implement comprehensive input validation with proper error messages. Ensure userId format validation and message content validation.
+
+## 3. Integrate dstack Key Retrieval [pending]
+### Dependencies: 7.2
+### Description: Implement private key re-derivation using dstack for the specified userId
+### Details:
+Integrate with dstack service to re-derive private key for the given userId. Handle dstack connectivity and implement proper error handling for missing users or dstack failures. Ensure secure key retrieval process.
+
+## 4. Implement Message Signing [pending]
+### Dependencies: 7.3
+### Description: Add crypto utilities integration for message signing with private key
+### Details:
+Use crypto utilities to sign the validated message with the retrieved private key. Generate signature hex and handle optional signature_chain from dstack response. Implement proper signing flow and error handling for signing failures.
+
+## 5. Ensure Memory Safety [pending]
+### Dependencies: 7.4
+### Description: Implement secure private key handling and immediate memory cleanup
+### Details:
+Ensure private keys are immediately cleared from memory after use. Implement secure memory handling practices, zero out sensitive data, and prevent key persistence in memory or logs. Add security measures for key lifecycle management.
+
+## 6. Add Performance Monitoring [pending]
+### Dependencies: 7.5
+### Description: Implement structured logging and performance optimization for 50ms p95 target
+### Details:
+Add comprehensive structured logging for all operations. Implement performance monitoring to meet 50ms p95 target. Add timing metrics, error tracking, and performance optimization. Include proper error handling and logging for all failure scenarios.
+

@@ -1,0 +1,566 @@
+{
+  "master": {
+    "tasks": [
+      {
+        "id": 1,
+        "title": "Initialize Next.js Project with Dependencies",
+        "description": "Set up Next.js 15+ project with App Router and install required dependencies with security patches",
+        "status": "done",
+        "dependencies": [
+          "13"
+        ],
+        "priority": "high",
+        "details": "Initialize Next.js 15.2.3+ project using create-next-app with App Router to avoid CVE-2025-29927 vulnerability. Install dependencies with pinned secure versions: @phala/dstack-sdk, prisma@6.11.1+, @prisma/client, @noble/curves@3.0.0, js-sha3@0.9.3 (instead of sha3), viem@2.0+, zod for validation, and dev dependencies including TypeScript, ESLint. Pin exact versions in package.json to ensure security compliance. Configure package.json scripts for build, dev, start, and database operations. Set up proper TypeScript configuration and Next.js configuration file (next.config.mjs) with proper security headers. CRITICAL: Use Next.js 15.2.3+ or 14.2.25+ minimum to avoid security vulnerability.",
+        "testStrategy": "Verify project initializes correctly with secure Next.js version, all dependencies install without conflicts and security warnings, TypeScript compilation works, development server starts successfully, and security audit passes",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Initialize Next.js project with secure version",
+            "description": "Create Next.js project using version 15.2.3+ to avoid CVE-2025-29927",
+            "status": "done",
+            "dependencies": [],
+            "details": "Run create-next-app with Next.js 15.2.3+ (or 14.2.25+ minimum) to avoid CVE-2025-29927 vulnerability. Use App Router, TypeScript, and Tailwind CSS. Verify the installed Next.js version meets security requirements before proceeding.",
+            "testStrategy": "Verify Next.js version is 15.2.3+ or 14.2.25+ and project structure is correct"
+          },
+          {
+            "id": 2,
+            "title": "Install and pin secure dependency versions",
+            "description": "Install all required dependencies with exact secure versions pinned in package.json",
+            "status": "done",
+            "dependencies": [
+              1
+            ],
+            "details": "Install dependencies with exact pinned versions: @noble/curves@3.0.0, js-sha3@0.9.3, viem@^2.0.0, prisma@^6.11.1, @prisma/client@^6.11.1, @phala/dstack-sdk@latest, zod@latest. Use exact versions where specified for security. Verify no security vulnerabilities in dependency tree.",
+            "testStrategy": "Run npm audit and verify all dependencies install without security warnings"
+          },
+          {
+            "id": 3,
+            "title": "Configure package.json scripts and project settings",
+            "description": "Set up development, build, and database scripts with proper configuration",
+            "status": "done",
+            "dependencies": [
+              2
+            ],
+            "details": "Configure package.json scripts for build, dev, start, and database operations (db:generate, db:migrate, db:studio). Set up proper TypeScript configuration with strict mode. Configure Next.js configuration file (next.config.mjs) with security headers including Content Security Policy, X-Frame-Options, and other security headers.",
+            "testStrategy": "Verify all scripts run without errors and security headers are properly configured"
+          },
+          {
+            "id": 4,
+            "title": "Verify security compliance and dependency audit",
+            "description": "Run security audits and verify all dependencies meet security requirements",
+            "status": "done",
+            "dependencies": [],
+            "details": "Run npm audit to ensure no security vulnerabilities. Verify Next.js version is 15.2.3+ or 14.2.25+. Check that @noble/curves is 3.0.0, js-sha3 is 0.9.3, viem is 2.0+, and Prisma is 6.11.1+. Document security compliance in project README.",
+            "testStrategy": "Security audit passes with no vulnerabilities and all version requirements are met"
+          }
+        ]
+      },
+      {
+        "id": 2,
+        "title": "Configure Prisma Database Schema and Setup",
+        "description": "Set up SQLite database with Prisma schema for user data storage",
+        "details": "Create Prisma schema file defining User model with fields: id (String, cuid), email (String, unique), userId (String, unique), pubKeyHex (String), address (String), createdAt (DateTime). Configure SQLite as database provider in schema.prisma. Set up Prisma client generation and database migration scripts. Create initial migration for user table. Ensure database file is in .gitignore and set up proper database URL in environment variables.",
+        "testStrategy": "Verify schema generates without errors, migrations run successfully, Prisma client can connect to database, and user model operations work correctly",
+        "priority": "high",
+        "dependencies": [
+          1
+        ],
+        "status": "done",
+        "subtasks": []
+      },
+      {
+        "id": 5,
+        "title": "Implement User Signup API",
+        "description": "Create POST /api/signup endpoint for user registration and wallet generation",
+        "details": "Create app/api/signup/route.ts implementing POST handler. Validate request body with Zod schema for email and userId. Call dstack to get deterministic private key, derive public key and Ethereum address using crypto utilities. Store user data (id, email, userId, pubKeyHex, address, createdAt) in database via Prisma. Return user object with public data only. Implement duplicate email/userId validation and proper error responses. Add structured logging for signup events with metrics.",
+        "testStrategy": "Integration tests for successful user creation, duplicate prevention, input validation, database persistence verification, and performance testing for 1s p95 requirement",
+        "priority": "high",
+        "dependencies": [
+          2
+        ],
+        "status": "done",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Create API route structure and basic POST handler",
+            "description": "Set up app/api/signup/route.ts with basic POST handler structure and Next.js API route configuration",
+            "dependencies": [],
+            "details": "Create the route.ts file in app/api/signup/ directory. Implement basic POST function with proper TypeScript typing. Set up proper Next.js 13+ app router API route structure. Add basic error handling wrapper and response formatting. Configure proper HTTP methods and CORS if needed.",
+            "status": "done",
+            "testStrategy": ""
+          },
+          {
+            "id": 2,
+            "title": "Implement request validation with Zod schema",
+            "description": "Create and implement Zod validation schema for email and userId request body parameters",
+            "dependencies": [
+              "5.1"
+            ],
+            "details": "Define Zod schema for signup request body with email (valid email format) and userId (string, required) validation. Implement request body parsing and validation with proper error responses for invalid input. Add sanitization for email field and userId format validation. Return structured validation errors with field-specific messages.",
+            "status": "done",
+            "testStrategy": ""
+          },
+          {
+            "id": 3,
+            "title": "Integrate dstack for deterministic key generation",
+            "description": "Implement dstack integration to generate deterministic private keys and derive public keys and Ethereum addresses",
+            "dependencies": [
+              "5.2"
+            ],
+            "details": "Call dstack service to get deterministic private key for userId. Use crypto utilities to derive uncompressed public key (65 bytes) from private key. Generate Ethereum address from public key using keccak-256 hash. Handle dstack connectivity errors and implement retry logic. Ensure private key is immediately cleared from memory after use.",
+            "status": "done",
+            "testStrategy": ""
+          },
+          {
+            "id": 4,
+            "title": "Implement database operations with Prisma",
+            "description": "Set up Prisma database operations for user creation with duplicate prevention",
+            "dependencies": [
+              "5.3"
+            ],
+            "details": "Create user record in database with id, email, userId, pubKeyHex, address, and createdAt fields. Implement duplicate email and userId validation using Prisma unique constraints and proper error handling. Use database transactions for atomic user creation. Add proper error handling for database connection issues and constraint violations.",
+            "status": "done",
+            "testStrategy": ""
+          },
+          {
+            "id": 5,
+            "title": "Implement error handling and response formatting",
+            "description": "Add comprehensive error handling, logging, and response formatting for all scenarios",
+            "dependencies": [
+              "5.4"
+            ],
+            "details": "Implement proper HTTP status codes for different error scenarios (400 for validation, 409 for duplicates, 500 for server errors). Add structured logging for signup events with metrics tracking. Format success response with user object containing only public data (no private keys). Implement proper error response structure with meaningful messages.",
+            "status": "done",
+            "testStrategy": ""
+          },
+          {
+            "id": 6,
+            "title": "Create comprehensive integration tests",
+            "description": "Develop complete test suite for signup API covering all scenarios and performance requirements",
+            "dependencies": [
+              "5.5"
+            ],
+            "details": "Create integration tests for successful user creation, duplicate email/userId prevention, input validation scenarios, database persistence verification. Add performance tests to ensure 1s p95 response time requirement. Test error handling for dstack failures, database connectivity issues, and malformed requests. Include load testing for concurrent signup scenarios.",
+            "status": "done",
+            "testStrategy": ""
+          }
+        ]
+      },
+      {
+        "id": 6,
+        "title": "Implement User Keys API",
+        "description": "Create GET /api/users/me/keys endpoint to retrieve user's wallet information",
+        "details": "Create app/api/users/me/keys/route.ts implementing GET handler. Accept userId as query parameter, validate input with Zod. Query database for user by userId, return address and pubKeyHex fields. Implement proper error handling for user not found. Add request validation and structured logging. Consider implementing basic rate limiting to prevent enumeration attacks.",
+        "testStrategy": "Unit tests for user lookup, error handling for non-existent users, input validation, and response format verification",
+        "priority": "medium",
+        "dependencies": [
+          2,
+          5
+        ],
+        "status": "done",
+        "subtasks": []
+      },
+      {
+        "id": 7,
+        "title": "Implement Message Signing API",
+        "description": "Create POST /api/users/[userId]/sign endpoint for message signing",
+        "details": "Create app/api/users/[userId]/sign/route.ts implementing POST handler. Validate userId parameter and message body with Zod. Re-derive private key via dstack for the userId, sign the message using crypto utilities. Return signature hex and optional signature_chain from dstack response. Implement proper error handling for missing users, signing failures, and dstack connectivity issues. Add structured logging and performance monitoring for 50ms p95 target. Ensure private key is immediately cleared from memory after use.",
+        "testStrategy": "Integration tests for successful signing, performance benchmarks, user validation, memory safety verification, and error handling for various failure scenarios",
+        "priority": "high",
+        "dependencies": [
+          5
+        ],
+        "status": "done",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Create API Route Structure",
+            "description": "Set up the basic Next.js API route file and POST handler structure",
+            "dependencies": [],
+            "details": "Create app/api/users/[userId]/sign/route.ts with proper Next.js API route structure. Implement basic POST handler function with NextRequest/NextResponse types. Set up proper HTTP method handling and basic response structure.",
+            "status": "done",
+            "testStrategy": ""
+          },
+          {
+            "id": 2,
+            "title": "Implement Input Validation",
+            "description": "Add Zod schema validation for userId parameter and message body",
+            "dependencies": [
+              "7.1"
+            ],
+            "details": "Create Zod schemas for validating userId parameter from URL and message body from request. Implement comprehensive input validation with proper error messages. Ensure userId format validation and message content validation.",
+            "status": "done",
+            "testStrategy": ""
+          },
+          {
+            "id": 3,
+            "title": "Integrate dstack Key Retrieval",
+            "description": "Implement private key re-derivation using dstack for the specified userId",
+            "dependencies": [
+              "7.2"
+            ],
+            "details": "Integrate with dstack service to re-derive private key for the given userId. Handle dstack connectivity and implement proper error handling for missing users or dstack failures. Ensure secure key retrieval process.",
+            "status": "done",
+            "testStrategy": ""
+          },
+          {
+            "id": 4,
+            "title": "Implement Message Signing",
+            "description": "Add crypto utilities integration for message signing with private key",
+            "dependencies": [
+              "7.3"
+            ],
+            "details": "Use crypto utilities to sign the validated message with the retrieved private key. Generate signature hex and handle optional signature_chain from dstack response. Implement proper signing flow and error handling for signing failures.",
+            "status": "done",
+            "testStrategy": ""
+          },
+          {
+            "id": 5,
+            "title": "Ensure Memory Safety",
+            "description": "Implement secure private key handling and immediate memory cleanup",
+            "dependencies": [
+              "7.4"
+            ],
+            "details": "Ensure private keys are immediately cleared from memory after use. Implement secure memory handling practices, zero out sensitive data, and prevent key persistence in memory or logs. Add security measures for key lifecycle management.",
+            "status": "done",
+            "testStrategy": ""
+          },
+          {
+            "id": 6,
+            "title": "Add Performance Monitoring",
+            "description": "Implement structured logging and performance optimization for 50ms p95 target",
+            "dependencies": [
+              "7.5"
+            ],
+            "details": "Add comprehensive structured logging for all operations. Implement performance monitoring to meet 50ms p95 target. Add timing metrics, error tracking, and performance optimization. Include proper error handling and logging for all failure scenarios.",
+            "status": "done",
+            "testStrategy": ""
+          }
+        ]
+      },
+      {
+        "id": 8,
+        "title": "Implement Signature Verification API",
+        "description": "Create POST /api/verify endpoint for signature verification",
+        "details": "Create app/api/verify/route.ts implementing POST handler. Validate request body with Zod schema for pubKeyHex, message, and signature. Use crypto utilities to verify signature against public key and message hash. Return boolean result indicating signature validity. Implement comprehensive input validation, proper error handling, and structured logging. Add performance optimization for high-throughput verification scenarios.",
+        "testStrategy": "Unit tests for valid signature verification, negative tests with tampered signatures/messages, input validation, and performance testing",
+        "priority": "medium",
+        "dependencies": [],
+        "status": "done",
+        "subtasks": []
+      },
+      {
+        "id": 9,
+        "title": "Implement Admin Users API",
+        "description": "Create GET /api/admin/users endpoint for admin dashboard user listing",
+        "details": "Create app/api/admin/users/route.ts implementing GET handler. Query all users from database with pagination support, return array of user objects with all public fields (id, email, userId, pubKeyHex, address, createdAt). Implement pagination, sorting, and filtering capabilities. Add performance optimization for 10k users with 200ms p95 target. Include structured logging and basic security headers.",
+        "testStrategy": "Performance tests with large datasets, pagination functionality, data integrity verification, and response time benchmarks",
+        "priority": "medium",
+        "dependencies": [
+          2
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 10,
+        "title": "Implement Health Check API",
+        "description": "Create GET /api/health endpoint for application health monitoring",
+        "details": "Create app/api/health/route.ts implementing GET handler. Check database connectivity via Prisma, dstack socket availability, and overall application health. Return 200 OK with health status object including database status, dstack status, and timestamp. Implement timeout handling and graceful failure reporting. Add optional detailed health metrics when EXPOSE_INFO environment variable is set.",
+        "testStrategy": "Health check reliability tests, database connection failure handling, dstack socket availability testing, and timeout behavior verification",
+        "priority": "medium",
+        "dependencies": [
+          2
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 11,
+        "title": "Build User Interface Components",
+        "description": "Create React components for signup page, user dashboard, and admin dashboard",
+        "details": "Create app/page.tsx for signup form with email and userId inputs, success display showing user wallet info. Create app/dashboard/page.tsx for user dashboard displaying userId, address, public key, message signing textarea with sign/verify functionality. Create app/admin/page.tsx for admin dashboard with user table showing all public user data. Implement proper form validation, loading states, error handling, and responsive design. Use Next.js App Router patterns and TypeScript. Add client-side API integration with proper error boundaries.",
+        "testStrategy": "Component rendering tests, form validation, API integration testing, responsive design verification, and user interaction flows",
+        "priority": "medium",
+        "dependencies": [
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Create Signup Form Component",
+            "description": "Build the main signup page component with email and userId inputs",
+            "dependencies": [],
+            "details": "Create app/page.tsx with form inputs for email and userId, implement form submission handling, add success state displaying user wallet info, integrate with user creation API endpoint, add proper TypeScript types and Next.js App Router patterns",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 2,
+            "title": "Create User Dashboard Component",
+            "description": "Build user dashboard displaying wallet info and message signing functionality",
+            "dependencies": [],
+            "details": "Create app/dashboard/page.tsx showing userId, address, public key fields, add message signing textarea with sign/verify buttons, integrate with signing API endpoints, implement proper state management for signing operations",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 3,
+            "title": "Create Admin Dashboard Component",
+            "description": "Build admin dashboard with user table displaying all public user data",
+            "dependencies": [],
+            "details": "Create app/admin/page.tsx with data table component showing all users, display public user information (userId, address, public key), implement table sorting and filtering, integrate with users list API endpoint",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 4,
+            "title": "Implement Client-side API Integration Layer",
+            "description": "Create API client utilities for frontend-backend communication",
+            "dependencies": [],
+            "details": "Create API client functions for user creation, key retrieval, message signing, and user listing. Implement proper error handling, loading states, and TypeScript types for API responses. Add request/response interceptors and retry logic",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 5,
+            "title": "Implement Form Validation",
+            "description": "Add comprehensive form validation across all components",
+            "dependencies": [
+              "11.1",
+              "11.2"
+            ],
+            "details": "Implement Zod schemas for client-side validation, add real-time validation feedback, create reusable validation components, handle validation errors gracefully with user-friendly messages, ensure consistency with backend validation",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 6,
+            "title": "Implement Error Handling and Loading States",
+            "description": "Add comprehensive error boundaries and loading state management",
+            "dependencies": [
+              "11.1",
+              "11.2",
+              "11.3",
+              "11.4"
+            ],
+            "details": "Create error boundary components, implement loading spinners and skeleton states, add toast notifications for success/error feedback, handle API errors with user-friendly messages, create fallback UI components",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 7,
+            "title": "Implement Responsive Design",
+            "description": "Ensure all components work properly across different screen sizes",
+            "dependencies": [
+              "11.1",
+              "11.2",
+              "11.3"
+            ],
+            "details": "Add responsive CSS/Tailwind classes, test components on mobile/tablet/desktop viewports, implement mobile-friendly form layouts, ensure admin table is scrollable on small screens, optimize touch interactions",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 8,
+            "title": "Create Component Testing Suite",
+            "description": "Implement comprehensive tests for all UI components",
+            "dependencies": [
+              "11.1",
+              "11.2",
+              "11.3",
+              "11.4",
+              "11.5"
+            ],
+            "details": "Write unit tests for component rendering, test form validation flows, mock API integrations for testing, add accessibility tests, create user interaction tests with React Testing Library, ensure responsive design testing",
+            "status": "pending",
+            "testStrategy": ""
+          }
+        ]
+      },
+      {
+        "id": 12,
+        "title": "Create Deployment Configuration",
+        "description": "Set up Docker, docker-compose, and CVM deployment artifacts",
+        "details": "Create multi-stage Dockerfile for production builds with Node.js 20 Alpine base, optimized layer caching, security hardening, and health checks. Create docker-compose.yml with web service configuration, dstack socket volume mount (/var/run/dstack.sock), security options, resource limits, and health checks. Create app-compose.json for Phala CVM deployment with proper security attestation, socket mounting, capability dropping, and routing configuration. Add .dockerignore for build optimization. Include comprehensive README with local and CVM deployment instructions.",
+        "testStrategy": "Docker build verification, container security scanning, health check functionality, socket mounting tests, and deployment documentation validation",
+        "priority": "high",
+        "dependencies": [
+          1,
+          10
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Create Multi-stage Dockerfile",
+            "description": "Build production-optimized Dockerfile with Node.js 20 Alpine base",
+            "dependencies": [],
+            "details": "Create multi-stage Dockerfile with builder stage for dependencies and production stage. Use Node.js 20 Alpine base image, implement layer caching optimization, include security hardening measures (non-root user, minimal packages), and add health check configuration.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 2,
+            "title": "Configure docker-compose.yml",
+            "description": "Set up Docker Compose configuration with service definitions",
+            "dependencies": [
+              "12.1"
+            ],
+            "details": "Create docker-compose.yml with web service configuration, dstack socket volume mount (/var/run/dstack.sock), security options, resource limits, and health checks. Include environment variable configuration and proper networking setup.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 3,
+            "title": "Create Phala CVM app-compose.json",
+            "description": "Build CVM-specific deployment configuration",
+            "dependencies": [
+              "12.1"
+            ],
+            "details": "Create app-compose.json for Phala CVM deployment with security attestation, socket mounting configuration, capability dropping for security hardening, and proper routing configuration for CVM environment.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 4,
+            "title": "Implement Security Hardening Measures",
+            "description": "Apply security configurations across all deployment files",
+            "dependencies": [
+              "12.1",
+              "12.2",
+              "12.3"
+            ],
+            "details": "Implement security hardening including non-root user configuration, capability dropping, security context settings, read-only root filesystem where applicable, and proper secret management practices.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 5,
+            "title": "Configure Health Check Systems",
+            "description": "Set up health check endpoints and monitoring",
+            "dependencies": [
+              "12.2",
+              "12.3"
+            ],
+            "details": "Configure comprehensive health checks for Docker and CVM deployments, including application health endpoints, dependency checks, and proper timeout/retry configurations.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 6,
+            "title": "Create .dockerignore Optimization",
+            "description": "Optimize Docker build context with .dockerignore",
+            "dependencies": [
+              "12.1"
+            ],
+            "details": "Create .dockerignore file to exclude unnecessary files from Docker build context, reducing build time and image size. Include node_modules, .git, logs, and development-only files.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 7,
+            "title": "Write Deployment Documentation",
+            "description": "Create comprehensive deployment README and documentation",
+            "dependencies": [
+              "12.4",
+              "12.5",
+              "12.6"
+            ],
+            "details": "Create detailed deployment documentation including local Docker setup instructions, CVM deployment guide, environment variable configuration, troubleshooting guide, and security considerations.",
+            "status": "pending",
+            "testStrategy": ""
+          }
+        ]
+      },
+      {
+        "id": 13,
+        "title": "Set up Flox Development Environment",
+        "description": "Install and configure Flox for reproducible development environment management",
+        "details": "Install Flox package manager on the development machine using appropriate method (brew for macOS, apt/rpm for Linux). Initialize Flox environment in project root with 'flox init'. Create manifest.toml configuration with Node.js 20+, and required development tools. Configure environment variables and activation hooks for automatic dependency installation. This ensures all developers have identical, reproducible environments across different machines and operating systems.",
+        "testStrategy": "Verify Flox is installed with 'flox --version', environment activates successfully with 'flox activate', Node.js and npm are available in the Flox environment, and manifest.toml is properly configured",
+        "status": "done",
+        "dependencies": [],
+        "priority": "high",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Install Flox package manager",
+            "description": "Install Flox on the development system using the appropriate method",
+            "details": "Install Flox using Homebrew on macOS with 'brew install flox' or download the appropriate package for Linux. Verify installation with 'flox --version'. Ensure Flox is available in PATH for all terminal sessions.",
+            "status": "done",
+            "dependencies": [],
+            "parentTaskId": 13
+          },
+          {
+            "id": 2,
+            "title": "Initialize Flox environment",
+            "description": "Create a new Flox environment in the project root directory",
+            "details": "Run 'flox init' in the project root to create a new Flox environment. This will create a .flox directory and an initial manifest.toml file. Accept default prompts or specify project-specific settings as needed.",
+            "status": "done",
+            "dependencies": [
+              "13.1"
+            ],
+            "parentTaskId": 13
+          },
+          {
+            "id": 3,
+            "title": "Configure manifest.toml for Node.js environment",
+            "description": "Set up the Flox manifest with Node.js 20+ and required development tools",
+            "details": "Edit manifest.toml to include: Node.js 20+ (nodejs_20), Git, and other development tools. Add configuration like: [install] nodejs_20.pkg-path = \"nodejs_20\" git.pkg-path = \"git\". Include any system dependencies needed for native Node modules.",
+            "status": "done",
+            "dependencies": [
+              "13.2"
+            ],
+            "parentTaskId": 13
+          },
+          {
+            "id": 4,
+            "title": "Add environment hooks and variables",
+            "description": "Configure activation hooks for automatic dependency installation and environment setup",
+            "details": "Add [hook] section to manifest.toml with on-activate script to run 'npm install' when environment is activated. Configure any necessary environment variables in [vars] section. Example: [hook] on-activate = 'npm install'. This ensures dependencies are installed when developers enter the Flox environment.",
+            "status": "done",
+            "dependencies": [
+              "13.3"
+            ],
+            "parentTaskId": 13
+          },
+          {
+            "id": 5,
+            "title": "Test and verify Flox environment",
+            "description": "Activate the Flox environment and verify all tools are available and working",
+            "details": "Run 'flox activate' to enter the environment. Verify Node.js is available with 'node --version' and should be 20+. Check npm with 'npm --version'. Test that the on-activate hook runs and installs dependencies. Exit and re-enter environment to ensure persistence. Document the activation command in README for other developers.",
+            "status": "done",
+            "dependencies": [
+              "13.4"
+            ],
+            "parentTaskId": 13
+          }
+        ]
+      },
+      {
+        "id": 14,
+        "title": "Implement dstack SDK Integration",
+        "description": "Create proper dstack client wrapper for TEE-based key management and signing",
+        "details": "Create lib/dstack.ts wrapper that uses @phala/dstack-sdk for all cryptographic operations. The SDK provides complete key management internally:\n- Use client.getKey('wallet/ethereum', userId) to get deterministic wallet keys\n- The SDK returns complete key objects with signing capabilities built-in\n- All crypto operations happen inside the TEE\n- Connect via Unix socket at /var/run/dstack.sock\n- Implement proper error handling for TEE connection issues\n- Add fallback for local development without TEE",
+        "testStrategy": "Integration tests with mock TEE, connection handling tests, key derivation consistency tests",
+        "status": "done",
+        "dependencies": [
+          1
+        ],
+        "priority": "high",
+        "subtasks": []
+      }
+    ],
+    "metadata": {
+      "created": "2025-09-09T04:45:44.364Z",
+      "updated": "2025-09-09T06:36:58.079Z",
+      "description": "Tasks for master context"
+    }
+  }
+}

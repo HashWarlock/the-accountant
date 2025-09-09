@@ -1,0 +1,11 @@
+# Task ID: 8
+# Title: Implement Signature Verification API
+# Status: pending
+# Dependencies: 3
+# Priority: medium
+# Description: Create POST /api/verify endpoint for signature verification
+# Details:
+Create app/api/verify/route.ts implementing POST handler. Validate request body with Zod schema for pubKeyHex, message, and signature. Use crypto utilities to verify signature against public key and message hash. Return boolean result indicating signature validity. Implement comprehensive input validation, proper error handling, and structured logging. Add performance optimization for high-throughput verification scenarios.
+
+# Test Strategy:
+Unit tests for valid signature verification, negative tests with tampered signatures/messages, input validation, and performance testing

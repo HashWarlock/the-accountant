@@ -1,0 +1,43 @@
+# Task ID: 13
+# Title: Set up Flox Development Environment
+# Status: pending
+# Dependencies: None
+# Priority: high
+# Description: Install and configure Flox for reproducible development environment management
+# Details:
+Install Flox package manager on the development machine using appropriate method (brew for macOS, apt/rpm for Linux). Initialize Flox environment in project root with 'flox init'. Create manifest.toml configuration with Node.js 20+, and required development tools. Configure environment variables and activation hooks for automatic dependency installation. This ensures all developers have identical, reproducible environments across different machines and operating systems.
+
+# Test Strategy:
+Verify Flox is installed with 'flox --version', environment activates successfully with 'flox activate', Node.js and npm are available in the Flox environment, and manifest.toml is properly configured
+
+# Subtasks:
+## 1. Install Flox package manager [pending]
+### Dependencies: None
+### Description: Install Flox on the development system using the appropriate method
+### Details:
+Install Flox using Homebrew on macOS with 'brew install flox' or download the appropriate package for Linux. Verify installation with 'flox --version'. Ensure Flox is available in PATH for all terminal sessions.
+
+## 2. Initialize Flox environment [pending]
+### Dependencies: 13.1
+### Description: Create a new Flox environment in the project root directory
+### Details:
+Run 'flox init' in the project root to create a new Flox environment. This will create a .flox directory and an initial manifest.toml file. Accept default prompts or specify project-specific settings as needed.
+
+## 3. Configure manifest.toml for Node.js environment [pending]
+### Dependencies: 13.2
+### Description: Set up the Flox manifest with Node.js 20+ and required development tools
+### Details:
+Edit manifest.toml to include: Node.js 20+ (nodejs_20), Git, and other development tools. Add configuration like: [install] nodejs_20.pkg-path = "nodejs_20" git.pkg-path = "git". Include any system dependencies needed for native Node modules.
+
+## 4. Add environment hooks and variables [pending]
+### Dependencies: 13.3
+### Description: Configure activation hooks for automatic dependency installation and environment setup
+### Details:
+Add [hook] section to manifest.toml with on-activate script to run 'npm install' when environment is activated. Configure any necessary environment variables in [vars] section. Example: [hook] on-activate = 'npm install'. This ensures dependencies are installed when developers enter the Flox environment.
+
+## 5. Test and verify Flox environment [pending]
+### Dependencies: 13.4
+### Description: Activate the Flox environment and verify all tools are available and working
+### Details:
+Run 'flox activate' to enter the environment. Verify Node.js is available with 'node --version' and should be 20+. Check npm with 'npm --version'. Test that the on-activate hook runs and installs dependencies. Exit and re-enter environment to ensure persistence. Document the activation command in README for other developers.
+

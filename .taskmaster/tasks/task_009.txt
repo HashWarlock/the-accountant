@@ -1,0 +1,11 @@
+# Task ID: 9
+# Title: Implement Admin Users API
+# Status: pending
+# Dependencies: 2
+# Priority: medium
+# Description: Create GET /api/admin/users endpoint for admin dashboard user listing
+# Details:
+Create app/api/admin/users/route.ts implementing GET handler. Query all users from database with pagination support, return array of user objects with all public fields (id, email, userId, pubKeyHex, address, createdAt). Implement pagination, sorting, and filtering capabilities. Add performance optimization for 10k users with 200ms p95 target. Include structured logging and basic security headers.
+
+# Test Strategy:
+Performance tests with large datasets, pagination functionality, data integrity verification, and response time benchmarks

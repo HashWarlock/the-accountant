@@ -1,0 +1,55 @@
+# Task ID: 12
+# Title: Create Deployment Configuration
+# Status: pending
+# Dependencies: 1, 10
+# Priority: high
+# Description: Set up Docker, docker-compose, and CVM deployment artifacts
+# Details:
+Create multi-stage Dockerfile for production builds with Node.js 20 Alpine base, optimized layer caching, security hardening, and health checks. Create docker-compose.yml with web service configuration, dstack socket volume mount (/var/run/dstack.sock), security options, resource limits, and health checks. Create app-compose.json for Phala CVM deployment with proper security attestation, socket mounting, capability dropping, and routing configuration. Add .dockerignore for build optimization. Include comprehensive README with local and CVM deployment instructions.
+
+# Test Strategy:
+Docker build verification, container security scanning, health check functionality, socket mounting tests, and deployment documentation validation
+
+# Subtasks:
+## 1. Create Multi-stage Dockerfile [pending]
+### Dependencies: None
+### Description: Build production-optimized Dockerfile with Node.js 20 Alpine base
+### Details:
+Create multi-stage Dockerfile with builder stage for dependencies and production stage. Use Node.js 20 Alpine base image, implement layer caching optimization, include security hardening measures (non-root user, minimal packages), and add health check configuration.
+
+## 2. Configure docker-compose.yml [pending]
+### Dependencies: 12.1
+### Description: Set up Docker Compose configuration with service definitions
+### Details:
+Create docker-compose.yml with web service configuration, dstack socket volume mount (/var/run/dstack.sock), security options, resource limits, and health checks. Include environment variable configuration and proper networking setup.
+
+## 3. Create Phala CVM app-compose.json [pending]
+### Dependencies: 12.1
+### Description: Build CVM-specific deployment configuration
+### Details:
+Create app-compose.json for Phala CVM deployment with security attestation, socket mounting configuration, capability dropping for security hardening, and proper routing configuration for CVM environment.
+
+## 4. Implement Security Hardening Measures [pending]
+### Dependencies: 12.1, 12.2, 12.3
+### Description: Apply security configurations across all deployment files
+### Details:
+Implement security hardening including non-root user configuration, capability dropping, security context settings, read-only root filesystem where applicable, and proper secret management practices.
+
+## 5. Configure Health Check Systems [pending]
+### Dependencies: 12.2, 12.3
+### Description: Set up health check endpoints and monitoring
+### Details:
+Configure comprehensive health checks for Docker and CVM deployments, including application health endpoints, dependency checks, and proper timeout/retry configurations.
+
+## 6. Create .dockerignore Optimization [pending]
+### Dependencies: 12.1
+### Description: Optimize Docker build context with .dockerignore
+### Details:
+Create .dockerignore file to exclude unnecessary files from Docker build context, reducing build time and image size. Include node_modules, .git, logs, and development-only files.
+
+## 7. Write Deployment Documentation [pending]
+### Dependencies: 12.4, 12.5, 12.6
+### Description: Create comprehensive deployment README and documentation
+### Details:
+Create detailed deployment documentation including local Docker setup instructions, CVM deployment guide, environment variable configuration, troubleshooting guide, and security considerations.
+

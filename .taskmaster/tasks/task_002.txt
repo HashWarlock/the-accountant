@@ -1,0 +1,11 @@
+# Task ID: 2
+# Title: Configure Prisma Database Schema and Setup
+# Status: pending
+# Dependencies: 1
+# Priority: high
+# Description: Set up SQLite database with Prisma schema for user data storage
+# Details:
+Create Prisma schema file defining User model with fields: id (String, cuid), email (String, unique), userId (String, unique), pubKeyHex (String), address (String), createdAt (DateTime). Configure SQLite as database provider in schema.prisma. Set up Prisma client generation and database migration scripts. Create initial migration for user table. Ensure database file is in .gitignore and set up proper database URL in environment variables.
+
+# Test Strategy:
+Verify schema generates without errors, migrations run successfully, Prisma client can connect to database, and user model operations work correctly

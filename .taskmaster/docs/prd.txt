@@ -1,0 +1,400 @@
+# Technical PRD — dstack JS SDK Demo (User Wallets, Sign & Verify)
+
+## 0) TL;DR
+
+A production-like demo app that shows how to use the **dstack JS SDK** to deterministically derive a per-user wallet (secp256k1), display public keys, sign arbitrary messages, and verify signatures. It includes a **User Dashboard**, **Admin Dashboard**, and **deployment artifacts** for running in a Confidential VM (CVM).
+
+---
+
+## 1) Objectives & Scope
+
+### Goals
+
+* User can **sign up** and immediately see a **derived wallet (public key & address)**.
+* User can **sign** arbitrary text and **verify** the signature.
+* Admin can **list users** and their public keys for auditability.
+* All key operations use **dstack**; **private key never leaves** the server process or disk.
+* Ready-to-run **Docker/Docker Compose** with CVM socket mount for **/var/run/dstack.sock**.
+
+### Non-Goals
+
+* No blockchain transactions (signatures only).
+* No multi-tenant RBAC or complex auth (basic demo path).
+* No persistence of private keys or long-term key escrow.
+
+---
+
+## 2) Users & Stories
+
+**Personas**
+
+* **End User**: wants a simple account + a verifiable public key and signing ability.
+* **Admin**: needs an audit list of users + public keys.
+* **Platform Engineer**: wants a minimal, secure integration pattern with dstack in a CVM.
+
+**Key Stories**
+
+1. As a user, I sign up and get a wallet (public key & address).
+2. As a user, I sign a message; the app returns a signature and can verify it.
+3. As an admin, I list users, their public keys, and creation date.
+4. As an engineer, I can deploy this app in a **Phala CVM** with dstack socket mounted.
+
+---
+
+## 3) Success Metrics
+
+* TTI (sign-up to derived wallet) ≤ **1s p95** (CVM warm).
+* Sign endpoint ≤ **50ms p95** (excluding cold start).
+* **0** instances of private key written to disk or logs (verified via static checks + runtime guards).
+* Admin list returns ≤ **200ms p95** for 10k users (SQLite acceptable for demo).
+
+---
+
+## 4) Architecture
+
+### Stack
+
+* **Next.js 14 (App Router)** — web/API.
+* **SQLite + Prisma** — store users (public data only).
+* **dstack JS SDK (@phala/dstack-sdk)** — key derivation/signing inside TEE-integrated runtime.
+* **Crypto libs**: `@noble/curves` (secp256k1), `sha3` (keccak-256), `viem` helpers as needed.
+* **Docker + docker-compose** with **UNIX socket mount** (`/var/run/dstack.sock`) for CVM.
+
+### High-Level Diagram
+
+```mermaid
+flowchart LR
+  U[Browser\nUser/Admin] -->|HTTP(S)| N(Next.js Server)
+  N -->|Prisma| DB[(SQLite)]
+  N -->|Unix socket| D[dstack runtime]
+```
+
+### Sequence — Sign & Verify
+
+```mermaid
+sequenceDiagram
+  participant User
+  participant Next
+  participant dstack
+  participant DB
+
+  User->>Next: POST /api/users/:userId/sign {message}
+  Next->>dstack: getKey("wallet/ethereum", userId)
+  dstack-->>Next: { key(Uint8Array), signature_chain }
+  Next->>Next: sign(message, key)
+  Next-->>User: { signature, signature_chain }
+
+  User->>Next: POST /api/verify {pubKeyHex, message, signature}
+  Next->>Next: verify(pubKeyHex, message, signature)
+  Next-->>User: { valid: true/false }
+```
+
+---
+
+## 5) Data Model (Prisma)
+
+```prisma
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  userId    String   @unique   // stable external ID used for deterministic key
+  pubKeyHex String               // uncompressed 0x04... or compressed 0x02/0x03...
+  address   String               // Ethereum-style address (keccak of pubkey)
+  createdAt DateTime @default(now())
+}
+```
+
+> Only **public** data is stored. Private key material is never persisted.
+
+---
+
+## 6) API Surface (App Router)
+
+*All routes are server-only; auth kept minimal for demo.*
+
+* `POST /api/signup`
+  **Body**: `{ email: string, userId: string }`
+  **Flow**: `dstack.getKey("wallet/ethereum", userId)` → derive public key & address → **persist public data**.
+  **Resp**: `{ id, email, address, pubKeyHex }`.
+
+* `GET /api/users/me/keys?userId=...`
+  **Resp**: `{ address, pubKeyHex }` (from DB).
+
+* `POST /api/users/:userId/sign`
+  **Body**: `{ message: string }`
+  **Flow**: Re-derive key via dstack → sign → return signature (+ optional `signature_chain`).
+  **Resp**: `{ signature, signature_chain? }`.
+
+* `POST /api/verify`
+  **Body**: `{ pubKeyHex, message, signature }`
+  **Resp**: `{ valid: boolean }`.
+
+* `GET /api/admin/users`
+  **Resp**: `{ users: Array<{ id, email, userId, pubKeyHex, address, createdAt }> }`.
+
+* `GET /api/health` (healthcheck)
+  **Resp**: `200 OK` when server is healthy.
+
+*Optional*: `GET /api/info` → surface `dstack.info()` for runtime attestation metadata demo.
+
+---
+
+## 7) Cryptography & Key Management
+
+* **Deterministic derivation**: `getKey("wallet/ethereum", userId)` returns a stable **secp256k1** private key for that `(category, userId)` pair.
+* **Rotation**: bump path/namespace (e.g., `"wallet/ethereum/v2"`) to rotate keys while preserving userId.
+* **Public derivation**:
+
+  * `priv → pub (secp256k1)` (uncompressed 65 bytes, `0x04...`).
+  * `pub → address`: keccak-256 of uncompressed pubkey (drop first byte), last 20 bytes.
+* **Signing**: keccak-256(message) + ECDSA (return 65 bytes + recovery ID as hex).
+* **Verification**: `verify(signature, hash(message), publicKey)`.
+* **Never persist** the private key; use in-memory only. Avoid logging.
+
+> If desired, swap raw signing for **EIP-191**-style message prefixing or **EIP-712 typed data** (future enhancement).
+
+---
+
+## 8) UX
+
+* **Sign Up Page**: email + userId → create user, show JSON response and links to dashboards.
+* **User Dashboard**:
+
+  * shows userId, address, public key
+  * textarea for message; **Sign** → signature; **Verify** → boolean alert.
+* **Admin Dashboard**:
+
+  * table of users (email, userId, address, public key, createdAt).
+
+---
+
+## 9) Deployment (CVM-ready)
+
+Artifacts (add to repo root):
+
+### `docker-compose.yml`
+
+```yaml
+version: "3.9"
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: dstack-demo-web:local
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      PORT: "3000"
+    ports:
+      - "3000:3000"
+    volumes:
+      - /var/run/dstack.sock:/var/run/dstack.sock
+    security_opt:
+      - no-new-privileges:true
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 10s
+      timeout: 3s
+      retries: 10
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 512M
+```
+
+### `app-compose.json`
+
+```json
+{
+  "version": "1",
+  "name": "dstack-js-demo",
+  "description": "Next.js demo: user signup, deterministic wallet per userId via dstack, sign & verify.",
+  "services": {
+    "web": {
+      "listen": [{ "port": 3000, "protocol": "http", "public": true, "tls_termination": "platform" }],
+      "readiness_path": "/api/health"
+    }
+  },
+  "security": {
+    "attestation": { "require_quote": false },
+    "sockets": [{ "path": "/var/run/dstack.sock", "mount": "rw" }],
+    "capabilities": { "drop_all": true }
+  },
+  "env": { "NODE_ENV": "production", "PORT": "3000" },
+  "routes": [
+    { "path": "/", "to": "web" },
+    { "path": "/api/*", "to": "web" }
+  ]
+}
+```
+
+### `Dockerfile`
+
+```dockerfile
+# ---- build stage ----
+FROM node:20-alpine AS build
+WORKDIR /app
+COPY package.json package-lock.json* pnpm-lock.yaml* yarn.lock* .npmrc* ./
+RUN if [ -f package-lock.json ]; then npm ci; \
+    elif [ -f pnpm-lock.yaml ]; then npm i -g pnpm && pnpm i --frozen-lockfile; \
+    elif [ -f yarn.lock ]; then yarn --frozen-lockfile; \
+    else npm i; fi
+COPY . .
+RUN npm run build
+
+# ---- run stage ----
+FROM node:20-alpine
+WORKDIR /app
+ENV NODE_ENV=production PORT=3000
+COPY package.json package-lock.json* pnpm-lock.yaml* yarn.lock* ./
+RUN if [ -f package-lock.json ]; then npm ci --omit=dev; \
+    elif [ -f pnpm-lock.yaml ]; then npm i -g pnpm && pnpm i --prod --frozen-lockfile; \
+    elif [ -f yarn.lock ]; then yarn --production --frozen-lockfile; \
+    else npm i --omit=dev; fi
+COPY --from=build /app/.next ./.next
+COPY --from=build /app/public ./public
+COPY --from=build /app/next.config.mjs ./next.config.mjs
+HEALTHCHECK --interval=10s --timeout=3s --retries=10 CMD node -e "fetch('http://127.0.0.1:3000/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"
+EXPOSE 3000
+CMD ["npm", "start"]
+```
+
+**Local run**: `docker compose up --build` → [http://localhost:3000](http://localhost:3000)
+**CVM run**: Use Phala “Deploy from Compose”; ensure `/var/run/dstack.sock` is available and mounted.
+
+---
+
+## 10) Security & Compliance (Secure-by-Design)
+
+* **Zero trust**: treat all inputs as untrusted; validate with Zod; server-only crypto.
+* **Key protection**: private key **in memory only**; never log or persist.
+* **Least privilege**: drop Linux capabilities, no new privileges, read-only FS optional.
+* **Transport**: platform TLS termination; internal calls are loopback.
+* **Auditability**:
+
+  * Persist **public** artifacts only (pubKeyHex, address).
+  * Optional: store `signature_chain` returned by dstack next to signatures for provenance.
+* **PII**: store only email + userId; no secrets; enable log redaction.
+* **Compliance posture**: demo aligns with SOC 2 controls for key custody (process-only); HIPAA/PCI not targeted.
+
+---
+
+## 11) Observability & Telemetry
+
+* **Logs** (structured JSON):
+
+  * `event`: signup | sign | verify | admin\_list | health
+  * `userId`, `request_id`, `latency_ms`, `result` (ok/error), `error_code`
+* **Metrics**:
+
+  * `http_request_duration_ms{route,method,status}`
+  * `dstack_getKey_latency_ms`
+  * `sign_latency_ms`, `verify_latency_ms`
+  * `signup_total`, `sign_total`, `verify_total`
+* **Health**: `/api/health` returns 200 and checks Prisma + (optional) socket reachability.
+* **Feature flags**: expose `EXPOSE_INFO=true` to enable `/api/info` for dstack info.
+
+---
+
+## 12) Performance & Scale
+
+* Target **p95** latencies listed in §3.
+* SQLite is adequate for demo; swap to Postgres if users > 50k.
+* Stateless web; can horizontally scale if using an external DB.
+
+---
+
+## 13) Test Plan & Acceptance Criteria
+
+### Unit
+
+* `privateToPublicHex`: known vectors.
+* `publicToEthAddress`: deterministic outputs for fixtures.
+* `signMessage/verifySignature`: roundtrip true; tampered message/keys false.
+
+### Integration
+
+* `POST /api/signup`:
+
+  * creates user; rejects duplicate `userId`/email.
+* `POST /api/users/:userId/sign`:
+
+  * returns 65+1 bytes sig hex; includes `signature_chain` if available.
+* `POST /api/verify`:
+
+  * valid for correct pair; invalid for modified message/signature.
+
+### E2E (manual)
+
+1. Sign up `alice@example.com`, `userId=alice` → see pubKey & address.
+2. Sign “hello dstack” → returns signature; verify → `true`.
+3. Admin page lists Alice.
+4. Negative: verify with wrong pubkey → `false`.
+
+**Acceptance**: All above pass; security checks confirm no private key persistence.
+
+---
+
+## 14) Risks & Mitigations
+
+* **Binding to `userId` immutability**: changing userId would change key.
+  *Mitigation*: treat `userId` as immutable; migrations use new namespace path (v2).
+* **Deterministic keys threat model**: same `(category,userId)` always yields same key.
+  *Mitigation*: namespaced categories; rotate namespace for compromise; document clearly.
+* **Message signing ambiguities** (prefixing vs raw): wallets differ.
+  *Mitigation*: document current scheme; plan EIP-191/EIP-712 upgrade path.
+* **Socket availability in CVM**: missing mount breaks key ops.
+  *Mitigation*: startup check; `/api/info` diagnostics, fail-fast healthcheck.
+
+---
+
+## 15) Backlog (Next 2 Sprints)
+
+**Sprint 1 (Demo Complete)**
+
+* [ ] Implement APIs and pages per §6/§8.
+* [ ] Integrate dstack `getKey` & sign; never persist private key.
+* [ ] Add healthcheck + structured logs + metrics counters.
+* [ ] Dockerfile + docker-compose + app-compose.json.
+* [ ] Smoke tests + manual E2E.
+
+**Sprint 2 (Hardening & Nice-to-Haves)**
+
+* [ ] `/api/info` to surface attestation metadata.
+* [ ] Rate limiting on sign/verify endpoints.
+* [ ] Switch signing to **EIP-191** (config flag), add EIP-712 example.
+* [ ] Basic session auth (NextAuth or header token) for admin route.
+* [ ] Export CSV of admin user list.
+
+---
+
+## 16) Deliverables
+
+* Source tree with Next.js app, Prisma schema, crypto utils.
+* Deployment artifacts: **Dockerfile**, **docker-compose.yml**, **app-compose.json**.
+* README with local & CVM run instructions.
+* Minimal test suite + sample vectors.
+
+---
+
+## 17) Open Questions
+
+* Should we expose **attestation quote** and verify on client, or keep server-only for demo?
+* Preferred **message signing standard** for your audience (raw vs EIP-191/EIP-712)?
+* Do we need **OIDC login** or keep email/userId form for simplicity?
+
+---
+
+## 18) Appendix — Key Implementation Notes (for Engineers)
+
+* **Derivation**: `getKey("wallet/ethereum", userId)` (category name is a stable namespace; change to rotate). Returns `{ key: Uint8Array, signature_chain?: string }`.
+* **Public Key**: secp256k1 uncompressed (65 bytes, `0x04...`) is convenient for verification.
+* **Address**: keccak-256 of uncompressed pubkey (sans prefix), last 20 bytes.
+* **Signature**: return `0x` hex of 65-byte sig + 1-byte recovery ID for developer ergonomics.
+* **No private key persistence**: lint rule + code review checklist ensure no writes/logs.
+
+---
+
+If you want me to include a **one-pager README** or a **Mermaid component diagram** for the repo root, I can add that now.

@@ -1,0 +1,11 @@
+# Task ID: 6
+# Title: Implement User Keys API
+# Status: pending
+# Dependencies: 2, 5
+# Priority: medium
+# Description: Create GET /api/users/me/keys endpoint to retrieve user's wallet information
+# Details:
+Create app/api/users/me/keys/route.ts implementing GET handler. Accept userId as query parameter, validate input with Zod. Query database for user by userId, return address and pubKeyHex fields. Implement proper error handling for user not found. Add request validation and structured logging. Consider implementing basic rate limiting to prevent enumeration attacks.
+
+# Test Strategy:
+Unit tests for user lookup, error handling for non-existent users, input validation, and response format verification
