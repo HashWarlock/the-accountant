@@ -20,14 +20,31 @@ export interface DstackWallet {
  * @returns DstackWallet with signing capabilities
  */
 export async function createWallet(userId: string): Promise<DstackWallet> {
+  console.log(`\n🔐 [Wallet] Creating wallet for user: ${userId}`)
+  console.log(`⏰ [Wallet] Start time: ${new Date().toISOString()}`)
+  
   // Get the private key from dstack TEE
+  console.log(`🔑 [Wallet] Requesting key from dstack TEE...`)
   const keyResponse = await getWalletKey(userId)
+  console.log(`✅ [Wallet] Key received from TEE`)
+  console.log(`📊 [Wallet] Key length: ${keyResponse.key.length} bytes`)
+  console.log(`🔐 [Wallet] Attestation chain length: ${keyResponse.signature_chain.length}`)
   
   // Convert to hex for viem
   const privateKeyHex = keyToHex(keyResponse)
+  console.log(`🔤 [Wallet] Private key converted to hex (length: ${privateKeyHex.length})`)
   
   // Create viem account from the private key
+  console.log(`👤 [Wallet] Creating viem account from private key...`)
   const account = privateKeyToAccount(privateKeyHex as `0x${string}`)
+  
+  console.log(`\n✨ [Wallet] ===== WALLET CREATED SUCCESSFULLY =====`)
+  console.log(`🆔 [Wallet] User ID: ${userId}`)
+  console.log(`📍 [Wallet] ETH Address: ${account.address}`)
+  console.log(`🔑 [Wallet] Public Key: ${account.publicKey}`)
+  console.log(`🏷️ [Wallet] Public Key Length: ${account.publicKey.length} chars`)
+  console.log(`⏰ [Wallet] Completed at: ${new Date().toISOString()}`)
+  console.log(`================================================\n`)
   
   return {
     userId,
@@ -37,12 +54,20 @@ export async function createWallet(userId: string): Promise<DstackWallet> {
     
     // Sign a message using viem's account
     signMessage: async (message: string) => {
-      return await account.signMessage({ message })
+      console.log(`\n📝 [Wallet] Signing message for ${userId}`)
+      console.log(`📋 [Wallet] Message: "${message.substring(0, 100)}${message.length > 100 ? '...' : ''}"`)
+      const signature = await account.signMessage({ message })
+      console.log(`✅ [Wallet] Message signed successfully`)
+      console.log(`🖊️ [Wallet] Signature: ${signature}`)
+      return signature
     },
     
     // Sign a transaction using viem's account
     signTransaction: async (tx: any) => {
-      return await account.signTransaction(tx)
+      console.log(`\n💳 [Wallet] Signing transaction for ${userId}`)
+      const signature = await account.signTransaction(tx)
+      console.log(`✅ [Wallet] Transaction signed successfully`)
+      return signature
     }
   }
 }

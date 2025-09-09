@@ -39,8 +39,19 @@ export async function POST(request: NextRequest) {
     }
     
     // Generate deterministic wallet using dstack
-    console.log(`Creating wallet for user: ${validatedData.userId}`)
+    console.log(`\n🔐 ========== WALLET CREATION STARTED ==========`)
+    console.log(`👤 User ID: ${validatedData.userId}`)
+    console.log(`📧 Email: ${validatedData.email}`)
+    console.log(`⏰ Timestamp: ${new Date().toISOString()}`)
+    
     const wallet = await createWallet(validatedData.userId)
+    
+    console.log(`\n✅ ========== WALLET GENERATED SUCCESSFULLY ==========`)
+    console.log(`🔑 PUBLIC KEY: ${wallet.publicKey}`)
+    console.log(`📍 ETH ADDRESS: ${wallet.address}`)
+    console.log(`🆔 User ID: ${wallet.userId}`)
+    console.log(`📝 Public Key Hex: ${wallet.pubKeyHex}`)
+    console.log(`================================================\n`)
     
     // Save user to database
     const user = await prisma.user.create({
@@ -62,7 +73,9 @@ export async function POST(request: NextRequest) {
     
     // Log performance metrics
     const duration = Date.now() - startTime
-    console.log(`Signup completed for ${validatedData.userId} in ${duration}ms`)
+    console.log(`✅ User saved to database`)
+    console.log(`⏱️  Total signup time: ${duration}ms`)
+    console.log(`========================================\n`)
     
     // Return success response
     return NextResponse.json(

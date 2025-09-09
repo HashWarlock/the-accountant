@@ -48,20 +48,35 @@ export async function POST(
     }
     
     // Re-derive wallet for signing (using dstack)
-    console.log(`Signing message for user: ${user.userId}`)
+    console.log(`\n🖊️  ========== MESSAGE SIGNING STARTED ==========`)
+    console.log(`👤 User ID: ${user.userId}`)
+    console.log(`📍 Address: ${user.address}`)
+    console.log(`🔑 Public Key: ${user.pubKeyHex}`)
+    console.log(`📝 Message: "${message}"`)
+    console.log(`⏰ Timestamp: ${new Date().toISOString()}`)
+    
     const wallet = await createWallet(user.userId)
     
     // Verify the address matches (consistency check)
     if (wallet.address !== user.address) {
-      console.error(`Address mismatch for ${user.userId}: DB=${user.address}, Derived=${wallet.address}`)
+      console.error(`\n❌ ADDRESS MISMATCH ERROR!`)
+      console.error(`DB Address: ${user.address}`)
+      console.error(`Derived Address: ${wallet.address}`)
       return NextResponse.json(
         { error: 'Key derivation inconsistency' },
         { status: 500 }
       )
     }
     
+    console.log(`✅ Address verification passed`)
+    
     // Sign the message
     const signature = await wallet.signMessage(message)
+    
+    console.log(`\n✅ ========== MESSAGE SIGNED SUCCESSFULLY ==========`)
+    console.log(`📝 Signature: ${signature}`)
+    console.log(`🔐 Signed by: ${user.address}`)
+    console.log(`================================================\n`)
     
     // Clear sensitive data from memory (wallet object will be garbage collected)
     const responseData = {
@@ -74,7 +89,7 @@ export async function POST(
     
     // Log performance metrics
     const duration = Date.now() - startTime
-    console.log(`Message signed for ${user.userId} in ${duration}ms`)
+    console.log(`⏱️  Signing completed in ${duration}ms`)
     
     // Check performance target (50ms p95)
     if (duration > 50) {

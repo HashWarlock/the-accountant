@@ -34,19 +34,30 @@ export async function getTeeInfo(): Promise<InfoResponse<TcbInfoV05x>> {
  */
 export async function getUserWalletKey(userId: string): Promise<GetKeyResponse> {
   try {
+    console.log(`\n🔐 [dstack] Getting wallet key from TEE`)
+    console.log(`👤 [dstack] User ID: ${userId}`)
+    console.log(`🔌 [dstack] Socket: /var/run/dstack.sock`)
+    
     const client = getDstackClient()
     
     // The SDK returns GetKeyResponse with:
     // - key: Uint8Array (32 bytes for secp256k1 private key)
     // - signature_chain: Uint8Array[] (attestation signatures)
+    console.log(`📡 [dstack] Calling TEE getKey('wallet/ethereum', '${userId}')...`)
     const keyResponse = await client.getKey('wallet/ethereum', userId)
+    
+    console.log(`✅ [dstack] Key received from TEE`)
+    console.log(`📏 [dstack] Key size: ${keyResponse.key.length} bytes`)
+    console.log(`🔐 [dstack] Attestation signatures: ${keyResponse.signature_chain.length}`)
     
     return keyResponse
   } catch (error) {
     // Check if it's a connection error (TEE not available)
     if (error instanceof Error && error.message.includes('does not exist')) {
+      console.error(`❌ [dstack] TEE not available - socket not found`)
       throw new Error('TEE not available. Is dstack running? Socket: /var/run/dstack.sock')
     }
+    console.error(`❌ [dstack] Failed to get wallet key: ${error}`)
     throw new Error(`Failed to get wallet key: ${error instanceof Error ? error.message : 'Unknown error'}`)
   }
 }
@@ -88,12 +99,18 @@ export async function getDevWalletKey(userId: string): Promise<GetKeyResponse> {
     throw new Error('Development mode keys not available in production')
   }
   
+  console.warn('\n⚠️  ========== DEVELOPMENT MODE ==========')
   console.warn('⚠️  Using development mode - keys are not secure!')
+  console.warn(`⚠️  User ID: ${userId}`)
   
   // In development, return a mock GetKeyResponse structure
   // Create a deterministic but insecure key based on userId
   const crypto = await import('crypto')
   const hash = crypto.createHash('sha256').update(userId).digest()
+  
+  console.warn(`⚠️  Generated mock key: ${hash.length} bytes`)
+  console.warn(`⚠️  No TEE attestation in dev mode`)
+  console.warn('⚠️  =====================================\n')
   
   return {
     __name__: 'GetKeyResponse' as const,
@@ -108,16 +125,25 @@ export async function getDevWalletKey(userId: string): Promise<GetKeyResponse> {
  * @returns GetKeyResponse from TEE or dev fallback
  */
 export async function getWalletKey(userId: string): Promise<GetKeyResponse> {
+  console.log(`\n🔑 [dstack] Getting wallet key for user: ${userId}`)
+  console.log(`🌍 [dstack] Environment: ${process.env.NODE_ENV || 'development'}`)
+  
   // Try TEE first
   try {
-    return await getUserWalletKey(userId)
+    console.log(`🔐 [dstack] Attempting to use TEE...`)
+    const result = await getUserWalletKey(userId)
+    console.log(`✅ [dstack] Successfully got key from TEE`)
+    return result
   } catch (error) {
+    console.error(`⚠️  [dstack] TEE failed: ${error}`)
+    
     // In development, fall back to mock keys
     if (process.env.NODE_ENV !== 'production') {
-      console.warn('TEE not available, using development fallback')
+      console.warn('📌 [dstack] TEE not available, using development fallback')
       return await getDevWalletKey(userId)
     }
     // In production, TEE is required
+    console.error(`❌ [dstack] TEE required in production - no fallback available`)
     throw error
   }
 }
