@@ -1,0 +1,110 @@
+## Flox Environment Manifest -----------------------------------------
+##
+##   _Everything_ you need to know about the _manifest_ is here:
+##
+##               https://flox.dev/docs/concepts/manifest
+##
+## -------------------------------------------------------------------
+# Flox manifest version managed by Flox CLI
+version = 1
+
+
+## Install Packages --------------------------------------------------
+##  $ flox install gum  <- puts a package in [install] section below
+##  $ flox search gum   <- search for a package
+##  $ flox show gum     <- show all versions of a package
+## -------------------------------------------------------------------
+[install]
+# Node.js 20 LTS for the project
+nodejs_20.pkg-path = "nodejs_20"
+nodejs_20.version = "20.19.4"
+
+# Git for version control
+git.pkg-path = "git"
+
+# Additional build tools that might be needed for native modules
+gcc.pkg-path = "gcc"
+gnumake.pkg-path = "gnumake"
+
+# Python for node-gyp and native module compilation
+python3.pkg-path = "python3"
+
+
+## Environment Variables ---------------------------------------------
+##  ... available for use in the activated environment
+##      as well as [hook], [profile] scripts and [services] below.
+## -------------------------------------------------------------------
+[vars]
+# Project environment
+NODE_ENV = "development"
+PROJECT_NAME = "dstack-js-sdk-demo"
+
+# Database configuration
+DATABASE_URL = "file:./dev.db"
+
+
+## Activation Hook ---------------------------------------------------
+##  ... run by _bash_ shell when you run 'flox activate'.
+## -------------------------------------------------------------------
+[hook]
+on-activate = '''
+  echo "🚀 Activating dstack JS SDK Demo environment..."
+  
+  # Check if package.json exists and install dependencies
+  if [ -f "$FLOX_ENV_PROJECT/package.json" ]; then
+    echo "📦 Installing npm dependencies..."
+    npm install
+  fi
+  
+  # Check if Prisma schema exists and generate client
+  if [ -f "$FLOX_ENV_PROJECT/prisma/schema.prisma" ]; then
+    echo "🗄️ Generating Prisma client..."
+    npx prisma generate
+  fi
+  
+  echo "✅ Environment ready! Node.js $(node --version) | npm $(npm --version)"
+  echo "📝 Project: $PROJECT_NAME"
+'''
+
+
+## Profile script ----------------------------------------------------
+## ... sourced by _your shell_ when you run 'flox activate'.
+## -------------------------------------------------------------------
+[profile]
+common = '''
+  # Add useful aliases for the project
+  alias dev="npm run dev"
+  alias build="npm run build"
+  alias test="npm test"
+  alias db:migrate="npx prisma migrate dev"
+  alias db:studio="npx prisma studio"
+  
+  # Set command prompt to show we're in Flox environment
+  export PS1="[flox:the-accountant] $PS1"
+'''
+## Shell specific profiles go here:
+# bash = ...
+# zsh  = ...
+# fish = ...
+
+
+## Services ----------------------------------------------------------
+##  $ flox services start             <- Starts all services
+##  $ flox services status            <- Status of running services
+##  $ flox activate --start-services  <- Activates & starts all
+## -------------------------------------------------------------------
+[services]
+# myservice.command = "python3 -m http.server"
+
+
+## Other Environment Options -----------------------------------------
+[options]
+# Systems that environment is compatible with
+systems = [
+  "aarch64-darwin",
+  "aarch64-linux",
+  "x86_64-darwin",
+  "x86_64-linux",
+]
+# Uncomment to disable CUDA detection.
+# cuda-detection = false
