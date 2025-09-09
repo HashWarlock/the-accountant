@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   web:
-    image: hashwarlock/the-accountant:v1.0.4
+    image: hashwarlock/the-accountant:v1.1.0
     container_name: dstack-js-sdk-demo
     ports:
       - "3000:3000"

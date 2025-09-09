@@ -26,20 +26,27 @@ All dependencies are pinned to exact versions for reproducible builds.
 
 ### Key Derivation Security
 
-**CRITICAL**: This application ensures unique key derivation for each user through:
+**⚠️ CRITICAL SECURITY REQUIREMENT**: This application uses the `APP_NAMESPACE` environment variable to ensure unique key derivation for each user.
 
-1. **Application Namespace**: Uses `APP_NAMESPACE` environment variable (default: `the-accountant-v1`) to prevent cross-application key collisions
+**[📖 See SECURITY.md for complete security documentation](./SECURITY.md)**
+
+Quick summary:
+1. **Application Namespace**: Uses `APP_NAMESPACE` environment variable (default: `the-accountant-v1`)
 2. **User ID Hashing**: SHA256 hashes the userId to create a consistent, unique identifier
-3. **Hierarchical Path Structure**: `wallet/{namespace}/eth/{userIdHash}` ensures globally unique paths
+3. **Derivation Path**: `wallet/{namespace}/eth/{sha256(userId)}` ensures globally unique keys
 
-This prevents the critical security issue where multiple users could receive the same private key. The derivation path is:
-```
-wallet/the-accountant-v1/eth/{sha256(userId)}
-```
+**WARNING**: Never share `APP_NAMESPACE` values between different environments (prod/staging/dev).
 
-To customize the namespace for your deployment:
+To configure for your deployment:
 ```bash
-export APP_NAMESPACE="my-app-v1"
+# Production
+export APP_NAMESPACE="the-accountant-prod"
+
+# Staging
+export APP_NAMESPACE="the-accountant-staging"
+
+# Development
+export APP_NAMESPACE="the-accountant-dev"
 ```
 
 ## Tech Stack
