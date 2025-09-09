@@ -24,7 +24,7 @@ export async function GET(request: NextRequest) {
     // Build query based on provided header
     const whereClause = validatedHeaders['x-user-id'] 
       ? { userId: validatedHeaders['x-user-id'] }
-      : { email: validatedHeaders['x-user-email'] }
+      : { email: validatedHeaders['x-user-email'] || undefined }
     
     // Fetch user from database
     const user = await prisma.user.findFirst({

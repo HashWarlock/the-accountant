@@ -394,7 +394,7 @@
           1,
           10
         ],
-        "status": "in-progress",
+        "status": "done",
         "subtasks": [
           {
             "id": 1,
@@ -555,11 +555,24 @@
         ],
         "priority": "high",
         "subtasks": []
+      },
+      {
+        "id": 15,
+        "title": "Test Docker Image Build",
+        "description": "Verify the Docker image builds successfully and is production-ready",
+        "details": "Build the Docker image using the multi-stage Dockerfile to ensure all stages complete successfully. Verify standalone Next.js output generation, dependency installation, Prisma client generation, non-root user setup, and health check configuration. Test image size optimization and layer caching.",
+        "testStrategy": "Run docker build command, verify build completes without errors, check image size is under 500MB, test container startup, verify health endpoint responds correctly",
+        "status": "done",
+        "dependencies": [
+          12
+        ],
+        "priority": "high",
+        "subtasks": []
       }
     ],
     "metadata": {
       "created": "2025-09-09T04:45:44.364Z",
-      "updated": "2025-09-09T07:03:41.004Z",
+      "updated": "2025-09-09T07:17:17.633Z",
       "description": "Tasks for master context"
     }
   }
