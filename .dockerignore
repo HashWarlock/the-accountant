@@ -1,0 +1,86 @@
+# Dependencies
+node_modules
+npm-debug.log
+yarn-error.log
+
+# Next.js build output
+.next
+out
+
+# Development files
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Version control
+.git
+.gitignore
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Testing
+coverage
+.nyc_output
+jest.config.js
+__tests__
+*.test.ts
+*.test.tsx
+*.spec.ts
+*.spec.tsx
+
+# Documentation
+README.md
+docs
+*.md
+
+# Flox environment
+.flox
+
+# Task Master
+.taskmaster
+
+# Build artifacts
+dist
+build
+
+# Logs
+logs
+*.log
+
+# Temporary files
+tmp
+temp
+*.tmp
+*.temp
+
+# Docker files (to avoid nested builds)
+Dockerfile*
+docker-compose*.yml
+.dockerignore
+
+# CI/CD
+.github
+.gitlab-ci.yml
+.circleci
+
+# Package manager files (except package.json and lock files)
+.npm
+.yarn
+pnpm-lock.yaml
+
+# TypeScript cache
+*.tsbuildinfo
+
+# License and other root files (keep package.json and lock files)
+LICENSE
+CHANGELOG.md

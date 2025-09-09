@@ -289,7 +289,7 @@
           8,
           9
         ],
-        "status": "in-progress",
+        "status": "done",
         "subtasks": [
           {
             "id": 1,
@@ -394,7 +394,7 @@
           1,
           10
         ],
-        "status": "pending",
+        "status": "in-progress",
         "subtasks": [
           {
             "id": 1,
@@ -402,7 +402,7 @@
             "description": "Build production-optimized Dockerfile with Node.js 20 Alpine base",
             "dependencies": [],
             "details": "Create multi-stage Dockerfile with builder stage for dependencies and production stage. Use Node.js 20 Alpine base image, implement layer caching optimization, include security hardening measures (non-root user, minimal packages), and add health check configuration.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": ""
           },
           {
@@ -413,7 +413,7 @@
               "12.1"
             ],
             "details": "Create docker-compose.yml with web service configuration, dstack socket volume mount (/var/run/dstack.sock), security options, resource limits, and health checks. Include environment variable configuration and proper networking setup.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": ""
           },
           {
@@ -424,7 +424,7 @@
               "12.1"
             ],
             "details": "Create app-compose.json for Phala CVM deployment with security attestation, socket mounting configuration, capability dropping for security hardening, and proper routing configuration for CVM environment.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": ""
           },
           {
@@ -437,7 +437,7 @@
               "12.3"
             ],
             "details": "Implement security hardening including non-root user configuration, capability dropping, security context settings, read-only root filesystem where applicable, and proper secret management practices.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": ""
           },
           {
@@ -449,7 +449,7 @@
               "12.3"
             ],
             "details": "Configure comprehensive health checks for Docker and CVM deployments, including application health endpoints, dependency checks, and proper timeout/retry configurations.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": ""
           },
           {
@@ -460,7 +460,7 @@
               "12.1"
             ],
             "details": "Create .dockerignore file to exclude unnecessary files from Docker build context, reducing build time and image size. Include node_modules, .git, logs, and development-only files.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": ""
           },
           {
@@ -473,7 +473,7 @@
               "12.6"
             ],
             "details": "Create detailed deployment documentation including local Docker setup instructions, CVM deployment guide, environment variable configuration, troubleshooting guide, and security considerations.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": ""
           }
         ]
@@ -559,7 +559,7 @@
     ],
     "metadata": {
       "created": "2025-09-09T04:45:44.364Z",
-      "updated": "2025-09-09T07:00:46.665Z",
+      "updated": "2025-09-09T07:03:41.004Z",
       "description": "Tasks for master context"
     }
   }
