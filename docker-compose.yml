@@ -3,7 +3,7 @@ version: '3.8'
 # The Accountant v1.2.0 - TEE-backed key management with attestation & audit logging
 services:
   web:
-    image: hashwarlock/the-accountant:v1.2.0
+    image: hashwarlock/the-accountant:v1.2.1
     container_name: dstack-js-sdk-demo
     ports:
       - "3000:3000"
@@ -37,14 +37,6 @@ services:
     read_only: true
     tmpfs:
       - /tmp
-    deploy:
-      resources:
-        limits:
-          cpus: '2'
-          memory: 1G
-        reservations:
-          cpus: '0.5'
-          memory: 256M
 
   # Optional: Database viewer for development
   db-viewer:
