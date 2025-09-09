@@ -1,0 +1,24 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  userId    String   @unique
+  pubKeyHex String   // Uncompressed public key (0x04... or compressed 0x02/0x03...)
+  address   String   // Ethereum-style address (keccak of pubkey)
+  createdAt DateTime @default(now())
+  
+  @@index([email])
+  @@index([userId])
+  @@index([address])
+}
