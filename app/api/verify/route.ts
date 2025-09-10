@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { verifyMessage } from 'viem'
 import { prisma } from '@/lib/db'
+import { createWalletWithAttestation } from '@/lib/wallet'
+import { createAuditLog } from '@/lib/audit'
 
 // Validation schema
 const verifyRequestSchema = z.object({
@@ -137,6 +139,54 @@ export async function POST(request: NextRequest) {
     // Log performance metrics
     const duration = Date.now() - startTime
     
+    // Generate attestation for the verify operation (if userId is available)
+    let attestationData = null
+    if (userId) {
+      try {
+        console.log(`\n🔏 Generating attestation for verify operation...`)
+        const wallet = await createWalletWithAttestation(
+          userId, 
+          'verify', 
+          { message, signature }
+        )
+        
+        if (wallet.attestationQuote) {
+          attestationData = {
+            quote: wallet.attestationQuote,
+            eventLog: wallet.eventLog,
+            checksum: wallet.attestationChecksum,
+            phalaVerificationUrl: wallet.phalaVerificationUrl,
+            t16zVerificationUrl: wallet.t16zVerificationUrl,
+            reportData: wallet.reportData
+          }
+          
+          // Create audit log with attestation
+          await createAuditLog({
+            userId,
+            operation: 'verify',
+            address: expectedAddress,
+            publicKey: userData?.pubKeyHex || null,
+            message,
+            signature,
+            attestationQuote: wallet.attestationQuote,
+            eventLog: wallet.eventLog,
+            applicationData: wallet.reportData,
+            attestationChecksum: wallet.attestationChecksum,
+            phalaVerificationUrl: wallet.phalaVerificationUrl,
+            t16zVerificationUrl: wallet.t16zVerificationUrl,
+            verificationStatus: 'pending'
+          })
+          
+          console.log(`✅ Attestation generated and audit log created`)
+          if (wallet.t16zVerificationUrl) {
+            console.log(`🔗 t16z verification: ${wallet.t16zVerificationUrl}`)
+          }
+        }
+      } catch (attestError) {
+        console.error(`⚠️ Failed to generate attestation (non-critical):`, attestError)
+      }
+    }
+    
     console.log(`\n📊 ========== VERIFICATION SUMMARY ==========`)
     console.log(`⏱️  Duration: ${duration}ms`)
     console.log(`✅ Valid: ${isValid}`)
@@ -147,10 +197,13 @@ export async function POST(request: NextRequest) {
     if (userData) {
       console.log(`👤 User ID: ${userData.userId}`)
     }
+    if (attestationData) {
+      console.log(`📜 Has Attestation: Yes`)
+    }
     console.log(`===========================================\n`)
     
     // Prepare response
-    const response = {
+    const response: any = {
       valid: isValid,
       message,
       expectedAddress,
@@ -163,6 +216,13 @@ export async function POST(request: NextRequest) {
         error: 'Signature does not match expected address' 
       }),
       timestamp: new Date().toISOString()
+    }
+    
+    // Add attestation data and verification URLs if available
+    if (attestationData) {
+      response.attestation = attestationData
+      response.phalaVerificationUrl = attestationData.phalaVerificationUrl
+      response.t16zVerificationUrl = attestationData.t16zVerificationUrl
     }
     
     return NextResponse.json(response, { status: 200 })

@@ -1,9 +1,9 @@
 version: '3.8'
 
-# The Accountant v1.3.6 - Enhanced UI with attestation verification links
+# The Accountant v1.4.0 - Rich attestation context and immediate verification links
 services:
   web:
-    image: hashwarlock/the-accountant:v1.3.6
+    image: hashwarlock/the-accountant:v1.4.0
     container_name: dstack-js-sdk-demo
     ports:
       - "3000:3000"

@@ -59,7 +59,7 @@ export async function POST(
     // Try to create wallet with attestation for signing operation
     let wallet
     try {
-      wallet = await createWalletWithAttestation(user.userId, 'sign')
+      wallet = await createWalletWithAttestation(user.userId, 'sign', { message })
     } catch (error) {
       console.warn(`⚠️ Failed to create wallet with attestation, falling back to regular:`, error)
       wallet = await createWallet(user.userId)
@@ -95,7 +95,7 @@ export async function POST(
       timestamp: new Date().toISOString()
     }
     
-    // Add attestation quote if available
+    // Add attestation and verification URLs if available
     if (wallet.attestationQuote) {
       responseData.attestation = {
         quote: wallet.attestationQuote,
@@ -105,9 +105,18 @@ export async function POST(
           phala: wallet.phalaVerificationUrl,
           t16z: wallet.t16zVerificationUrl
         },
+        reportData: wallet.reportData, // Include the structured report data
         timestamp: new Date().toISOString()
       }
+      
+      // Also add verification URLs at top level for easy access
+      responseData.phalaVerificationUrl = wallet.phalaVerificationUrl
+      responseData.t16zVerificationUrl = wallet.t16zVerificationUrl
+      
       console.log(`📜 Attestation quote included in signing response`)
+      if (wallet.t16zVerificationUrl) {
+        console.log(`🔗 t16z verification: ${wallet.t16zVerificationUrl}`)
+      }
     }
     
     // Log performance metrics

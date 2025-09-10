@@ -187,11 +187,13 @@ export function keyToHex(keyResponse: GetKeyResponse): string {
  * Get wallet key with remote attestation quote
  * @param userId - Unique user identifier
  * @param operation - Operation type for audit logging
+ * @param additionalData - Additional data for attestation context (e.g., message being signed)
  * @returns Object with key response and attestation quote
  */
 export async function getWalletKeyWithAttestation(
   userId: string, 
-  operation: 'signup' | 'sign' | 'verify'
+  operation: 'signup' | 'sign' | 'verify',
+  additionalData?: { message?: string; signature?: string }
 ): Promise<{
   keyResponse: GetKeyResponse
   attestationQuote?: string
@@ -199,6 +201,7 @@ export async function getWalletKeyWithAttestation(
   attestationChecksum?: string
   phalaVerificationUrl?: string
   t16zVerificationUrl?: string
+  reportData?: any // The original JSON data before hashing
 }> {
   try {
     // Get the wallet key first
@@ -209,22 +212,34 @@ export async function getWalletKeyWithAttestation(
     const { privateKeyToAccount } = await import('viem/accounts')
     const account = privateKeyToAccount(privateKeyHex as `0x${string}`)
     
-    // Generate attestation quote with HASHED public key (64-byte limit for Intel TDX)
+    // Generate attestation quote with structured report data
     console.log(`\n🔏 [dstack] Generating attestation quote for operation: ${operation}`)
     
-    // Intel TDX has a 64-byte limit for application data
-    // Public key is 130 hex chars (65 bytes) uncompressed, which exceeds the limit
-    // We'll hash the public key to get a consistent 32-byte value
+    // Create structured report data with operation context
+    const reportData = {
+      operation,
+      userId,
+      publicKey: account.publicKey,
+      address: account.address.toLowerCase(),
+      algorithm: 'secp256k1',
+      timestamp: new Date().toISOString(),
+      appNamespace: process.env.APP_NAMESPACE || 'the-accountant-v1',
+      ...(additionalData?.message && { message: additionalData.message.substring(0, 100) }), // Limit message length
+      ...(additionalData?.signature && { signature: additionalData.signature.substring(0, 66) }) // Limit signature length
+    }
+    
+    console.log(`📊 [dstack] Report data:`, JSON.stringify(reportData, null, 2))
+    
+    // Hash the JSON report data to fit within 64-byte limit
     const crypto = await import('crypto')
-    const publicKeyHash = crypto.createHash('sha256')
-      .update(account.publicKey.toLowerCase()) // Normalize to lowercase
+    const reportDataHash = crypto.createHash('sha256')
+      .update(JSON.stringify(reportData))
       .digest('hex')
     
-    console.log(`🔑 [dstack] Public key: ${account.publicKey.substring(0, 20)}...`)
-    console.log(`#️⃣ [dstack] Public key hash (for attestation): ${publicKeyHash.substring(0, 20)}...`)
+    console.log(`#️⃣ [dstack] Report data hash (for attestation): ${reportDataHash.substring(0, 20)}...`)
     
     // Use the hash as application data (32 bytes, well within 64-byte limit)
-    const applicationData = publicKeyHash
+    const applicationData = reportDataHash
     
     try {
       const quoteResponse = await generateAttestationQuote(applicationData)
@@ -254,13 +269,7 @@ export async function getWalletKeyWithAttestation(
           const uploadResult = await uploadAttestationQuote(
             quoteHex,
             eventLogHex,
-            {
-              userId,
-              operation,
-              publicKeyHash: applicationData, // This is the SHA256 hash of the public key
-              originalPublicKey: account.publicKey,
-              timestamp: new Date().toISOString()
-            }
+            reportData // Pass the full report data as application data
           )
           
           attestationChecksum = uploadResult.checksum
@@ -269,6 +278,7 @@ export async function getWalletKeyWithAttestation(
           
           console.log(`✅ [dstack] Attestation uploaded successfully`)
           console.log(`📊 [dstack] Checksum: ${attestationChecksum}`)
+          console.log(`🔗 [dstack] Verify on t16z: ${t16zVerificationUrl}`)
         } catch (uploadError) {
           // Upload is optional, log but don't fail
           console.error(`⚠️ [dstack] Attestation upload failed (non-critical):`, uploadError)
@@ -281,7 +291,8 @@ export async function getWalletKeyWithAttestation(
         eventLog: eventLogHex,
         attestationChecksum,
         phalaVerificationUrl,
-        t16zVerificationUrl
+        t16zVerificationUrl,
+        reportData // Include the original report data
       }
     } catch (quoteError) {
       // If quote generation fails, still return the key (backward compatibility)

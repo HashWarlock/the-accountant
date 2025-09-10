@@ -18,6 +18,7 @@ export interface DstackWallet {
   attestationChecksum?: string
   phalaVerificationUrl?: string
   t16zVerificationUrl?: string
+  reportData?: any // The structured report data used for attestation
 }
 
 /**
@@ -121,14 +122,19 @@ export async function verifyDeterministicKeys(userId: string): Promise<boolean> 
  * Create a wallet with attestation quote for a user
  * @param userId - Unique user identifier
  * @param operation - Operation type for audit logging
+ * @param additionalData - Additional data for attestation context (e.g., message being signed)
  * @returns DstackWallet with attestation quote
  */
 export async function createWalletWithAttestation(
   userId: string,
-  operation: 'signup' | 'sign' | 'verify' = 'signup'
+  operation: 'signup' | 'sign' | 'verify' = 'signup',
+  additionalData?: { message?: string; signature?: string }
 ): Promise<DstackWallet> {
   console.log(`\n🔐 [Wallet] Creating wallet with attestation for user: ${userId}`)
   console.log(`📋 [Wallet] Operation: ${operation}`)
+  if (additionalData?.message) {
+    console.log(`📝 [Wallet] Message: ${additionalData.message.substring(0, 50)}...`)
+  }
   console.log(`⏰ [Wallet] Start time: ${new Date().toISOString()}`)
   
   // Get the private key with attestation from dstack TEE
@@ -139,8 +145,9 @@ export async function createWalletWithAttestation(
     eventLog,
     attestationChecksum,
     phalaVerificationUrl,
-    t16zVerificationUrl
-  } = await getWalletKeyWithAttestation(userId, operation)
+    t16zVerificationUrl,
+    reportData
+  } = await getWalletKeyWithAttestation(userId, operation, additionalData)
   
   console.log(`✅ [Wallet] Key received from TEE`)
   console.log(`📊 [Wallet] Key length: ${keyResponse.key.length} bytes`)
@@ -188,6 +195,7 @@ export async function createWalletWithAttestation(
     attestationChecksum,
     phalaVerificationUrl,
     t16zVerificationUrl,
+    reportData,
     
     // Sign a message using viem's account
     signMessage: async (message: string) => {

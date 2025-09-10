@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { toast } from 'sonner'
-import { Loader2, Shield, X } from 'lucide-react'
+import { Loader2, Shield, X, ExternalLink } from 'lucide-react'
 
 export function VerifySignature() {
   const [loading, setLoading] = useState(false)
@@ -44,6 +44,24 @@ export function VerifySignature() {
       setVerificationResult(data)
       if (data.valid) {
         toast.success('✅ Signature is valid!')
+        
+        // Show verification link in toast if available
+        if (data.t16zVerificationUrl) {
+          toast.info(
+            <div className="flex flex-col gap-2">
+              <span>🔗 Attestation generated for verification!</span>
+              <a 
+                href={data.t16zVerificationUrl} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-blue-500 underline text-xs"
+              >
+                Verify on t16z Explorer →
+              </a>
+            </div>,
+            { duration: 10000 }
+          )
+        }
       } else {
         toast.error('❌ Signature is invalid!')
       }
@@ -160,6 +178,48 @@ export function VerifySignature() {
                 Verified at: {new Date(verificationResult.timestamp).toLocaleString()}
               </div>
             </div>
+            
+            {/* Attestation Verification Links */}
+            {(verificationResult.phalaVerificationUrl || verificationResult.t16zVerificationUrl) && (
+              <div className="mt-3 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded space-y-2">
+                <div className="flex items-center gap-2 text-blue-700 dark:text-blue-300">
+                  <Shield className="h-4 w-4" />
+                  <span className="font-semibold text-sm">TEE Attestation for Verification</span>
+                </div>
+                <div className="flex flex-col gap-2">
+                  {verificationResult.t16zVerificationUrl && (
+                    <a
+                      href={verificationResult.t16zVerificationUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-1 text-xs text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
+                    >
+                      <ExternalLink className="h-3 w-3" />
+                      Verify on t16z Explorer
+                    </a>
+                  )}
+                  {verificationResult.phalaVerificationUrl && (
+                    <a
+                      href={verificationResult.phalaVerificationUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-1 text-xs text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
+                    >
+                      <ExternalLink className="h-3 w-3" />
+                      Verify on Phala Cloud
+                    </a>
+                  )}
+                </div>
+                {verificationResult.attestation?.checksum && (
+                  <div className="mt-2">
+                    <span className="text-xs text-muted-foreground">Checksum:</span>
+                    <p className="font-mono text-xs bg-background/50 p-1 rounded mt-1 break-all">
+                      {verificationResult.attestation.checksum}
+                    </p>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         )}
       </CardContent>
