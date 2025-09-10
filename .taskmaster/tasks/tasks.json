@@ -732,11 +732,24 @@
         ],
         "priority": "high",
         "subtasks": []
+      },
+      {
+        "id": 28,
+        "title": "Fix Docker build cache and rebuild with Phala theme",
+        "description": "Clean up Docker build cache and rebuild v1.5.0 image to ensure the new Phala Network theme is properly included. Current build seems to be using cached old UI.",
+        "details": "The Docker build appears to be using cached layers from previous builds, causing the old UI to persist. Need to: 1) Clean Docker build cache with --no-cache flag, 2) Verify all theme files are properly included in the build context, 3) Rebuild the image for linux/amd64 platform, 4) Test locally to confirm new theme is applied, 5) Push updated image to DockerHub",
+        "testStrategy": "",
+        "status": "done",
+        "dependencies": [
+          27
+        ],
+        "priority": "high",
+        "subtasks": []
       }
     ],
     "metadata": {
       "created": "2025-09-09T04:45:44.364Z",
-      "updated": "2025-09-10T19:02:41.426Z",
+      "updated": "2025-09-10T20:02:23.741Z",
       "description": "Tasks for master context"
     }
   }

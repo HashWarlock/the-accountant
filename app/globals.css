@@ -1,20 +1,16 @@
-@import './theme.css';
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@import './theme.css';
 
 @layer base {
   :root {
     --radius: 0.5rem;
   }
-}
-
-@layer base {
-  * {
-    @apply border-border;
-  }
+  
   body {
-    @apply bg-background text-foreground;
+    background-color: var(--bg);
+    color: var(--fg);
   }
 }
