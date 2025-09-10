@@ -2,11 +2,12 @@
 
 A secure TEE-backed key management system demonstrating the dstack SDK for deterministic wallet generation and cryptographic operations in a Confidential VM environment.
 
-## 🚀 Version 1.3.0 - Phala Cloud Attestation Integration
+## 🚀 Version 1.3.1 - Phala Cloud PUBLIC API Integration
 
-### New Features in v1.3.0
-- **Phala Cloud Integration**: Upload attestation quotes to Phala Cloud for verification
-- **t16z Explorer Support**: Public attestation verification via t16z.com
+### New Features in v1.3.1
+- **Phala Cloud PUBLIC API**: No API key required - uses Phala's public attestation service
+- **Corrected API endpoints**: Proper integration with cloud-api.phala.network
+- **t16z Explorer Support**: Public attestation verification via proof.t16z.com
 - **Verification URLs**: Automatic generation of public verification links
 - **Enhanced Audit Logs**: Store attestation checksums and verification URLs
 - **Fixed Quote Handling**: Corrected hex string handling for attestation quotes

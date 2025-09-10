@@ -7,13 +7,15 @@
 import crypto from 'crypto'
 
 // API Endpoints (from documentation)
-const PHALA_CLOUD_API_BASE = process.env.PHALA_CLOUD_API_URL || 'https://phat-anchor-api.phala.network'
-const ATTESTATION_UPLOAD_ENDPOINT = '/attestation/report'
-const ATTESTATION_STATUS_ENDPOINT = '/attestation/report'
+// Phala Cloud provides a PUBLIC API - NO API KEY REQUIRED
+const PHALA_CLOUD_API_BASE = process.env.PHALA_CLOUD_API_URL || 'https://cloud-api.phala.network/api/v1'
+const ATTESTATION_VERIFY_ENDPOINT = '/attestations/verify'
+const ATTESTATION_VIEW_ENDPOINT = '/attestations/view'
+const ATTESTATION_RAW_ENDPOINT = '/attestations/raw'
+const ATTESTATION_COLLATERAL_ENDPOINT = '/attestations/collateral'
 const T16Z_EXPLORER_BASE = 'https://proof.t16z.com'
 
 // Configuration
-const API_KEY = process.env.PHALA_CLOUD_API_KEY
 const UPLOAD_TIMEOUT = parseInt(process.env.ATTESTATION_UPLOAD_TIMEOUT || '30000')
 const MAX_RETRY_ATTEMPTS = 3
 const INITIAL_RETRY_DELAY = 1000 // 1 second
@@ -67,8 +69,9 @@ export function calculateQuoteChecksum(quote: string): string {
 }
 
 /**
- * Upload attestation quote to Phala Cloud
- * Based on documentation: POST /attestation/report
+ * Upload attestation quote to Phala Cloud for verification and storage
+ * Based on documentation: POST /attestations/verify
+ * NO API KEY REQUIRED - This is a public API
  */
 export async function uploadQuoteToPhalaCloud(
   quote: string,
@@ -94,18 +97,6 @@ export async function uploadQuoteToPhalaCloud(
   console.log(`📊 [Phala Cloud] Quote checksum: ${checksum.substring(0, 16)}...`)
   console.log(`📏 [Phala Cloud] Quote size: ${cleanQuote.length / 2} bytes`)
   
-  // Prepare request payload following Phala Cloud API format
-  const payload = {
-    report: cleanQuote,
-    event_log: eventLog,
-    metadata: {
-      ...metadata,
-      checksum,
-      uploadedAt: new Date().toISOString(),
-      source: 'the-accountant-v1'
-    }
-  }
-  
   let lastError: Error | null = null
   
   // Retry logic with exponential backoff
@@ -116,35 +107,45 @@ export async function uploadQuoteToPhalaCloud(
       const controller = new AbortController()
       const timeoutId = setTimeout(() => controller.abort(), UPLOAD_TIMEOUT)
       
-      const response = await fetch(`${PHALA_CLOUD_API_BASE}${ATTESTATION_UPLOAD_ENDPOINT}`, {
+      // Use JSON format with hex string as documented
+      const response = await fetch(`${PHALA_CLOUD_API_BASE}${ATTESTATION_VERIFY_ENDPOINT}`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
-          ...(API_KEY ? { 'Authorization': `Bearer ${API_KEY}` } : {})
+          'Content-Type': 'application/json'
         },
-        body: JSON.stringify(payload),
+        body: JSON.stringify({ 
+          hex: cleanQuote  // API expects "hex" field with quote data
+        }),
         signal: controller.signal
       })
       
       clearTimeout(timeoutId)
       
       if (!response.ok) {
-        throw new Error(`Phala Cloud API error: ${response.status} ${response.statusText}`)
+        const errorText = await response.text()
+        throw new Error(`Phala Cloud API error: ${response.status} - ${errorText}`)
       }
       
       const result = await response.json()
       
-      console.log(`✅ [Phala Cloud] Quote uploaded successfully`)
-      console.log(`🔗 [Phala Cloud] Checksum: ${checksum}`)
+      // Check the verification result
+      if (!result.success) {
+        throw new Error(`Quote verification failed: ${result.detail || 'Unknown error'}`)
+      }
       
-      // Generate verification URL
-      const verificationUrl = `${PHALA_CLOUD_API_BASE}/attestation/verify/${checksum}`
+      console.log(`✅ [Phala Cloud] Quote uploaded and verified successfully`)
+      console.log(`🔗 [Phala Cloud] Checksum: ${result.checksum}`)
+      console.log(`✓ [Phala Cloud] Verified: ${result.quote?.verified ? 'Yes' : 'No'}`)
+      
+      // Generate URLs based on the checksum returned by the API
+      const actualChecksum = result.checksum || checksum
+      const verificationUrl = `${T16Z_EXPLORER_BASE}/reports/${actualChecksum}`
       
       return {
-        checksum,
-        uploadedAt: new Date().toISOString(),
+        checksum: actualChecksum,
+        uploadedAt: result.uploaded_at || new Date().toISOString(),
         verificationUrl,
-        status: 'uploaded'
+        status: result.quote?.verified ? 'verified' : 'uploaded'
       }
       
     } catch (error) {
@@ -173,16 +174,14 @@ export async function uploadQuoteToPhalaCloud(
 
 /**
  * Get verification status of uploaded attestation quote
+ * NO API KEY REQUIRED - This is a public API
  */
 export async function getPhalaVerificationStatus(checksum: string): Promise<PhalaVerificationStatus> {
   console.log(`\n🔍 [Phala Cloud] Checking verification status for: ${checksum}`)
   
   try {
-    const response = await fetch(`${PHALA_CLOUD_API_BASE}${ATTESTATION_STATUS_ENDPOINT}/${checksum}`, {
-      headers: {
-        ...(API_KEY ? { 'Authorization': `Bearer ${API_KEY}` } : {})
-      }
-    })
+    // Use the view endpoint to get quote details
+    const response = await fetch(`${PHALA_CLOUD_API_BASE}${ATTESTATION_VIEW_ENDPOINT}/${checksum}`)
     
     if (!response.ok) {
       if (response.status === 404) {
@@ -199,14 +198,24 @@ export async function getPhalaVerificationStatus(checksum: string): Promise<Phal
     
     console.log(`✅ [Phala Cloud] Verification status retrieved`)
     
+    // Extract TEE type from header
+    const teeType = result.header?.tee_type === 'TEE_TDX' ? 'TDX' : 
+                    result.header?.tee_type === 'TEE_SGX' ? 'SGX' : 'TDX'
+    
     return {
       checksum,
       status: result.verified ? 'verified' : 'pending',
       verificationDetails: result.verified ? {
-        teeType: result.tee_type || 'TDX',
-        measurements: result.measurements || {},
+        teeType,
+        measurements: {
+          mrtd: result.body?.mrtd,
+          rtmr0: result.body?.rtmr0,
+          rtmr1: result.body?.rtmr1,
+          rtmr2: result.body?.rtmr2,
+          rtmr3: result.body?.rtmr3,
+        },
         trustLevel: determineTrustLevel(result),
-        verifiedAt: result.verified_at || new Date().toISOString()
+        verifiedAt: result.uploaded_at || new Date().toISOString()
       } : undefined
     }
     
@@ -269,19 +278,14 @@ export async function uploadQuoteToT16z(quote: string): Promise<T16zUploadRespon
 /**
  * Generate public verification URLs for attestation
  */
-export function generateVerificationUrls(checksum: string, t16zReportId?: string): {
+export function generateVerificationUrls(checksum: string): {
   phalaUrl: string
-  t16zUrl?: string
+  t16zUrl: string
 } {
-  const urls: { phalaUrl: string; t16zUrl?: string } = {
-    phalaUrl: `${PHALA_CLOUD_API_BASE}/attestation/verify/${checksum}`
+  return {
+    phalaUrl: `${PHALA_CLOUD_API_BASE}${ATTESTATION_VIEW_ENDPOINT}/${checksum}`,
+    t16zUrl: `${T16Z_EXPLORER_BASE}/reports/${checksum}` // t16z uses the same checksum
   }
-  
-  if (t16zReportId) {
-    urls.t16zUrl = `${T16Z_EXPLORER_BASE}/reports/${t16zReportId}`
-  }
-  
-  return urls
 }
 
 /**
@@ -307,7 +311,7 @@ function determineTrustLevel(verificationResult: any): 'high' | 'medium' | 'low'
 }
 
 /**
- * Combined upload to both Phala Cloud and t16z explorer
+ * Combined upload to Phala Cloud (t16z is integrated via Phala Cloud)
  */
 export async function uploadAttestationQuote(
   quote: string,
@@ -315,40 +319,28 @@ export async function uploadAttestationQuote(
   metadata?: any
 ): Promise<{
   phalaCloud: PhalaCloudUploadResponse
-  t16z?: T16zUploadResponse
   checksum: string
   verificationUrls: {
     phalaUrl: string
-    t16zUrl?: string
+    t16zUrl: string
   }
 }> {
-  console.log('\n🚀 [Attestation] Starting combined attestation upload...')
+  console.log('\n🚀 [Attestation] Starting attestation upload to Phala Cloud...')
   
-  const checksum = calculateQuoteChecksum(quote)
-  
-  // Upload to Phala Cloud (primary)
+  // Upload to Phala Cloud (which also makes it available on t16z)
   const phalaResult = await uploadQuoteToPhalaCloud(quote, eventLog, metadata)
   
-  // Upload to t16z (optional, don't fail if it doesn't work)
-  let t16zResult: T16zUploadResponse | undefined
-  try {
-    t16zResult = await uploadQuoteToT16z(quote)
-  } catch (error) {
-    console.warn('⚠️  [Attestation] t16z upload failed (non-critical)', error)
-  }
-  
-  const verificationUrls = generateVerificationUrls(checksum, t16zResult?.reportId)
+  // Use the checksum from Phala Cloud result
+  const checksum = phalaResult.checksum
+  const verificationUrls = generateVerificationUrls(checksum)
   
   console.log('\n✅ [Attestation] Upload complete')
   console.log(`📊 [Attestation] Checksum: ${checksum}`)
-  console.log(`🔗 [Attestation] Phala Cloud: ${verificationUrls.phalaUrl}`)
-  if (verificationUrls.t16zUrl) {
-    console.log(`🔗 [Attestation] t16z Explorer: ${verificationUrls.t16zUrl}`)
-  }
+  console.log(`🔗 [Attestation] Phala Cloud View: ${verificationUrls.phalaUrl}`)
+  console.log(`🔗 [Attestation] t16z Explorer: ${verificationUrls.t16zUrl}`)
   
   return {
     phalaCloud: phalaResult,
-    t16z: t16zResult,
     checksum,
     verificationUrls
   }
