@@ -25,17 +25,22 @@ model User {
 }
 
 model AuditLog {
-  id               String   @id @default(cuid())
-  userId           String   // User ID for the operation
-  operation        String   // Operation type: signup, sign, verify
-  attestationQuote String?  // Hex-encoded attestation quote (SQLite TEXT can handle large strings)
-  eventLog         String?  // Hex-encoded event log
-  applicationData  String?  // JSON stringified application data
-  address          String?  // Ethereum address at time of operation
-  publicKey        String?  // Public key at time of operation
-  message          String?  // Message that was signed (for sign operations)
-  signature        String?  // Signature generated (for sign operations)
-  createdAt        DateTime @default(now())
+  id                   String   @id @default(cuid())
+  userId               String   // User ID for the operation
+  operation            String   // Operation type: signup, sign, verify
+  attestationQuote     String?  // Hex-encoded attestation quote (SQLite TEXT can handle large strings)
+  eventLog             String?  // Hex-encoded event log
+  applicationData      String?  // JSON stringified application data
+  address              String?  // Ethereum address at time of operation
+  publicKey            String?  // Public key at time of operation
+  message              String?  // Message that was signed (for sign operations)
+  signature            String?  // Signature generated (for sign operations)
+  attestationChecksum  String?  // SHA256 checksum of attestation quote
+  phalaVerificationUrl String?  // Phala Cloud verification URL
+  t16zVerificationUrl  String?  // t16z Explorer verification URL
+  verificationStatus   String   @default("pending") // pending, verified, failed
+  quoteUploadedAt      DateTime? // When quote was uploaded to cloud services
+  createdAt            DateTime @default(now())
   
   // Relations
   user             User     @relation(fields: [userId], references: [userId], onDelete: Cascade)
@@ -45,4 +50,6 @@ model AuditLog {
   @@index([operation])
   @@index([createdAt])
   @@index([userId, createdAt])
+  @@index([attestationChecksum])
+  @@index([verificationStatus])
 }

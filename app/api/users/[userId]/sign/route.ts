@@ -100,6 +100,11 @@ export async function POST(
       responseData.attestation = {
         quote: wallet.attestationQuote,
         eventLog: wallet.eventLog,
+        checksum: wallet.attestationChecksum,
+        verificationUrls: {
+          phala: wallet.phalaVerificationUrl,
+          t16z: wallet.t16zVerificationUrl
+        },
         timestamp: new Date().toISOString()
       }
       console.log(`📜 Attestation quote included in signing response`)
@@ -120,6 +125,9 @@ export async function POST(
       operation: 'sign',
       attestationQuote: wallet.attestationQuote,
       eventLog: wallet.eventLog,
+      attestationChecksum: wallet.attestationChecksum,
+      phalaVerificationUrl: wallet.phalaVerificationUrl,
+      t16zVerificationUrl: wallet.t16zVerificationUrl,
       applicationData: {
         namespace: process.env.APP_NAMESPACE || 'the-accountant-v1',
         timestamp: new Date().toISOString(),

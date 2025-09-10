@@ -11,6 +11,9 @@ export interface AuditLogData {
   publicKey?: string
   message?: string
   signature?: string
+  attestationChecksum?: string
+  phalaVerificationUrl?: string
+  t16zVerificationUrl?: string
 }
 
 /**
@@ -28,7 +31,12 @@ export async function createAuditLog(data: AuditLogData) {
         address: data.address || null,
         publicKey: data.publicKey || null,
         message: data.message || null,
-        signature: data.signature || null
+        signature: data.signature || null,
+        attestationChecksum: data.attestationChecksum || null,
+        phalaVerificationUrl: data.phalaVerificationUrl || null,
+        t16zVerificationUrl: data.t16zVerificationUrl || null,
+        verificationStatus: data.attestationChecksum ? 'pending' : null,
+        quoteUploadedAt: data.attestationChecksum ? new Date() : null
       }
     })
     

@@ -1,4 +1,5 @@
 import { DstackClient, type InfoResponse, type GetKeyResponse, type GetQuoteResponse, type TcbInfoV05x } from '@phala/dstack-sdk'
+import { uploadAttestationQuote } from './phala-cloud'
 
 // Singleton instance
 let clientInstance: DstackClient | null = null
@@ -195,6 +196,9 @@ export async function getWalletKeyWithAttestation(
   keyResponse: GetKeyResponse
   attestationQuote?: string
   eventLog?: string
+  attestationChecksum?: string
+  phalaVerificationUrl?: string
+  t16zVerificationUrl?: string
 }> {
   try {
     // Get the wallet key first
@@ -216,20 +220,58 @@ export async function getWalletKeyWithAttestation(
     try {
       const quoteResponse = await generateAttestationQuote(applicationData)
       
-      // Convert quote to hex for storage and display
-      const quoteHex = Buffer.from(quoteResponse.quote).toString('hex')
-      const eventLogHex = quoteResponse.event_log ? 
-        Buffer.from(quoteResponse.event_log).toString('hex') : 
-        undefined
+      // The SDK already returns quote as a hex string, don't convert from bytes
+      // Remove '0x' prefix if present for consistent storage
+      const quoteHex = quoteResponse.quote.startsWith('0x') ? 
+        quoteResponse.quote.slice(2) : 
+        quoteResponse.quote
       
+      // Event log is already a string (JSON), store it directly
+      const eventLogHex = quoteResponse.event_log || undefined
+      
+      console.log(`🔍 [dstack] Quote Response: ${JSON.stringify(quoteResponse)}`)
       console.log(`✅ [dstack] Attestation quote generated`)
-      console.log(`📜 [dstack] Quote size: ${quoteResponse.quote.length} bytes`)
+      console.log(`📜 [dstack] Quote size: ${quoteHex.length} hex characters (${quoteHex.length / 2} bytes)`)
       console.log(`🔍 [dstack] Quote (first 32 chars): ${quoteHex.substring(0, 32)}...`)
+      
+      // Upload to Phala Cloud and t16z if enabled
+      let attestationChecksum: string | undefined
+      let phalaVerificationUrl: string | undefined
+      let t16zVerificationUrl: string | undefined
+      
+      if (process.env.ENABLE_ATTESTATION_UPLOAD === 'true') {
+        try {
+          console.log(`\n📤 [dstack] Uploading attestation to Phala Cloud...`)
+          const uploadResult = await uploadAttestationQuote(
+            quoteHex,
+            eventLogHex,
+            {
+              userId,
+              operation,
+              publicKey: applicationData,
+              timestamp: new Date().toISOString()
+            }
+          )
+          
+          attestationChecksum = uploadResult.checksum
+          phalaVerificationUrl = uploadResult.verificationUrls.phalaUrl
+          t16zVerificationUrl = uploadResult.verificationUrls.t16zUrl
+          
+          console.log(`✅ [dstack] Attestation uploaded successfully`)
+          console.log(`📊 [dstack] Checksum: ${attestationChecksum}`)
+        } catch (uploadError) {
+          // Upload is optional, log but don't fail
+          console.error(`⚠️ [dstack] Attestation upload failed (non-critical):`, uploadError)
+        }
+      }
       
       return {
         keyResponse,
         attestationQuote: quoteHex,
-        eventLog: eventLogHex
+        eventLog: eventLogHex,
+        attestationChecksum,
+        phalaVerificationUrl,
+        t16zVerificationUrl
       }
     } catch (quoteError) {
       // If quote generation fails, still return the key (backward compatibility)

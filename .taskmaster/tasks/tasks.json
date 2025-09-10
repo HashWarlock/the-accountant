@@ -670,11 +670,60 @@
         ],
         "priority": "medium",
         "subtasks": []
+      },
+      {
+        "id": 24,
+        "title": "Fix critical quote handling bug in dstack.ts where quote is incorrectly converted from hex string to bytes",
+        "description": "The dstack SDK's getQuote() method returns a quote property as a Hex string type, but the code incorrectly treats it as bytes and applies Buffer.from() conversion on line 220.",
+        "details": "The bug is in the `getWalletKeyWithAttestation` function at line 220 in `/lib/dstack.ts`. The code currently does `Buffer.from(quoteResponse.quote).toString('hex')` which assumes `quoteResponse.quote` is a Uint8Array or Buffer, but according to the SDK documentation, `getQuote()` returns a quote property that is already a Hex string type. This double conversion is corrupting the quote data. The fix involves removing the `Buffer.from()` wrapper and directly using `quoteResponse.quote` since it's already in hex format. The same issue exists on line 222 for the event_log field. Update both lines to handle the hex string correctly: `const quoteHex = quoteResponse.quote` and `const eventLogHex = quoteResponse.event_log || undefined`. Also update the console logging to reflect that the quote is already a hex string.",
+        "testStrategy": "Test quote generation with real TEE environment to verify quote format matches expected attestation structure, compare quote output before and after fix to ensure no data corruption, verify that audit log storage and retrieval works correctly with the fixed quote format, test attestation quote verification endpoints to ensure quotes are properly formatted for validation services, add unit tests that mock the SDK response to verify proper handling of hex string quotes.",
+        "status": "done",
+        "dependencies": [
+          18,
+          21,
+          23
+        ],
+        "priority": "high",
+        "subtasks": []
+      },
+      {
+        "id": 25,
+        "title": "Create Phala Cloud integration module for uploading attestation quotes to Phala Cloud API",
+        "description": "Implement uploadQuoteToPhalaCloud() and getPhalaVerificationStatus() functions with API authentication for storing and verifying attestation quotes via Phala Cloud services.",
+        "details": "Create lib/phala-cloud.ts module implementing integration with Phala Cloud API. The module should include: 1) uploadQuoteToPhalaCloud(quote: string, metadata: object) function that uploads attestation quotes to Phala Cloud storage/verification service, 2) getPhalaVerificationStatus(quoteId: string) function to check verification status of uploaded quotes, 3) API authentication handling using API keys or token-based auth as required by Phala Cloud, 4) Error handling for network failures, authentication errors, and quota limits, 5) TypeScript interfaces for request/response structures, 6) Integration with existing attestation system in lib/dstack.ts:220 where quotes are generated, 7) Configuration via environment variables (PHALA_CLOUD_API_KEY, PHALA_CLOUD_ENDPOINT), 8) Retry logic with exponential backoff for failed uploads, 9) Quote validation before upload to ensure proper format, 10) Logging integration consistent with existing dstack logging patterns. Update existing quote generation flows in getWalletKeyWithAttestation() to optionally upload quotes to Phala Cloud for external verification. Add new API endpoint POST /api/attestation/upload for manual quote uploads if needed.",
+        "testStrategy": "Unit tests for uploadQuoteToPhalaCloud() with mock API responses, integration tests with Phala Cloud sandbox/staging environment, error handling tests for network failures and invalid authentication, quote format validation tests, configuration validation tests for missing/invalid API keys, end-to-end tests uploading real quotes from dstack and verifying upload success, performance tests for upload timeouts and retry behavior",
+        "status": "done",
+        "dependencies": [
+          14,
+          18,
+          21,
+          23,
+          "24"
+        ],
+        "priority": "high",
+        "subtasks": []
+      },
+      {
+        "id": 26,
+        "title": "Implement t16z explorer integration for attestation verification",
+        "description": "Create uploadQuoteToT16z() function to submit quotes to t16z.com and generate public verification URLs for attestation verification via the TEE Attestation Explorer.",
+        "details": "Create lib/t16z-explorer.ts module implementing integration with t16z.com's TEE Attestation Explorer for public attestation verification. The module should include: 1) uploadQuoteToT16z(quote: string, metadata?: object) function that uploads attestation quotes to proof.t16z.com verification service, 2) generateVerificationUrl(quote: string) function to create public verification URLs for attestation reports, 3) Error handling for network failures and invalid quotes, 4) TypeScript interfaces for request/response structures, 5) Integration with existing attestation system in lib/dstack.ts:220 where quotes are generated, 6) Configuration via environment variables (T16Z_API_ENDPOINT), 7) Retry logic with exponential backoff for failed uploads, 8) Quote validation before upload to ensure proper Intel TDX format, 9) Logging integration consistent with existing dstack logging patterns, 10) Support for both automatic upload during key operations and manual verification URL generation. Update existing quote generation flows in getWalletKeyWithAttestation() to optionally upload quotes to t16z for public verification. Add new API endpoint POST /api/attestation/verify-t16z for manual quote verification.",
+        "testStrategy": "Unit tests for uploadQuoteToT16z() with mock API responses, integration tests with t16z.com staging environment, error handling tests for network failures and invalid quotes, quote format validation tests for Intel TDX compliance, configuration validation tests for missing/invalid API endpoints, end-to-end tests uploading real quotes from dstack and verifying public URLs work correctly, performance tests for upload timeouts and retry behavior, verification of generated URLs redirect to correct t16z explorer pages",
+        "status": "pending",
+        "dependencies": [
+          14,
+          18,
+          21,
+          23,
+          24
+        ],
+        "priority": "medium",
+        "subtasks": []
       }
     ],
     "metadata": {
       "created": "2025-09-09T04:45:44.364Z",
-      "updated": "2025-09-09T22:32:23.681Z",
+      "updated": "2025-09-10T01:58:48.937Z",
       "description": "Tasks for master context"
     }
   }
