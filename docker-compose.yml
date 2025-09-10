@@ -1,9 +1,9 @@
 version: '3.8'
 
-# The Accountant v1.3.1 - TEE-backed key management with Phala Cloud PUBLIC API integration
+# The Accountant v1.3.2 - TEE-backed key management with 64-byte attestation fix
 services:
   web:
-    image: hashwarlock/the-accountant:v1.3.1
+    image: hashwarlock/the-accountant:v1.3.2
     container_name: dstack-js-sdk-demo
     ports:
       - "3000:3000"
@@ -14,7 +14,7 @@ services:
       - APP_NAMESPACE=the-accountant-v1  # Ensures unique key derivation namespace
       # Attestation upload configuration (disabled by default for production testing)
       # Phala Cloud provides a PUBLIC API - NO API KEY REQUIRED
-      - ENABLE_ATTESTATION_UPLOAD=false
+      - ENABLE_ATTESTATION_UPLOAD=true
       # - PHALA_CLOUD_API_URL=https://cloud-api.phala.network/api/v1  # Optional, default works
       # - ATTESTATION_UPLOAD_TIMEOUT=30000  # Optional, 30 second default
     volumes:

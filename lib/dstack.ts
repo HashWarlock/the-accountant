@@ -209,13 +209,22 @@ export async function getWalletKeyWithAttestation(
     const { privateKeyToAccount } = await import('viem/accounts')
     const account = privateKeyToAccount(privateKeyHex as `0x${string}`)
     
-    // Generate attestation quote with ONLY the public key (64-byte limit for Intel TDX)
+    // Generate attestation quote with HASHED public key (64-byte limit for Intel TDX)
     console.log(`\n🔏 [dstack] Generating attestation quote for operation: ${operation}`)
     
     // Intel TDX has a 64-byte limit for application data
-    // Public key is 66 characters (33 bytes) when compressed: 0x04... (uncompressed is 130 chars)
-    // We'll use just the public key to fit within the limit
-    const applicationData = account.publicKey // This is the hex string of the public key
+    // Public key is 130 hex chars (65 bytes) uncompressed, which exceeds the limit
+    // We'll hash the public key to get a consistent 32-byte value
+    const crypto = await import('crypto')
+    const publicKeyHash = crypto.createHash('sha256')
+      .update(account.publicKey.toLowerCase()) // Normalize to lowercase
+      .digest('hex')
+    
+    console.log(`🔑 [dstack] Public key: ${account.publicKey.substring(0, 20)}...`)
+    console.log(`#️⃣ [dstack] Public key hash (for attestation): ${publicKeyHash.substring(0, 20)}...`)
+    
+    // Use the hash as application data (32 bytes, well within 64-byte limit)
+    const applicationData = publicKeyHash
     
     try {
       const quoteResponse = await generateAttestationQuote(applicationData)
@@ -248,7 +257,8 @@ export async function getWalletKeyWithAttestation(
             {
               userId,
               operation,
-              publicKey: applicationData,
+              publicKeyHash: applicationData, // This is the SHA256 hash of the public key
+              originalPublicKey: account.publicKey,
               timestamp: new Date().toISOString()
             }
           )

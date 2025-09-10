@@ -127,7 +127,7 @@ export async function POST(request: NextRequest) {
         email: user.email,
         namespace: process.env.APP_NAMESPACE || 'the-accountant-v1',
         timestamp: new Date().toISOString(),
-        note: 'Attestation quote contains only public key (Intel TDX 64-byte limit)'
+        note: 'Attestation quote contains SHA256 hash of public key (Intel TDX 64-byte limit)'
       },
       address: user.address,
       publicKey: user.pubKeyHex

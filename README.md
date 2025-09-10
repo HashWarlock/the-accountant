@@ -2,9 +2,10 @@
 
 A secure TEE-backed key management system demonstrating the dstack SDK for deterministic wallet generation and cryptographic operations in a Confidential VM environment.
 
-## 🚀 Version 1.3.1 - Phala Cloud PUBLIC API Integration
+## 🚀 Version 1.3.2 - Critical 64-Byte Attestation Fix
 
-### New Features in v1.3.1
+### New Features in v1.3.2
+- **Fixed 64-byte limit issue**: SHA256 hash public keys to fit Intel TDX 64-byte report data limit
 - **Phala Cloud PUBLIC API**: No API key required - uses Phala's public attestation service
 - **Corrected API endpoints**: Proper integration with cloud-api.phala.network
 - **t16z Explorer Support**: Public attestation verification via proof.t16z.com
