@@ -2,7 +2,7 @@
 # Startup script for production deployment
 # Ensures database migrations are applied before starting the app
 
-echo "🚀 Starting The Accountant v1.3.5..."
+echo "🚀 Starting The Accountant v1.3.6..."
 
 # Apply database migrations
 echo "📊 Applying database migrations..."

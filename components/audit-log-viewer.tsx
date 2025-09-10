@@ -14,6 +14,10 @@ interface AuditLog {
   attestationQuote: string | null
   eventLog: string | null
   applicationData: any
+  attestationChecksum: string | null
+  phalaVerificationUrl: string | null
+  t16zVerificationUrl: string | null
+  verificationStatus: string
 }
 
 interface AuditLogViewerProps {
@@ -85,14 +89,18 @@ export function AuditLogViewer({ userId }: AuditLogViewerProps) {
       filename = `audit-logs-${userId}-${Date.now()}.json`
     } else {
       // CSV export
-      const headers = ['ID', 'Operation', 'Timestamp', 'Address', 'Message', 'Has Attestation']
+      const headers = ['ID', 'Operation', 'Timestamp', 'Address', 'Message', 'Has Attestation', 'Verification Status', 'Checksum', 'Phala URL', 't16z URL']
       const rows = filteredLogs.map(log => [
         log.id,
         log.operation,
         log.createdAt,
         log.address || '',
         log.message || '',
-        log.attestationQuote ? 'Yes' : 'No'
+        log.attestationQuote ? 'Yes' : 'No',
+        log.verificationStatus || '',
+        log.attestationChecksum || '',
+        log.phalaVerificationUrl || '',
+        log.t16zVerificationUrl || ''
       ])
       
       content = [
@@ -235,8 +243,13 @@ export function AuditLogViewer({ userId }: AuditLogViewerProps) {
                       {new Date(log.createdAt).toLocaleString()}
                     </span>
                     {log.attestationQuote && (
-                      <span className="text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded">
-                        With Attestation
+                      <span className={`text-xs px-2 py-1 rounded flex items-center gap-1 ${
+                        log.verificationStatus === 'verified' 
+                          ? 'bg-green-100 text-green-800' 
+                          : 'bg-yellow-100 text-yellow-800'
+                      }`}>
+                        <Shield className="h-3 w-3" />
+                        {log.verificationStatus === 'verified' ? 'Verified' : 'With Attestation'}
                       </span>
                     )}
                   </div>
@@ -322,22 +335,80 @@ export function AuditLogViewer({ userId }: AuditLogViewerProps) {
                   )}
                   
                   {log.attestationQuote && (
-                    <div>
-                      <label className="text-xs font-semibold text-gray-600">Attestation Quote</label>
-                      <div className="flex items-center gap-2">
-                        <p className="font-mono text-xs bg-yellow-50 p-2 rounded border border-yellow-200 break-all flex-1">
-                          {log.attestationQuote}
-                        </p>
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            copyToClipboard(log.attestationQuote, 'Attestation Quote')
-                          }}
-                          className="text-gray-400 hover:text-gray-600"
-                        >
-                          <Copy className="h-4 w-4" />
-                        </button>
+                    <div className="space-y-3">
+                      <div>
+                        <label className="text-xs font-semibold text-gray-600">Attestation Quote</label>
+                        <div className="flex items-center gap-2">
+                          <div className="font-mono text-xs bg-yellow-50 p-2 rounded border border-yellow-200 break-all flex-1 max-h-32 overflow-y-auto">
+                            {log.attestationQuote.substring(0, 200)}...
+                            <details className="mt-2">
+                              <summary className="cursor-pointer text-blue-600 hover:text-blue-800">Show full quote</summary>
+                              <div className="mt-2">{log.attestationQuote}</div>
+                            </details>
+                          </div>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              copyToClipboard(log.attestationQuote, 'Attestation Quote')
+                            }}
+                            className="text-gray-400 hover:text-gray-600"
+                          >
+                            <Copy className="h-4 w-4" />
+                          </button>
+                        </div>
                       </div>
+                      
+                      {log.attestationChecksum && (
+                        <div>
+                          <label className="text-xs font-semibold text-gray-600">Attestation Checksum</label>
+                          <p className="font-mono text-xs bg-gray-50 p-2 rounded border break-all">
+                            {log.attestationChecksum}
+                          </p>
+                        </div>
+                      )}
+                      
+                      {(log.phalaVerificationUrl || log.t16zVerificationUrl) && (
+                        <div>
+                          <label className="text-xs font-semibold text-gray-600">Verification Links</label>
+                          <div className="space-y-2 mt-1">
+                            {log.phalaVerificationUrl && (
+                              <a
+                                href={log.phalaVerificationUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="block text-sm text-blue-600 hover:text-blue-800 underline"
+                                onClick={(e) => e.stopPropagation()}
+                              >
+                                🔗 Verify on Phala Cloud →
+                              </a>
+                            )}
+                            {log.t16zVerificationUrl && (
+                              <a
+                                href={log.t16zVerificationUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="block text-sm text-blue-600 hover:text-blue-800 underline"
+                                onClick={(e) => e.stopPropagation()}
+                              >
+                                🔍 Verify on t16z Explorer →
+                              </a>
+                            )}
+                          </div>
+                        </div>
+                      )}
+                      
+                      {log.verificationStatus && (
+                        <div>
+                          <label className="text-xs font-semibold text-gray-600">Verification Status</label>
+                          <span className={`inline-block px-2 py-1 rounded text-xs font-semibold ${
+                            log.verificationStatus === 'verified' ? 'bg-green-100 text-green-800' :
+                            log.verificationStatus === 'failed' ? 'bg-red-100 text-red-800' :
+                            'bg-yellow-100 text-yellow-800'
+                          }`}>
+                            {log.verificationStatus.toUpperCase()}
+                          </span>
+                        </div>
+                      )}
                     </div>
                   )}
                   

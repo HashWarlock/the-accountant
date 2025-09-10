@@ -1,9 +1,9 @@
 version: '3.8'
 
-# The Accountant v1.3.5 - Fixed Prisma CLI for auto-migrations
+# The Accountant v1.3.6 - Enhanced UI with attestation verification links
 services:
   web:
-    image: hashwarlock/the-accountant:v1.3.5
+    image: hashwarlock/the-accountant:v1.3.6
     container_name: dstack-js-sdk-demo
     ports:
       - "3000:3000"
