@@ -20,28 +20,28 @@ export default function Home() {
   }
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
+    <main className="min-h-screen bg-gradient-to-br from-phala-g00 via-phala-g01 to-phala-g02">
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-6xl mx-auto space-y-8">
           <Card className="border-none shadow-none bg-transparent">
             <CardHeader className="text-center">
-              <div className="flex justify-center mb-4">
-                <div className="p-3 bg-primary/10 rounded-full">
-                  <Shield className="h-8 w-8 text-primary" />
+              <div className="flex justify-center mb-6">
+                <div className="p-4 bg-gradient-brand rounded-full shadow-glow phala-pulse">
+                  <Shield className="h-10 w-10 text-phala-g09" />
                 </div>
               </div>
-              <CardTitle className="text-3xl font-bold">dstack JS SDK Demo</CardTitle>
-              <CardDescription className="text-lg">
-                Secure TEE-backed key management for web applications
+              <CardTitle className="text-4xl font-bold phala-gradient-text">The Accountant</CardTitle>
+              <CardDescription className="text-lg text-phala-g08 font-medium mt-2">
+                TEE-Secured Wallet Infrastructure powered by Phala Network
               </CardDescription>
-              <div className="flex justify-center gap-6 mt-4 text-sm text-muted-foreground">
-                <div className="flex items-center gap-2">
-                  <Key className="h-4 w-4" />
-                  <span>Deterministic Keys</span>
+              <div className="flex justify-center gap-8 mt-6">
+                <div className="flex items-center gap-2 px-4 py-2 bg-phala-g02 rounded-lg border border-phala-g03">
+                  <Key className="h-4 w-4 text-phala-lime" />
+                  <span className="text-sm font-medium text-phala-g08">Deterministic Keys</span>
                 </div>
-                <div className="flex items-center gap-2">
-                  <Server className="h-4 w-4" />
-                  <span>TEE Protected</span>
+                <div className="flex items-center gap-2 px-4 py-2 bg-phala-g02 rounded-lg border border-phala-g03">
+                  <Server className="h-4 w-4 text-phala-lime" />
+                  <span className="text-sm font-medium text-phala-g08">Intel TDX Protected</span>
                 </div>
               </div>
             </CardHeader>
@@ -78,11 +78,11 @@ export default function Home() {
                 <AuditLogViewer userId={currentUserId} />
               ) : (
                 <div className="text-center py-8">
-                  <p className="text-gray-600 mb-4">Please create an account or enter a User ID to view audit logs</p>
+                  <p className="text-muted-foreground mb-4">Please create an account or enter a User ID to view audit logs</p>
                   <input
                     type="text"
                     placeholder="Enter User ID"
-                    className="px-3 py-2 border rounded mr-2"
+                    className="px-3 py-2 border border-border rounded-md mr-2 bg-white focus:outline-none focus:ring-2 focus:ring-phala-focus"
                     onKeyDown={(e) => {
                       if (e.key === 'Enter' && e.currentTarget.value) {
                         setCurrentUserId(e.currentTarget.value)
@@ -96,7 +96,7 @@ export default function Home() {
                         setCurrentUserId(input.value)
                       }
                     }}
-                    className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700"
+                    className="px-4 py-2 bg-phala-lime text-phala-g09 font-medium rounded-md hover:bg-phala-lime-hover transition-colors"
                   >
                     View Logs
                   </button>

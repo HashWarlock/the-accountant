@@ -1,0 +1,174 @@
+/* Phala Network Brand Colors */
+:root {
+  /* Phala Green Scale - Official Brand Palette */
+  --phala-lime: #CDFA50;   /* Primary brand color */
+  --phala-g00: #FCFDFA;    /* Lightest */
+  --phala-g01: #F7FBF1;
+  --phala-g02: #EBF9D0;
+  --phala-g03: #DFF4B5;
+  --phala-g04: #D1EB9C;
+  --phala-g05: #C2DD88;
+  --phala-g06: #B0CB72;
+  --phala-g07: #97B748;
+  --phala-g08: #647D1C;
+  --phala-g09: #36411D;    /* Darkest */
+  
+  /* Backgrounds */
+  --bg: #FCFDFA;           /* g00 - Page background */
+  --bg-subtle: #F7FBF1;    /* g01 - Subtle background */
+  --bg-card: #FFFFFF;      /* White - Card backgrounds */
+  --bg-hover: #EBF9D0;     /* g02 - Hover state */
+  --bg-active: #DFF4B5;    /* g03 - Active state */
+  
+  /* Text */
+  --fg: #1E2119;           /* Ink - Primary text */
+  --fg-muted: #647D1C;     /* g08 - Muted text */
+  --fg-subtle: #97B748;    /* g07 - Subtle text */
+  
+  /* Brand & Actions */
+  --brand: #CDFA50;        /* Phala Lime - Primary brand */
+  --brand-hover: #BAE730;  /* Darker lime for hover */
+  --brand-active: #A8D520; /* Even darker for active */
+  --focus: #CDFA50;        /* Focus ring */
+  
+  /* Status Colors */
+  --success: #97B748;      /* g07 - Success states */
+  --warning: #D1EB9C;      /* g04 - Warning states */
+  --danger: #DC2626;       /* Red for errors */
+  --info: #647D1C;         /* g08 - Info states */
+  
+  /* Surfaces & Borders */
+  --border: #DFF4B5;       /* g03 - Subtle borders */
+  --border-strong: #C2DD88; /* g05 - Strong borders */
+  --border-focus: #CDFA50;  /* Lime border for focus */
+  --badge: #EBF9D0;        /* g02 - Badge background */
+  
+  /* Interactive Elements */
+  --button-primary: #CDFA50;
+  --button-primary-hover: #BAE730;
+  --button-primary-text: #1E2119;
+  --button-secondary: #EBF9D0;
+  --button-secondary-hover: #DFF4B5;
+  --button-secondary-text: #36411D;
+  
+  /* Shadows with Phala tint */
+  --shadow-sm: 0 1px 2px 0 rgb(30 33 25 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(30 33 25 / 0.1), 0 2px 4px -1px rgb(30 33 25 / 0.06);
+  --shadow-lg: 0 10px 15px -3px rgb(30 33 25 / 0.1), 0 4px 6px -2px rgb(30 33 25 / 0.05);
+  --shadow-glow: 0 0 20px rgba(205, 250, 80, 0.3);
+  --shadow-glow-hover: 0 0 30px rgba(205, 250, 80, 0.5);
+  
+  /* Gradients */
+  --gradient-brand: linear-gradient(135deg, #CDFA50 0%, #97B748 100%);
+  --gradient-subtle: linear-gradient(135deg, #F7FBF1 0%, #EBF9D0 100%);
+}
+
+/* Dark mode - Phala themed */
+@media (prefers-color-scheme: dark) {
+  :root {
+    /* Backgrounds - Inverted */
+    --bg: #1A1F15;           /* Dark background */
+    --bg-subtle: #1E2119;    /* Slightly lighter */
+    --bg-card: #252B1F;      /* Card backgrounds */
+    --bg-hover: #2F3625;     /* Hover state */
+    --bg-active: #36411D;    /* Active state */
+    
+    /* Text - Inverted */
+    --fg: #F7FBF1;           /* Light primary text */
+    --fg-muted: #C2DD88;     /* Muted text */
+    --fg-subtle: #97B748;    /* Subtle text */
+    
+    /* Brand stays vibrant */
+    --brand: #CDFA50;
+    --brand-hover: #D4FF5F;
+    --brand-active: #BAE730;
+    
+    /* Status Colors adjusted for dark */
+    --success: #97B748;
+    --warning: #D1EB9C;
+    --danger: #EF4444;
+    --info: #C2DD88;
+    
+    /* Borders for dark mode */
+    --border: #36411D;
+    --border-strong: #647D1C;
+    --border-focus: #CDFA50;
+    --badge: #2F3625;
+    
+    /* Buttons for dark mode */
+    --button-primary: #CDFA50;
+    --button-primary-hover: #D4FF5F;
+    --button-primary-text: #1E2119;
+    --button-secondary: #36411D;
+    --button-secondary-hover: #647D1C;
+    --button-secondary-text: #F7FBF1;
+    
+    /* Dark mode shadows */
+    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.2);
+    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.3), 0 2px 4px -1px rgb(0 0 0 / 0.2);
+    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.4), 0 4px 6px -2px rgb(0 0 0 / 0.3);
+  }
+}
+
+/* Utility classes for Phala theme */
+.phala-glow {
+  box-shadow: var(--shadow-glow);
+}
+
+.phala-glow:hover {
+  box-shadow: var(--shadow-glow-hover);
+  transition: box-shadow 0.3s ease;
+}
+
+.phala-gradient {
+  background: var(--gradient-brand);
+}
+
+.phala-gradient-text {
+  background: var(--gradient-brand);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Animation for Phala brand elements */
+@keyframes phala-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.8; }
+}
+
+.phala-pulse {
+  animation: phala-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Custom scrollbar with Phala colors */
+::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-subtle);
+  border-radius: 6px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-strong);
+  border-radius: 6px;
+  border: 2px solid var(--bg-subtle);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--brand);
+}
+
+/* Focus styles with Phala lime */
+*:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
+/* Smooth transitions for theme changes */
+* {
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}

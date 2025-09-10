@@ -709,7 +709,7 @@
         "description": "Create uploadQuoteToT16z() function to submit quotes to t16z.com and generate public verification URLs for attestation verification via the TEE Attestation Explorer.",
         "details": "Create lib/t16z-explorer.ts module implementing integration with t16z.com's TEE Attestation Explorer for public attestation verification. The module should include: 1) uploadQuoteToT16z(quote: string, metadata?: object) function that uploads attestation quotes to proof.t16z.com verification service, 2) generateVerificationUrl(quote: string) function to create public verification URLs for attestation reports, 3) Error handling for network failures and invalid quotes, 4) TypeScript interfaces for request/response structures, 5) Integration with existing attestation system in lib/dstack.ts:220 where quotes are generated, 6) Configuration via environment variables (T16Z_API_ENDPOINT), 7) Retry logic with exponential backoff for failed uploads, 8) Quote validation before upload to ensure proper Intel TDX format, 9) Logging integration consistent with existing dstack logging patterns, 10) Support for both automatic upload during key operations and manual verification URL generation. Update existing quote generation flows in getWalletKeyWithAttestation() to optionally upload quotes to t16z for public verification. Add new API endpoint POST /api/attestation/verify-t16z for manual quote verification.",
         "testStrategy": "Unit tests for uploadQuoteToT16z() with mock API responses, integration tests with t16z.com staging environment, error handling tests for network failures and invalid quotes, quote format validation tests for Intel TDX compliance, configuration validation tests for missing/invalid API endpoints, end-to-end tests uploading real quotes from dstack and verifying public URLs work correctly, performance tests for upload timeouts and retry behavior, verification of generated URLs redirect to correct t16z explorer pages",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
           14,
           18,
@@ -719,11 +719,24 @@
         ],
         "priority": "medium",
         "subtasks": []
+      },
+      {
+        "id": 27,
+        "title": "UI Upgrade with Phala Network Brand Colors",
+        "description": "Implement Phala Network's official color palette throughout the application using CSS variables and update all shadcn/ui components",
+        "details": "Upgrade The Accountant application's user interface to align with Phala Network's brand identity. This involves implementing a comprehensive theming system with CSS variables using the Phala color palette (Phala Lime #CDFA50 as primary, Phala Green scale from #FCFDFA to #36411D), updating all shadcn/ui components, and ensuring a cohesive, modern design throughout the application. The implementation includes creating theme.css with semantic color mappings, updating Tailwind configuration, modifying all UI components to use the new color scheme, and ensuring excellent readability and contrast ratios.",
+        "testStrategy": "",
+        "status": "done",
+        "dependencies": [
+          26
+        ],
+        "priority": "high",
+        "subtasks": []
       }
     ],
     "metadata": {
       "created": "2025-09-09T04:45:44.364Z",
-      "updated": "2025-09-10T01:58:48.937Z",
+      "updated": "2025-09-10T19:02:41.426Z",
       "description": "Tasks for master context"
     }
   }
