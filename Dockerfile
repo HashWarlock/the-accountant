@@ -58,11 +58,12 @@ COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 # Copy public assets
 COPY --from=builder --chown=nextjs:nodejs /app/public ./public
-# Copy Prisma files with correct ownership including CLI for migrations
+# Copy Prisma files with correct ownership
 COPY --from=builder --chown=nextjs:nodejs /app/prisma ./prisma
 COPY --from=builder --chown=nextjs:nodejs /app/node_modules/.prisma ./node_modules/.prisma
 COPY --from=builder --chown=nextjs:nodejs /app/node_modules/@prisma ./node_modules/@prisma
-COPY --from=builder --chown=nextjs:nodejs /app/node_modules/prisma ./node_modules/prisma
+# Copy ALL node_modules for prisma CLI (required for migrations)
+COPY --from=deps --chown=nextjs:nodejs /app/node_modules ./node_modules
 # Copy startup script
 COPY --chown=nextjs:nodejs scripts/startup.sh ./startup.sh
 RUN chmod +x ./startup.sh
