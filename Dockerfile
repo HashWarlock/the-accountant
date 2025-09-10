@@ -58,10 +58,14 @@ COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 # Copy public assets
 COPY --from=builder --chown=nextjs:nodejs /app/public ./public
-# Copy Prisma files with correct ownership
+# Copy Prisma files with correct ownership including CLI for migrations
 COPY --from=builder --chown=nextjs:nodejs /app/prisma ./prisma
 COPY --from=builder --chown=nextjs:nodejs /app/node_modules/.prisma ./node_modules/.prisma
 COPY --from=builder --chown=nextjs:nodejs /app/node_modules/@prisma ./node_modules/@prisma
+COPY --from=builder --chown=nextjs:nodejs /app/node_modules/prisma ./node_modules/prisma
+# Copy startup script
+COPY --chown=nextjs:nodejs scripts/startup.sh ./startup.sh
+RUN chmod +x ./startup.sh
 
 # Ensure proper permissions for runtime directories
 RUN chown -R nextjs:nodejs /app
@@ -86,5 +90,5 @@ EXPOSE 3000
 # Use dumb-init to handle signals properly
 ENTRYPOINT ["dumb-init", "--"]
 
-# Start the application
-CMD ["node", "server.js"]
+# Start the application with migration script
+CMD ["./startup.sh"]

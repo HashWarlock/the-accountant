@@ -1,9 +1,9 @@
 version: '3.8'
 
-# The Accountant v1.3.3 - TEE-backed key management with 64-byte attestation fix
+# The Accountant v1.3.4 - Auto-migration support for production databases
 services:
   web:
-    image: hashwarlock/the-accountant:v1.3.3
+    image: hashwarlock/the-accountant:v1.3.4
     container_name: dstack-js-sdk-demo
     ports:
       - "3000:3000"
