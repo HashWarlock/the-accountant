@@ -112,7 +112,7 @@ export function AttestationVerifier() {
           </p>
         </div>
       </div>
-      <div className="space-y-6 max-w-2xl mx-auto">
+      <div className="space-y-6 w-full">
           <div className="space-y-2">
             <Label htmlFor="quote" className="text-sm font-medium">Attestation Quote (Hex)</Label>
             <textarea

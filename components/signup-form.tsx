@@ -64,7 +64,7 @@ export function SignupForm({ onSuccess }: SignupFormProps) {
             Generate your secure TEE-backed wallet with deterministic keys
           </p>
         </div>
-        <div className="space-y-6 max-w-sm mx-auto">
+        <div className="space-y-6 w-full">
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-2">
               <Label htmlFor="email" className="text-sm font-medium">Email Address</Label>

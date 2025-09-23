@@ -92,25 +92,25 @@ export default function Home() {
               {/* Content Area */}
               <div className="mt-6">
                 <TabsContent value="signup" className="m-0 flex justify-center">
-                  <div className="w-full max-w-md">
+                  <div className="w-full max-w-sm">
                     <SignupForm onSuccess={handleSignupSuccess} />
                   </div>
                 </TabsContent>
 
                 <TabsContent value="sign" className="m-0 flex justify-center">
-                  <div className="w-full max-w-md">
+                  <div className="w-full max-w-sm">
                     <SignMessage userId={currentUserId} />
                   </div>
                 </TabsContent>
 
                 <TabsContent value="verify" className="m-0 flex justify-center">
-                  <div className="w-full max-w-md">
+                  <div className="w-full max-w-sm">
                     <VerifySignature />
                   </div>
                 </TabsContent>
 
                 <TabsContent value="users" className="m-0 flex justify-center">
-                  <div className="w-full max-w-4xl">
+                  <div className="w-full max-w-2xl">
                     <UserList />
                   </div>
                 </TabsContent>
@@ -163,7 +163,7 @@ export default function Home() {
                   value="attestation"
                   className="m-0 flex justify-center"
                 >
-                  <div className="w-full max-w-2xl">
+                  <div className="w-full max-w-md">
                     <AttestationVerifier />
                   </div>
                 </TabsContent>

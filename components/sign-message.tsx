@@ -68,7 +68,7 @@ export function SignMessage({ userId: defaultUserId }: SignMessageProps) {
             Cryptographically sign a message using your TEE-backed private key
           </p>
         </div>
-        <div className="space-y-6 max-w-sm mx-auto">
+        <div className="space-y-6 w-full">
           <form onSubmit={handleSign} className="space-y-6">
             <div className="space-y-2">
               <Label htmlFor="sign-userId" className="text-sm font-medium">User ID</Label>

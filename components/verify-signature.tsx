@@ -76,7 +76,7 @@ export function VerifySignature() {
             Verify a cryptographic signature using an address or user ID
           </p>
         </div>
-        <div className="space-y-6 max-w-sm mx-auto">
+        <div className="space-y-6 w-full">
           <form onSubmit={handleVerify} className="space-y-6">
             <div className="space-y-2">
               <Label htmlFor="verify-message" className="text-sm font-medium">Message</Label>
