@@ -91,20 +91,20 @@ export default function Home() {
 
               {/* Content Area */}
               <div className="mt-6">
-                <TabsContent value="signup" className="m-0 flex justify-center">
-                  <div className="w-full max-w-sm">
+                <TabsContent value="signup" className="m-0 flex justify-center px-4">
+                  <div className="w-full max-w-md">
                     <SignupForm onSuccess={handleSignupSuccess} />
                   </div>
                 </TabsContent>
 
-                <TabsContent value="sign" className="m-0 flex justify-center">
-                  <div className="w-full max-w-sm">
+                <TabsContent value="sign" className="m-0 flex justify-center px-4">
+                  <div className="w-full max-w-md">
                     <SignMessage userId={currentUserId} />
                   </div>
                 </TabsContent>
 
-                <TabsContent value="verify" className="m-0 flex justify-center">
-                  <div className="w-full max-w-sm">
+                <TabsContent value="verify" className="m-0 flex justify-center px-4">
+                  <div className="w-full max-w-md">
                     <VerifySignature />
                   </div>
                 </TabsContent>

@@ -68,7 +68,7 @@ export function SignMessage({ userId: defaultUserId }: SignMessageProps) {
             Cryptographically sign a message using your TEE-backed private key
           </p>
         </div>
-        <div className="space-y-6 w-full">
+        <div className="space-y-6">
           <form onSubmit={handleSign} className="space-y-6">
             <div className="space-y-2">
               <Label htmlFor="sign-userId" className="text-sm font-medium">User ID</Label>
@@ -79,7 +79,7 @@ export function SignMessage({ userId: defaultUserId }: SignMessageProps) {
                 onChange={(e) => setUserId(e.target.value)}
                 required
                 disabled={loading}
-                className="h-11"
+                className="h-11 w-full max-w-md"
               />
             </div>
             <div className="space-y-2">
@@ -91,10 +91,10 @@ export function SignMessage({ userId: defaultUserId }: SignMessageProps) {
                 onChange={(e) => setMessage(e.target.value)}
                 required
                 disabled={loading}
-                className="h-11"
+                className="h-11 w-full max-w-md"
               />
             </div>
-            <Button type="submit" className="w-full h-11" disabled={loading}>
+            <Button type="submit" className="w-full max-w-md h-11" disabled={loading}>
               {loading && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
               {loading ? 'Signing...' : 'Sign Message'}
             </Button>

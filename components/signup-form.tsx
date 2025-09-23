@@ -64,7 +64,7 @@ export function SignupForm({ onSuccess }: SignupFormProps) {
             Generate your secure TEE-backed wallet with deterministic keys
           </p>
         </div>
-        <div className="space-y-6 w-full">
+        <div className="space-y-6">
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-2">
               <Label htmlFor="email" className="text-sm font-medium">Email Address</Label>
@@ -76,7 +76,7 @@ export function SignupForm({ onSuccess }: SignupFormProps) {
                 onChange={(e) => setEmail(e.target.value)}
                 required
                 disabled={loading}
-                className="h-11"
+                className="h-11 w-full max-w-md"
               />
             </div>
             <div className="space-y-2">
@@ -89,10 +89,10 @@ export function SignupForm({ onSuccess }: SignupFormProps) {
                 required
                 minLength={3}
                 disabled={loading}
-                className="h-11"
+                className="h-11 w-full max-w-md"
               />
             </div>
-            <Button type="submit" className="w-full h-11" disabled={loading}>
+            <Button type="submit" className="w-full max-w-md h-11" disabled={loading}>
               {loading && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
               {loading ? 'Creating Wallet...' : 'Create Wallet'}
             </Button>
