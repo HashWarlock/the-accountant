@@ -37,7 +37,7 @@ export default function Home() {
       </section>
 
       {/* Main Content */}
-      <main className="flex justify-center px-4 pb-32">
+      <main className="flex justify-center px-4 pb-16">
         <div className="w-full max-w-4xl">
           {/* Tab Navigation */}
           <div className="flex flex-wrap justify-center gap-2 mb-8">
@@ -165,10 +165,19 @@ export default function Home() {
       </main>
 
       {/* Footer */}
-      <footer className="py-12 px-4">
-        <div className="container max-w-4xl mx-auto">
+      <footer className="py-20 px-4">
+        <div className="container max-w-4xl mx-auto text-center">
+          <div className="mb-6">
+            <hr className="border-gray-300 mb-6" />
+            <p className="text-sm text-gray-600 font-medium mb-8">SOURCES</p>
+          </div>
           <div className="flex items-center justify-center gap-8">
-            <div className="flex items-center space-x-3 px-4 py-3 bg-white/90 backdrop-blur border border-gray-200 rounded-lg shadow-sm">
+            <a 
+              href="https://github.com/dstack-tee/dstack" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="block hover:opacity-80 transition-opacity"
+            >
               <Image 
                 src="/dstack-logo.png" 
                 alt="dstack"
@@ -176,9 +185,14 @@ export default function Home() {
                 height={24}
                 className="object-contain"
               />
-            </div>
+            </a>
             
-            <div className="flex items-center space-x-3 px-4 py-3 bg-white/90 backdrop-blur border border-gray-200 rounded-lg shadow-sm">
+            <a 
+              href="https://phala.com" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="block hover:opacity-80 transition-opacity"
+            >
               <Image 
                 src="/phala-logo.png" 
                 alt="Phala"
@@ -186,9 +200,14 @@ export default function Home() {
                 height={24}
                 className="object-contain"
               />
-            </div>
+            </a>
 
-            <div className="flex items-center space-x-3 px-4 py-3 bg-white/90 backdrop-blur border border-gray-200 rounded-lg shadow-sm">
+            <a 
+              href="https://github.com/HashWarlock/the-accountant" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="block hover:opacity-80 transition-opacity"
+            >
               <Image 
                 src="/github-logo.png" 
                 alt="GitHub"
@@ -196,7 +215,7 @@ export default function Home() {
                 height={24}
                 className="object-contain"
               />
-            </div>
+            </a>
           </div>
         </div>
       </footer>
