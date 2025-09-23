@@ -25,40 +25,14 @@ export default function Home() {
     <div className="min-h-screen bg-gradient-to-br from-white to-[#cdfa50]">
       {/* Header */}
       <header className="border-b bg-white/80 backdrop-blur supports-[backdrop-filter]:bg-white/60">
-        <div className="container flex h-16 items-center justify-end">
-          <Button variant="ghost" size="sm" asChild>
-            <a href="https://github.com/HashWarlock/the-accountant" target="_blank" rel="noopener noreferrer">
-              <Github className="h-4 w-4 mr-2" />
-              Source
-            </a>
-          </Button>
+        <div className="container flex h-16 items-center">
         </div>
       </header>
 
       {/* Hero Section */}
       <section className="py-24 px-4">
         <div className="container max-w-4xl mx-auto text-center">
-          <div className="inline-flex items-center rounded-full border border-black/10 bg-white/80 backdrop-blur px-4 py-2 text-sm font-medium mb-12 shadow-sm">
-            <Shield className="h-4 w-4 mr-2" />
-            Powered by{' '}
-            <a href="https://github.com/dstack-tee/dstack" target="_blank" rel="noopener noreferrer" className="text-black hover:underline mx-1 font-semibold">
-              dstack
-            </a>
-            {' '}Hosted on{' '}
-            <a href="https://phala.com" target="_blank" rel="noopener noreferrer" className="text-black hover:underline ml-1 font-semibold">
-              Phala Cloud
-            </a>
-          </div>
-          
-          <h1 className="text-5xl md:text-7xl font-black tracking-tight mb-8">
-            Enterprise Wallet
-            <br />
-            <span className="bg-gradient-to-r from-black to-gray-600 bg-clip-text text-transparent">
-              Infrastructure
-            </span>
-          </h1>
-          
-          <p className="text-2xl text-gray-700 mb-16 max-w-3xl mx-auto leading-relaxed font-medium">
+          <p className="text-2xl text-gray-800 mb-16 max-w-3xl mx-auto leading-relaxed font-medium">
             Zero-trust cryptographic operations in a secure enclave. Deterministic wallet generation with hardware-level security guarantees.
           </p>
         </div>
@@ -181,6 +155,40 @@ export default function Home() {
           </Tabs>
         </div>
       </main>
+
+      {/* Footer */}
+      <footer className="py-12 px-4">
+        <div className="container max-w-4xl mx-auto">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <div className="inline-flex items-center rounded-full border border-black/10 bg-white/80 backdrop-blur px-4 py-2 text-sm font-medium shadow-sm">
+              <Shield className="h-4 w-4 mr-2" />
+              Powered by{' '}
+              <a href="https://github.com/dstack-tee/dstack" target="_blank" rel="noopener noreferrer" className="text-black hover:underline ml-1 font-semibold">
+                dstack
+              </a>
+            </div>
+            
+            <div className="inline-flex items-center rounded-full border border-black/10 bg-white/80 backdrop-blur px-4 py-2 text-sm font-medium shadow-sm">
+              <img 
+                src="data:image/svg+xml;charset=utf-8;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTAgNS4xMkMwIDMuMzI3ODMgMCAyLjQzMTc1IDAuMzQ4Nzc5IDEuNzQ3MjNDMC42NTU1NzQgMS4xNDUxMSAxLjE0NTExIDAuNjU1NTczIDEuNzQ3MjMgMC4zNDg3NzlDMi40MzE3NSAwIDMuMzI3ODMgMCA1LjEyIDBIMjYuODhDMjguNjcyMiAwIDI5LjU2ODMgMCAzMC4yNTI4IDAuMzQ4Nzc5QzMwLjg1NDkgMC42NTU1NzMgMzEuMzQ0NCAxLjE0NTExIDMxLjY1MTIgMS43NDcyM0MzMiAyLjQzMTc1IDMyIDMuMzI3ODMgMzIgNS4xMlYyNi44OEMzMiAyOC42NzIxIDMyIDI5LjU2ODIgMzEuNjUxMiAzMC4yNTI3QzMxLjM0NDQgMzAuODU0OSAzMC44NTQ5IDMxLjM0NDQgMzAuMjUyOCAzMS42NTEyQzI5LjU2ODMgMzIgMjguNjcyMiAzMiAyNi44OCAzMkg1LjEyQzMuMzI3ODMgMzIgMi40MzE3NSAzMiAxLjc0NzIzIDMxLjY1MTJDMS4xNDUxMSAzMS4zNDQ0IDAuNjU1NTc0IDMwLjg1NDkgMC4zNDg3NzkgMzAuMjUyN0MwIDI5LjU2ODIgMCAyOC42NzIxIDAgMjYuODhWNS4xMloiIGZpbGw9IiNDREZBNTAiLz4KPHBhdGggZD0iTTcuNDY2NjcgMTkuNTU1OEgxMS4wMjIyVjI0Ljg4OTFINy40NjY2N1YxOS41NTU4WiIgZmlsbD0iIzFFMjExOSIvPgo8cGF0aCBkPSJNMjEuNjg4OSAxMC42NjY5SDI1LjI0NDVWMTYuMDAwMkgyMS42ODg5VjEwLjY2NjlaIiBmaWxsPSIjMUUyMTE5Ii8+CjxwYXRoIGQ9Ik0xMS4wMjIyIDE2LjAwMDJIMjEuNjg4OVYxOS41NTU4SDExLjAyMjJWMTYuMDAwMloiIGZpbGw9IiMxRTIxMTkiLz4KPHBhdGggZD0iTTcuNDY2NjcgNy4xMTEzM0gyMS42ODg5VjEwLjY2NjlIMTEuMDIyMlYxNi4wMDAyTDcuNDY2NjcgMTUuOTU1OFY3LjExMTMzWiIgZmlsbD0iIzFFMjExOSIvPgo8L3N2Zz4K" 
+                alt="Phala Cloud" 
+                className="h-4 w-4 mr-2"
+              />
+              Hosted on{' '}
+              <a href="https://phala.com" target="_blank" rel="noopener noreferrer" className="text-black hover:underline ml-1 font-semibold">
+                Phala Cloud
+              </a>
+            </div>
+
+            <div className="inline-flex items-center rounded-full border border-black/10 bg-white/80 backdrop-blur px-4 py-2 text-sm font-medium shadow-sm">
+              <Github className="h-4 w-4 mr-2" />
+              <a href="https://github.com/HashWarlock/the-accountant" target="_blank" rel="noopener noreferrer" className="text-black hover:underline font-semibold">
+                Source Code
+              </a>
+            </div>
+          </div>
+        </div>
+      </footer>
 
       <Toaster />
     </div>
