@@ -89,8 +89,8 @@ export default function Home() {
                 </TabsTrigger>
               </TabsList>
 
-              {/* Content Card */}
-              <Card className="mt-6 mx-auto max-w-3xl border-0 shadow-none p-6">
+              {/* Content Area */}
+              <div className="mt-6">
                 <TabsContent value="signup" className="m-0 flex justify-center">
                   <div className="w-full max-w-md">
                     <SignupForm onSuccess={handleSignupSuccess} />
@@ -167,7 +167,7 @@ export default function Home() {
                     <AttestationVerifier />
                   </div>
                 </TabsContent>
-              </Card>
+              </div>
             </Tabs>
           </div>
         </div>
