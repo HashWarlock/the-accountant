@@ -159,33 +159,44 @@ export default function Home() {
       {/* Footer */}
       <footer className="py-12 px-4">
         <div className="container max-w-4xl mx-auto">
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <div className="inline-flex items-center rounded-full border border-black/10 bg-white/80 backdrop-blur px-4 py-2 text-sm font-medium shadow-sm">
-              <Shield className="h-4 w-4 mr-2" />
-              Powered by{' '}
-              <a href="https://github.com/dstack-tee/dstack" target="_blank" rel="noopener noreferrer" className="text-black hover:underline ml-1 font-semibold">
-                dstack
-              </a>
-            </div>
+          <div className="flex items-center justify-center gap-6">
+            <a 
+              href="https://github.com/dstack-tee/dstack" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="w-10 h-10 rounded-full bg-white/80 backdrop-blur border border-black/10 shadow-sm flex items-center justify-center hover:bg-white/90 transition-all duration-200"
+              title="Powered by dstack"
+            >
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="12" cy="12" r="12" fill="#cdfa50"/>
+                <path d="M8 7h8c1.1 0 2 .9 2 2v6c0 1.1-.9 2-2 2H8c-1.1 0-2-.9-2-2V9c0-1.1.9-2 2-2z" fill="#1E2119"/>
+                <path d="M10 11h4v2h-4v-2z" fill="#cdfa50"/>
+              </svg>
+            </a>
             
-            <div className="inline-flex items-center rounded-full border border-black/10 bg-white/80 backdrop-blur px-4 py-2 text-sm font-medium shadow-sm">
+            <a 
+              href="https://phala.com" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="w-10 h-10 rounded-full bg-white/80 backdrop-blur border border-black/10 shadow-sm flex items-center justify-center hover:bg-white/90 transition-all duration-200"
+              title="Hosted on Phala Cloud"
+            >
               <img 
                 src="data:image/svg+xml;charset=utf-8;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTAgNS4xMkMwIDMuMzI3ODMgMCAyLjQzMTc1IDAuMzQ4Nzc5IDEuNzQ3MjNDMC42NTU1NzQgMS4xNDUxMSAxLjE0NTExIDAuNjU1NTczIDEuNzQ3MjMgMC4zNDg3NzlDMi40MzE3NSAwIDMuMzI3ODMgMCA1LjEyIDBIMjYuODhDMjguNjcyMiAwIDI5LjU2ODMgMCAzMC4yNTI4IDAuMzQ4Nzc5QzMwLjg1NDkgMC42NTU1NzMgMzEuMzQ0NCAxLjE0NTExIDMxLjY1MTIgMS43NDcyM0MzMiAyLjQzMTc1IDMyIDMuMzI3ODMgMzIgNS4xMlYyNi44OEMzMiAyOC42NzIxIDMyIDI5LjU2ODIgMzEuNjUxMiAzMC4yNTI3QzMxLjM0NDQgMzAuODU0OSAzMC44NTQ5IDMxLjM0NDQgMzAuMjUyOCAzMS42NTEyQzI5LjU2ODMgMzIgMjguNjcyMiAzMiAyNi44OCAzMkg1LjEyQzMuMzI3ODMgMzIgMi40MzE3NSAzMiAxLjc0NzIzIDMxLjY1MTJDMS4xNDUxMSAzMS4zNDQ0IDAuNjU1NTc0IDMwLjg1NDkgMC4zNDg3NzkgMzAuMjUyN0MwIDI5LjU2ODIgMCAyOC42NzIxIDAgMjYuODhWNS4xMloiIGZpbGw9IiNDREZBNTAiLz4KPHBhdGggZD0iTTcuNDY2NjcgMTkuNTU1OEgxMS4wMjIyVjI0Ljg4OTFINy40NjY2N1YxOS41NTU4WiIgZmlsbD0iIzFFMjExOSIvPgo8cGF0aCBkPSJNMjEuNjg4OSAxMC42NjY5SDI1LjI0NDVWMTYuMDAwMkgyMS42ODg5VjEwLjY2NjlaIiBmaWxsPSIjMUUyMTE5Ii8+CjxwYXRoIGQ9Ik0xMS4wMjIyIDE2LjAwMDJIMjEuNjg4OVYxOS41NTU4SDExLjAyMjJWMTYuMDAwMloiIGZpbGw9IiMxRTIxMTkiLz4KPHBhdGggZD0iTTcuNDY2NjcgNy4xMTEzM0gyMS42ODg5VjEwLjY2NjlIMTEuMDIyMlYxNi4wMDAyTDcuNDY2NjcgMTUuOTU1OFY3LjExMTMzWiIgZmlsbD0iIzFFMjExOSIvPgo8L3N2Zz4K" 
                 alt="Phala Cloud" 
-                className="h-4 w-4 mr-2"
+                className="w-6 h-6"
               />
-              Hosted on{' '}
-              <a href="https://phala.com" target="_blank" rel="noopener noreferrer" className="text-black hover:underline ml-1 font-semibold">
-                Phala Cloud
-              </a>
-            </div>
+            </a>
 
-            <div className="inline-flex items-center rounded-full border border-black/10 bg-white/80 backdrop-blur px-4 py-2 text-sm font-medium shadow-sm">
-              <Github className="h-4 w-4 mr-2" />
-              <a href="https://github.com/HashWarlock/the-accountant" target="_blank" rel="noopener noreferrer" className="text-black hover:underline font-semibold">
-                Source Code
-              </a>
-            </div>
+            <a 
+              href="https://github.com/HashWarlock/the-accountant" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="w-10 h-10 rounded-full bg-white/80 backdrop-blur border border-black/10 shadow-sm flex items-center justify-center hover:bg-white/90 transition-all duration-200"
+              title="Source Code"
+            >
+              <Github className="w-5 h-5 text-gray-700" />
+            </a>
           </div>
         </div>
       </footer>
