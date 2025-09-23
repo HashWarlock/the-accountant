@@ -10,7 +10,7 @@ const nextConfig = {
     ignoreBuildErrors: true,
   },
   // Configure allowed dev origins for Replit proxy
-  allowedDevOrigins: ['127.0.0.1', 'localhost', '*.replit.dev'],
+  allowedDevOrigins: ['localhost', '127.0.0.1', 'fabea0e9-d7ae-42e4-8c08-92c0b3280db5-00-o9934oy838al.riker.replit.dev'],
   
   async headers() {
     return [
