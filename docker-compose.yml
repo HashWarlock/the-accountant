@@ -1,6 +1,29 @@
 version: '3.8'
 
 services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:16-alpine
+    container_name: dstack-postgres
+    environment:
+      - POSTGRES_USER=accountant
+      - POSTGRES_PASSWORD=secure_password_change_me
+      - POSTGRES_DB=accountant_db
+      - PGDATA=/var/lib/postgresql/data/pgdata
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - dstack-network
+    ports:
+      - "127.0.0.1:5432:5432"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U accountant -d accountant_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
   web:
     image: hashwarlock/the-accountant:v1.5.2
     container_name: dstack-js-sdk-demo
@@ -8,7 +31,7 @@ services:
       - "3000:3000"
     environment:
       - NODE_ENV=production
-      - DATABASE_URL=file:./dev.db
+      - DATABASE_URL=postgresql://accountant:secure_password_change_me@postgres:5432/accountant_db?schema=public
       - EXPOSE_INFO=true
       - APP_NAMESPACE=the-accountant-v1  # Ensures unique key derivation namespace
       # Attestation upload configuration (disabled by default for production testing)
@@ -19,17 +42,19 @@ services:
     volumes:
       # Mount dstack socket for TEE access (required for dstack key generation & attestation)
       - /var/run/dstack.sock:/var/run/dstack.sock
-      # Persist SQLite database including audit logs - use a directory mount instead of file
       - prisma:/app/prisma
     networks:
       - dstack-network
+    depends_on:
+      postgres:
+        condition: service_healthy
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:3000/api/health"]
       interval: 30s
       timeout: 3s
       retries: 3
-      start_period: 10s
+      start_period: 30s
     security_opt:
       - no-new-privileges:true
     cap_drop:
@@ -42,18 +67,21 @@ services:
     tmpfs:
       - /tmp
 
-  # Optional: Database viewer for development
+  # Optional: Database viewer for development (now configured for PostgreSQL)
   db-viewer:
     image: adminer
     container_name: dstack-db-viewer
     ports:
       - "8080:8080"
     environment:
-      - ADMINER_DEFAULT_SERVER=sqlite
+      - ADMINER_DEFAULT_SERVER=postgres
+      - ADMINER_DESIGN=pepa-linha-dark
     networks:
       - dstack-network
     profiles:
       - debug
+    depends_on:
+      - postgres
     restart: unless-stopped
 
 networks:
@@ -61,4 +89,5 @@ networks:
     driver: bridge
 
 volumes:
+  postgres_data:
   prisma:
