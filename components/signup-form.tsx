@@ -76,7 +76,7 @@ export function SignupForm({ onSuccess }: SignupFormProps) {
                 onChange={(e) => setEmail(e.target.value)}
                 required
                 disabled={loading}
-                className="h-11 w-80"
+                className="h-11 w-80 mx-auto"
               />
             </div>
             <div className="space-y-2">
@@ -89,10 +89,10 @@ export function SignupForm({ onSuccess }: SignupFormProps) {
                 required
                 minLength={3}
                 disabled={loading}
-                className="h-11 w-80"
+                className="h-11 w-80 mx-auto"
               />
             </div>
-            <Button type="submit" className="w-80 h-11" disabled={loading}>
+            <Button type="submit" className="w-80 h-11 mx-auto" disabled={loading}>
               {loading && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
               {loading ? 'Creating Wallet...' : 'Create Wallet'}
             </Button>
