@@ -10,9 +10,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Shield, Wallet, FileText, Users, Search, Github } from 'lucide-react'
+import { Shield, Wallet, FileText, Users, Search } from 'lucide-react'
 import { Toaster } from '@/components/ui/toast'
 import { useState } from 'react'
+import Image from 'next/image'
 
 export default function Home() {
   const [currentUserId, setCurrentUserId] = useState<string>('')
@@ -112,7 +113,7 @@ export default function Home() {
                   </div>
                 </TabsContent>
 
-                <TabsContent value="audit" className="m-0">
+                <TabsContent value="audit" className="m-0 flex justify-center">
                   {currentUserId ? (
                     <AuditLogViewer userId={currentUserId} />
                   ) : (
@@ -173,11 +174,14 @@ export default function Home() {
               rel="noopener noreferrer"
               className="flex items-center space-x-3 px-6 py-4 bg-white/90 backdrop-blur border border-gray-200 rounded-xl shadow-sm hover:shadow-md hover:scale-105 transition-all duration-200"
             >
-              <div className="w-8 h-8 rounded-full bg-[#cdfa50] flex items-center justify-center">
-                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                  <path d="M4 4h12c1.1 0 2 .9 2 2v8c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" fill="#1E2119"/>
-                  <path d="M6 8h8v4H6V8z" fill="#cdfa50"/>
-                </svg>
+              <div className="h-8 w-auto flex items-center">
+                <Image 
+                  src="/dstack-logo.png" 
+                  alt="dstack"
+                  width={96}
+                  height={32}
+                  className="object-contain"
+                />
               </div>
               <span className="text-lg font-bold text-gray-900">dstack</span>
             </a>
@@ -188,8 +192,14 @@ export default function Home() {
               rel="noopener noreferrer"
               className="flex items-center space-x-3 px-6 py-4 bg-white/90 backdrop-blur border border-gray-200 rounded-xl shadow-sm hover:shadow-md hover:scale-105 transition-all duration-200"
             >
-              <div className="w-8 h-8 bg-[#cdfa50] rounded flex items-center justify-center">
-                <span className="text-black font-bold text-lg">P</span>
+              <div className="h-8 w-auto flex items-center">
+                <Image 
+                  src="/phala-logo.png" 
+                  alt="Phala"
+                  width={96}
+                  height={32}
+                  className="object-contain"
+                />
               </div>
               <span className="text-lg font-bold text-gray-900">PHALA</span>
             </a>
@@ -200,8 +210,14 @@ export default function Home() {
               rel="noopener noreferrer"
               className="flex items-center space-x-3 px-6 py-4 bg-white/90 backdrop-blur border border-gray-200 rounded-xl shadow-sm hover:shadow-md hover:scale-105 transition-all duration-200"
             >
-              <div className="w-8 h-8 rounded-full bg-black flex items-center justify-center">
-                <Github className="w-5 h-5 text-white" />
+              <div className="h-8 w-auto flex items-center">
+                <Image 
+                  src="/github-logo.png" 
+                  alt="GitHub"
+                  width={96}
+                  height={32}
+                  className="object-contain"
+                />
               </div>
               <span className="text-lg font-bold text-gray-900">GitHub</span>
             </a>
