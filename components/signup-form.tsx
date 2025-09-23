@@ -54,20 +54,20 @@ export function SignupForm({ onSuccess }: SignupFormProps) {
     <div className="space-y-8">
       <div className="text-center space-y-8">
         <div className="flex justify-center">
-          <div className="h-12 w-12 rounded-full bg-gray-900/10 flex items-center justify-center">
-            <Wallet className="h-6 w-6 text-gray-900" />
+          <div className="h-14 w-14 rounded-2xl bg-phala-g09/20 backdrop-blur-sm flex items-center justify-center border border-phala-g08/30">
+            <Wallet className="h-7 w-7 text-phala-lime" />
           </div>
         </div>
         <div className="space-y-2">
-          <h2 className="text-2xl font-semibold text-gray-900">Create Wallet</h2>
-          <p className="text-gray-600">
+          <h2 className="text-3xl font-bold text-phala-g00">Create Wallet</h2>
+          <p className="text-phala-g02">
             Generate your secure TEE-backed wallet with deterministic keys
           </p>
         </div>
         <div className="space-y-6">
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-2">
-              <Label htmlFor="email" className="text-sm font-medium">Email Address</Label>
+              <Label htmlFor="email" className="text-sm font-medium text-phala-g01">Email Address</Label>
               <Input
                 id="email"
                 type="email"
@@ -76,11 +76,11 @@ export function SignupForm({ onSuccess }: SignupFormProps) {
                 onChange={(e) => setEmail(e.target.value)}
                 required
                 disabled={loading}
-                className="h-11 w-80 mx-auto"
+                className="h-12 w-full max-w-sm mx-auto"
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="userId" className="text-sm font-medium">User ID</Label>
+              <Label htmlFor="userId" className="text-sm font-medium text-phala-g01">User ID</Label>
               <Input
                 id="userId"
                 placeholder="alice"
@@ -89,10 +89,10 @@ export function SignupForm({ onSuccess }: SignupFormProps) {
                 required
                 minLength={3}
                 disabled={loading}
-                className="h-11 w-80 mx-auto"
+                className="h-12 w-full max-w-sm mx-auto"
               />
             </div>
-            <Button type="submit" className="w-80 h-11 mx-auto" disabled={loading}>
+            <Button type="submit" className="w-full max-w-sm h-12 mx-auto" variant="phala" disabled={loading}>
               {loading && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
               {loading ? 'Creating Wallet...' : 'Create Wallet'}
             </Button>
@@ -101,10 +101,12 @@ export function SignupForm({ onSuccess }: SignupFormProps) {
       </div>
 
       {userData && userData.user && (
-        <div className="bg-white/80 backdrop-blur border border-green-200 rounded-2xl p-6 space-y-4">
-          <div className="flex items-center space-x-2 text-green-700">
-            <CheckCircle className="h-5 w-5" />
-            <h3 className="text-green-900 font-semibold">Wallet Created Successfully</h3>
+        <div className="bg-phala-g00/95 backdrop-blur-md rounded-2xl p-6 space-y-4 shadow-xl border border-phala-lime/20">
+          <div className="flex items-center space-x-3">
+            <div className="h-8 w-8 rounded-lg bg-green-100 flex items-center justify-center">
+              <CheckCircle className="h-5 w-5 text-green-600" />
+            </div>
+            <h3 className="text-phala-g09 font-bold text-lg">Wallet Created Successfully</h3>
           </div>
             <div className="grid gap-4">
               <div className="space-y-2">

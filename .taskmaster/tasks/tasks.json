@@ -758,11 +758,35 @@
         ],
         "priority": "high",
         "subtasks": []
+      },
+      {
+        "id": 30,
+        "title": "Redesign Secure Wallet UI for Modern Look",
+        "description": "Update the Secure Wallet Infrastructure interface to have a more modern and sleek appearance",
+        "details": "The current UI has rigid, boxy elements that need modernization:\n1. Navigation tabs - Replace rigid boxes with fluid, modern tab design\n2. Form inputs - Add proper styling, shadows, focus states, and transitions\n3. Button design - Improve the Sign Message button with modern styling\n4. Layout improvements - Add better spacing, reduce rigidity, implement card-based design\n5. Color scheme - Replace lime green background with sophisticated color palette\n6. Typography - Improve font choices, sizes, and text hierarchy\n7. Add subtle animations and transitions for better UX",
+        "testStrategy": "Visual testing to ensure UI updates render correctly across different screen sizes and browsers",
+        "status": "done",
+        "dependencies": [],
+        "priority": "high",
+        "subtasks": []
+      },
+      {
+        "id": 31,
+        "title": "Clean up unnecessary project files",
+        "description": "Remove unused files and assets to keep the project organized",
+        "details": "Clean up the following:\n1. Remove unused images in attached_assets folder that are no longer needed\n2. Review and remove any unused SVG files in public folder (file.svg, globe.svg, window.svg, vercel.svg if not used)\n3. Clean up any test or temporary files\n4. Ensure all remaining assets are properly used in the application\n5. Update .gitignore to exclude unnecessary files",
+        "testStrategy": "",
+        "status": "pending",
+        "dependencies": [
+          30
+        ],
+        "priority": "medium",
+        "subtasks": []
       }
     ],
     "metadata": {
       "created": "2025-09-09T04:45:44.364Z",
-      "updated": "2025-09-10T20:18:44.194Z",
+      "updated": "2025-09-23T07:51:47.116Z",
       "description": "Tasks for master context"
     }
   }

@@ -56,22 +56,22 @@ export function SignMessage({ userId: defaultUserId }: SignMessageProps) {
 
   return (
     <div className="space-y-8">
-      <div className="text-center space-y-8">
+      <div className="text-center space-y-6">
         <div className="flex justify-center">
-          <div className="h-12 w-12 rounded-full bg-gray-900/10 flex items-center justify-center">
-            <PenTool className="h-6 w-6 text-gray-900" />
+          <div className="h-14 w-14 rounded-2xl bg-phala-g09/20 backdrop-blur-sm flex items-center justify-center border border-phala-g08/30">
+            <PenTool className="h-7 w-7 text-phala-lime" />
           </div>
         </div>
-        <div className="space-y-2">
-          <h2 className="text-2xl font-semibold text-gray-900">Sign Message</h2>
-          <p className="text-gray-600">
+        <div className="space-y-3">
+          <h2 className="text-3xl font-bold text-phala-g00">Sign Message</h2>
+          <p className="text-phala-g02">
             Cryptographically sign a message using your TEE-backed private key
           </p>
         </div>
         <div className="space-y-6">
           <form onSubmit={handleSign} className="space-y-6">
             <div className="space-y-2">
-              <Label htmlFor="sign-userId" className="text-sm font-medium">User ID</Label>
+              <Label htmlFor="sign-userId" className="text-sm font-medium text-phala-g01">User ID</Label>
               <Input
                 id="sign-userId"
                 placeholder="alice"
@@ -79,11 +79,11 @@ export function SignMessage({ userId: defaultUserId }: SignMessageProps) {
                 onChange={(e) => setUserId(e.target.value)}
                 required
                 disabled={loading}
-                className="h-11 w-80 mx-auto"
+                className="h-12 w-full max-w-sm mx-auto"
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="message" className="text-sm font-medium">Message</Label>
+              <Label htmlFor="message" className="text-sm font-medium text-phala-g01">Message</Label>
               <Input
                 id="message"
                 placeholder="Hello, dstack!"
@@ -91,10 +91,10 @@ export function SignMessage({ userId: defaultUserId }: SignMessageProps) {
                 onChange={(e) => setMessage(e.target.value)}
                 required
                 disabled={loading}
-                className="h-11 w-80 mx-auto"
+                className="h-12 w-full max-w-sm mx-auto"
               />
             </div>
-            <Button type="submit" className="w-80 h-11 mx-auto" disabled={loading}>
+            <Button type="submit" className="w-full max-w-sm h-12 mx-auto" variant="phala" disabled={loading}>
               {loading && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
               {loading ? 'Signing...' : 'Sign Message'}
             </Button>
@@ -103,22 +103,24 @@ export function SignMessage({ userId: defaultUserId }: SignMessageProps) {
       </div>
 
       {signatureData && (
-        <div className="bg-white/80 backdrop-blur border border-blue-200 rounded-2xl p-6 space-y-6">
-          <div className="flex items-center space-x-2 text-blue-700">
-            <CheckCircle className="h-5 w-5" />
-            <h3 className="text-blue-900 font-semibold">Message Signed Successfully</h3>
+        <div className="bg-phala-g00/95 backdrop-blur-md rounded-2xl p-6 space-y-6 shadow-xl border border-phala-lime/20">
+          <div className="flex items-center space-x-3">
+            <div className="h-8 w-8 rounded-lg bg-green-100 flex items-center justify-center">
+              <CheckCircle className="h-5 w-5 text-green-600" />
+            </div>
+            <h3 className="text-slate-900 font-bold text-lg">Message Signed Successfully</h3>
           </div>
             <div className="grid gap-4">
               <div className="space-y-2">
-                <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                <Label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
                   Message
                 </Label>
                 <div className="flex items-center space-x-2">
-                  <code className="flex-1 px-3 py-2 bg-white rounded-md border text-sm font-mono">
+                  <code className="flex-1 px-4 py-3 bg-slate-50 rounded-xl border border-slate-200 text-sm font-mono hover:bg-slate-100 transition-colors duration-200">
                     "{signatureData.message}"
                   </code>
                   <Button
-                    variant="outline"
+                    variant="ghost"
                     size="sm"
                     onClick={() => copyToClipboard(signatureData.message, 'Message')}
                   >
@@ -128,15 +130,15 @@ export function SignMessage({ userId: defaultUserId }: SignMessageProps) {
               </div>
 
               <div className="space-y-2">
-                <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                <Label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
                   Signature
                 </Label>
                 <div className="flex items-center space-x-2">
-                  <code className="flex-1 px-3 py-2 bg-white rounded-md border text-xs font-mono break-all">
+                  <code className="flex-1 px-4 py-3 bg-slate-50 rounded-xl border border-slate-200 text-xs font-mono break-all hover:bg-slate-100 transition-colors duration-200">
                     {signatureData.signature}
                   </code>
                   <Button
-                    variant="outline"
+                    variant="ghost"
                     size="sm"
                     onClick={() => copyToClipboard(signatureData.signature, 'Signature')}
                   >
@@ -146,15 +148,15 @@ export function SignMessage({ userId: defaultUserId }: SignMessageProps) {
               </div>
 
               <div className="space-y-2">
-                <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                <Label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
                   Signer Address
                 </Label>
                 <div className="flex items-center space-x-2">
-                  <code className="flex-1 px-3 py-2 bg-white rounded-md border text-xs font-mono break-all">
+                  <code className="flex-1 px-4 py-3 bg-slate-50 rounded-xl border border-slate-200 text-xs font-mono break-all hover:bg-slate-100 transition-colors duration-200">
                     {signatureData.address}
                   </code>
                   <Button
-                    variant="outline"
+                    variant="ghost"
                     size="sm"
                     onClick={() => copyToClipboard(signatureData.address, 'Address')}
                   >
@@ -165,15 +167,15 @@ export function SignMessage({ userId: defaultUserId }: SignMessageProps) {
 
               {signatureData.publicKey && (
                 <div className="space-y-2">
-                  <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                  <Label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
                     Public Key
                   </Label>
                   <div className="flex items-center space-x-2">
-                    <code className="flex-1 px-3 py-2 bg-white rounded-md border text-xs font-mono break-all">
+                    <code className="flex-1 px-4 py-3 bg-slate-50 rounded-xl border border-slate-200 text-xs font-mono break-all hover:bg-slate-100 transition-colors duration-200">
                       {signatureData.publicKey}
                     </code>
                     <Button
-                      variant="outline"
+                      variant="ghost"
                       size="sm"
                       onClick={() => copyToClipboard(signatureData.publicKey, 'Public Key')}
                     >
@@ -190,11 +192,11 @@ export function SignMessage({ userId: defaultUserId }: SignMessageProps) {
 
             {/* Attestation Verification Links */}
             {(signatureData.phalaVerificationUrl || signatureData.t16zVerificationUrl) && (
-              <Card className="border-green-200 bg-green-50/50">
+              <Card className="border-emerald-200 bg-gradient-to-br from-emerald-50 to-green-50 shadow-lg shadow-emerald-100/50">
                 <CardHeader className="pb-3">
-                  <div className="flex items-center space-x-2 text-green-700">
-                    <Shield className="h-4 w-4" />
-                    <CardTitle className="text-sm text-green-900">TEE Attestation Generated</CardTitle>
+                  <div className="flex items-center space-x-2">
+                    <Shield className="h-5 w-5 text-emerald-600" />
+                    <CardTitle className="text-base font-bold text-slate-900">TEE Attestation Generated</CardTitle>
                   </div>
                 </CardHeader>
                 <CardContent className="pt-0 space-y-3">
@@ -228,15 +230,15 @@ export function SignMessage({ userId: defaultUserId }: SignMessageProps) {
                   </div>
                   {signatureData.attestation?.checksum && (
                     <div className="space-y-2">
-                      <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                      <Label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
                         Attestation Checksum
                       </Label>
                       <div className="flex items-center space-x-2">
-                        <code className="flex-1 px-3 py-2 bg-white rounded-md border text-xs font-mono break-all">
+                        <code className="flex-1 px-4 py-3 bg-slate-50 rounded-xl border border-slate-200 text-xs font-mono break-all hover:bg-slate-100 transition-colors duration-200">
                           {signatureData.attestation.checksum}
                         </code>
                         <Button
-                          variant="outline"
+                          variant="ghost"
                           size="sm"
                           onClick={() => copyToClipboard(signatureData.attestation.checksum, 'Checksum')}
                         >
@@ -249,8 +251,8 @@ export function SignMessage({ userId: defaultUserId }: SignMessageProps) {
               </Card>
             )}
 
-            <div className="p-4 bg-amber-50 border border-amber-200 rounded-lg">
-              <p className="text-sm text-amber-800">
+            <div className="p-4 bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200/60 rounded-xl">
+              <p className="text-sm text-amber-900 font-medium">
                 <strong>💡 Tip:</strong> Copy the signature and use it in the Verify tab to test verification!
               </p>
             </div>
