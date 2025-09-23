@@ -87,7 +87,7 @@ export function VerifySignature() {
                 onChange={(e) => setMessage(e.target.value)}
                 required
                 disabled={loading}
-                className="h-11 w-full max-w-md"
+                className="h-11 w-80"
               />
             </div>
             <div className="space-y-2">
@@ -99,7 +99,7 @@ export function VerifySignature() {
                 onChange={(e) => setSignature(e.target.value)}
                 required
                 disabled={loading}
-                className="h-11 w-full max-w-md"
+                className="h-11 w-80"
               />
             </div>
             <div className="space-y-2">
@@ -111,10 +111,10 @@ export function VerifySignature() {
                 onChange={(e) => setAddressOrUserId(e.target.value)}
                 required
                 disabled={loading}
-                className="h-11 w-full max-w-md"
+                className="h-11 w-80"
               />
             </div>
-            <Button type="submit" className="w-full max-w-md h-11" disabled={loading}>
+            <Button type="submit" className="w-80 h-11" disabled={loading}>
               {loading && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
               {loading ? 'Verifying...' : 'Verify Signature'}
             </Button>
