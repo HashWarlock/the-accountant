@@ -99,21 +99,20 @@ export function AttestationVerifier() {
 
   return (
     <div className="space-y-8">
-      <Card>
-        <CardHeader className="text-center space-y-4">
-          <div className="flex justify-center">
-            <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
-              <Shield className="h-6 w-6 text-primary" />
-            </div>
+      <div className="text-center space-y-8">
+        <div className="flex justify-center">
+          <div className="h-12 w-12 rounded-full bg-gray-900/10 flex items-center justify-center">
+            <Shield className="h-6 w-6 text-gray-900" />
           </div>
-          <div className="space-y-2">
-            <CardTitle className="text-2xl">Attestation Verifier</CardTitle>
-            <CardDescription className="text-base">
-              Verify TEE attestation quotes and validate platform trust
-            </CardDescription>
-          </div>
-        </CardHeader>
-        <CardContent className="space-y-6">
+        </div>
+        <div className="space-y-2">
+          <h2 className="text-2xl font-semibold text-gray-900">Attestation Verifier</h2>
+          <p className="text-gray-600">
+            Verify TEE attestation quotes and validate platform trust
+          </p>
+        </div>
+      </div>
+      <div className="space-y-6 max-w-2xl mx-auto">
           <div className="space-y-2">
             <Label htmlFor="quote" className="text-sm font-medium">Attestation Quote (Hex)</Label>
             <textarea
@@ -159,8 +158,7 @@ export function AttestationVerifier() {
               {error}
             </div>
           )}
-        </CardContent>
-      </Card>
+      </div>
 
       {result && (
         <Card className={result.verified ? 'border-green-200 bg-green-50/50' : 'border-red-200 bg-red-50/50'}>

@@ -56,21 +56,19 @@ export function SignMessage({ userId: defaultUserId }: SignMessageProps) {
 
   return (
     <div className="space-y-8">
-      <Card>
-        <CardHeader className="text-center space-y-4">
-          <div className="flex justify-center">
-            <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
-              <PenTool className="h-6 w-6 text-primary" />
-            </div>
+      <div className="text-center space-y-8">
+        <div className="flex justify-center">
+          <div className="h-12 w-12 rounded-full bg-gray-900/10 flex items-center justify-center">
+            <PenTool className="h-6 w-6 text-gray-900" />
           </div>
-          <div className="space-y-2">
-            <CardTitle className="text-2xl">Sign Message</CardTitle>
-            <CardDescription className="text-base">
-              Cryptographically sign a message using your TEE-backed private key
-            </CardDescription>
-          </div>
-        </CardHeader>
-        <CardContent className="space-y-6">
+        </div>
+        <div className="space-y-2">
+          <h2 className="text-2xl font-semibold text-gray-900">Sign Message</h2>
+          <p className="text-gray-600">
+            Cryptographically sign a message using your TEE-backed private key
+          </p>
+        </div>
+        <div className="space-y-6 max-w-sm mx-auto">
           <form onSubmit={handleSign} className="space-y-6">
             <div className="space-y-2">
               <Label htmlFor="sign-userId" className="text-sm font-medium">User ID</Label>
@@ -101,18 +99,15 @@ export function SignMessage({ userId: defaultUserId }: SignMessageProps) {
               {loading ? 'Signing...' : 'Sign Message'}
             </Button>
           </form>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
       {signatureData && (
-        <Card className="border-blue-200 bg-blue-50/50">
-          <CardHeader>
-            <div className="flex items-center space-x-2 text-blue-700">
-              <CheckCircle className="h-5 w-5" />
-              <CardTitle className="text-blue-900">Message Signed Successfully</CardTitle>
-            </div>
-          </CardHeader>
-          <CardContent className="space-y-6">
+        <div className="bg-white/80 backdrop-blur border border-blue-200 rounded-2xl p-6 space-y-6">
+          <div className="flex items-center space-x-2 text-blue-700">
+            <CheckCircle className="h-5 w-5" />
+            <h3 className="text-blue-900 font-semibold">Message Signed Successfully</h3>
+          </div>
             <div className="grid gap-4">
               <div className="space-y-2">
                 <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
@@ -259,8 +254,7 @@ export function SignMessage({ userId: defaultUserId }: SignMessageProps) {
                 <strong>💡 Tip:</strong> Copy the signature and use it in the Verify tab to test verification!
               </p>
             </div>
-          </CardContent>
-        </Card>
+        </div>
       )}
     </div>
   )

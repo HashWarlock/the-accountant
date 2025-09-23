@@ -60,21 +60,21 @@ export function UserList() {
   }
 
   return (
-    <Card>
-      <CardHeader className="text-center space-y-4">
+    <div className="space-y-8">
+      <div className="text-center space-y-8">
         <div className="flex justify-center">
-          <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
-            <Users className="h-6 w-6 text-primary" />
+          <div className="h-12 w-12 rounded-full bg-gray-900/10 flex items-center justify-center">
+            <Users className="h-6 w-6 text-gray-900" />
           </div>
         </div>
         <div className="space-y-2">
-          <CardTitle className="text-2xl">Registered Users</CardTitle>
-          <CardDescription className="text-base">
+          <h2 className="text-2xl font-semibold text-gray-900">Registered Users</h2>
+          <p className="text-gray-600">
             Browse and search all users with TEE-backed wallets
-          </CardDescription>
+          </p>
         </div>
-      </CardHeader>
-      <CardContent className="space-y-6">
+      </div>
+      <div className="space-y-6 max-w-2xl mx-auto">
         <form onSubmit={handleSearch} className="flex gap-2">
           <Input
             placeholder="Search by email, user ID, or address..."
@@ -96,8 +96,7 @@ export function UserList() {
           <>
             <div className="grid gap-4">
               {users.map((user) => (
-                <Card key={user.id} className="hover:shadow-md transition-shadow">
-                  <CardContent className="p-4">
+                <div key={user.id} className="bg-white/80 backdrop-blur border border-gray-200 rounded-2xl p-4 hover:shadow-md transition-shadow">
                     <div className="flex justify-between items-start mb-3">
                       <div className="space-y-1">
                         <div className="flex items-center space-x-2">
@@ -126,8 +125,7 @@ export function UserList() {
                         {user.address}
                       </code>
                     </div>
-                  </CardContent>
-                </Card>
+                </div>
               ))}
             </div>
 
@@ -160,7 +158,7 @@ export function UserList() {
             )}
           </>
         )}
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   )
 }

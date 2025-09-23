@@ -64,21 +64,19 @@ export function VerifySignature() {
 
   return (
     <div className="space-y-8">
-      <Card>
-        <CardHeader className="text-center space-y-4">
-          <div className="flex justify-center">
-            <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
-              <Shield className="h-6 w-6 text-primary" />
-            </div>
+      <div className="text-center space-y-8">
+        <div className="flex justify-center">
+          <div className="h-12 w-12 rounded-full bg-gray-900/10 flex items-center justify-center">
+            <Shield className="h-6 w-6 text-gray-900" />
           </div>
-          <div className="space-y-2">
-            <CardTitle className="text-2xl">Verify Signature</CardTitle>
-            <CardDescription className="text-base">
-              Verify a cryptographic signature using an address or user ID
-            </CardDescription>
-          </div>
-        </CardHeader>
-        <CardContent className="space-y-6">
+        </div>
+        <div className="space-y-2">
+          <h2 className="text-2xl font-semibold text-gray-900">Verify Signature</h2>
+          <p className="text-gray-600">
+            Verify a cryptographic signature using an address or user ID
+          </p>
+        </div>
+        <div className="space-y-6 max-w-sm mx-auto">
           <form onSubmit={handleVerify} className="space-y-6">
             <div className="space-y-2">
               <Label htmlFor="verify-message" className="text-sm font-medium">Message</Label>
@@ -121,8 +119,8 @@ export function VerifySignature() {
               {loading ? 'Verifying...' : 'Verify Signature'}
             </Button>
           </form>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
       {verificationResult && (
         <Card className={verificationResult.valid ? 'border-green-200 bg-green-50/50' : 'border-red-200 bg-red-50/50'}>

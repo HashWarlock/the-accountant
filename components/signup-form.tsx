@@ -52,21 +52,19 @@ export function SignupForm({ onSuccess }: SignupFormProps) {
 
   return (
     <div className="space-y-8">
-      <Card>
-        <CardHeader className="text-center space-y-4">
-          <div className="flex justify-center">
-            <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
-              <Wallet className="h-6 w-6 text-primary" />
-            </div>
+      <div className="text-center space-y-8">
+        <div className="flex justify-center">
+          <div className="h-12 w-12 rounded-full bg-gray-900/10 flex items-center justify-center">
+            <Wallet className="h-6 w-6 text-gray-900" />
           </div>
-          <div className="space-y-2">
-            <CardTitle className="text-2xl">Create Wallet</CardTitle>
-            <CardDescription className="text-base">
-              Generate your secure TEE-backed wallet with deterministic keys
-            </CardDescription>
-          </div>
-        </CardHeader>
-        <CardContent className="space-y-6">
+        </div>
+        <div className="space-y-2">
+          <h2 className="text-2xl font-semibold text-gray-900">Create Wallet</h2>
+          <p className="text-gray-600">
+            Generate your secure TEE-backed wallet with deterministic keys
+          </p>
+        </div>
+        <div className="space-y-6 max-w-sm mx-auto">
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-2">
               <Label htmlFor="email" className="text-sm font-medium">Email Address</Label>
@@ -99,18 +97,15 @@ export function SignupForm({ onSuccess }: SignupFormProps) {
               {loading ? 'Creating Wallet...' : 'Create Wallet'}
             </Button>
           </form>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
       {userData && userData.user && (
-        <Card className="border-green-200 bg-green-50/50">
-          <CardHeader>
-            <div className="flex items-center space-x-2 text-green-700">
-              <CheckCircle className="h-5 w-5" />
-              <CardTitle className="text-green-900">Wallet Created Successfully</CardTitle>
-            </div>
-          </CardHeader>
-          <CardContent className="space-y-4">
+        <div className="bg-white/80 backdrop-blur border border-green-200 rounded-2xl p-6 space-y-4">
+          <div className="flex items-center space-x-2 text-green-700">
+            <CheckCircle className="h-5 w-5" />
+            <h3 className="text-green-900 font-semibold">Wallet Created Successfully</h3>
+          </div>
             <div className="grid gap-4">
               <div className="space-y-2">
                 <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
@@ -191,8 +186,7 @@ export function SignupForm({ onSuccess }: SignupFormProps) {
                 from your User ID within the secure TEE enclave. Save these credentials securely.
               </p>
             </div>
-          </CardContent>
-        </Card>
+        </div>
       )}
     </div>
   )
