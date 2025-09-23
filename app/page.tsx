@@ -45,42 +45,42 @@ export default function Home() {
               <TabsList className="grid grid-cols-6 w-full max-w-3xl mx-auto bg-white/80 backdrop-blur border border-gray-200 rounded-xl p-2 gap-1 h-auto">
                 <TabsTrigger 
                   value="signup" 
-                  className="flex flex-col items-center justify-center space-y-1 p-2 rounded-lg text-gray-600 hover:text-gray-900 data-[state=active]:bg-white data-[state=active]:text-blue-600 data-[state=active]:shadow-sm transition-all duration-200"
+                  className="flex flex-col items-center justify-center space-y-1 p-2 rounded-lg text-gray-600 hover:text-gray-900 data-[state=active]:bg-white data-[state=active]:text-blue-600 data-[state=active]:shadow-lg data-[state=active]:shadow-blue-200/50 transition-all duration-200"
                 >
                   <Wallet className="h-4 w-4" />
                   <span className="text-xs font-medium">Create</span>
                 </TabsTrigger>
                 <TabsTrigger 
                   value="sign" 
-                  className="flex flex-col items-center justify-center space-y-1 p-2 rounded-lg text-gray-600 hover:text-gray-900 data-[state=active]:bg-white data-[state=active]:text-blue-600 data-[state=active]:shadow-sm transition-all duration-200"
+                  className="flex flex-col items-center justify-center space-y-1 p-2 rounded-lg text-gray-600 hover:text-gray-900 data-[state=active]:bg-white data-[state=active]:text-blue-600 data-[state=active]:shadow-lg data-[state=active]:shadow-blue-200/50 transition-all duration-200"
                 >
                   <FileText className="h-4 w-4" />
                   <span className="text-xs font-medium">Sign</span>
                 </TabsTrigger>
                 <TabsTrigger 
                   value="verify" 
-                  className="flex flex-col items-center justify-center space-y-1 p-2 rounded-lg text-gray-600 hover:text-gray-900 data-[state=active]:bg-white data-[state=active]:text-blue-600 data-[state=active]:shadow-sm transition-all duration-200"
+                  className="flex flex-col items-center justify-center space-y-1 p-2 rounded-lg text-gray-600 hover:text-gray-900 data-[state=active]:bg-white data-[state=active]:text-blue-600 data-[state=active]:shadow-lg data-[state=active]:shadow-blue-200/50 transition-all duration-200"
                 >
                   <Shield className="h-4 w-4" />
                   <span className="text-xs font-medium">Verify</span>
                 </TabsTrigger>
                 <TabsTrigger 
                   value="users" 
-                  className="flex flex-col items-center justify-center space-y-1 p-2 rounded-lg text-gray-600 hover:text-gray-900 data-[state=active]:bg-white data-[state=active]:text-blue-600 data-[state=active]:shadow-sm transition-all duration-200"
+                  className="flex flex-col items-center justify-center space-y-1 p-2 rounded-lg text-gray-600 hover:text-gray-900 data-[state=active]:bg-white data-[state=active]:text-blue-600 data-[state=active]:shadow-lg data-[state=active]:shadow-blue-200/50 transition-all duration-200"
                 >
                   <Users className="h-4 w-4" />
                   <span className="text-xs font-medium">Users</span>
                 </TabsTrigger>
                 <TabsTrigger 
                   value="audit" 
-                  className="flex flex-col items-center justify-center space-y-1 p-2 rounded-lg text-gray-600 hover:text-gray-900 data-[state=active]:bg-white data-[state=active]:text-blue-600 data-[state=active]:shadow-sm transition-all duration-200"
+                  className="flex flex-col items-center justify-center space-y-1 p-2 rounded-lg text-gray-600 hover:text-gray-900 data-[state=active]:bg-white data-[state=active]:text-blue-600 data-[state=active]:shadow-lg data-[state=active]:shadow-blue-200/50 transition-all duration-200"
                 >
                   <Search className="h-4 w-4" />
                   <span className="text-xs font-medium">Audit</span>
                 </TabsTrigger>
                 <TabsTrigger 
                   value="attestation" 
-                  className="flex flex-col items-center justify-center space-y-1 p-2 rounded-lg text-gray-600 hover:text-gray-900 data-[state=active]:bg-white data-[state=active]:text-blue-600 data-[state=active]:shadow-sm transition-all duration-200"
+                  className="flex flex-col items-center justify-center space-y-1 p-2 rounded-lg text-gray-600 hover:text-gray-900 data-[state=active]:bg-white data-[state=active]:text-blue-600 data-[state=active]:shadow-lg data-[state=active]:shadow-blue-200/50 transition-all duration-200"
                 >
                   <Shield className="h-4 w-4" />
                   <span className="text-xs font-medium">Attest</span>
@@ -88,7 +88,7 @@ export default function Home() {
               </TabsList>
 
               {/* Content Card */}
-              <Card className="mt-6 mx-auto max-w-3xl border-0 shadow-lg p-6">
+              <Card className="mt-6 mx-auto max-w-3xl border-0 shadow-none p-6">
                 <TabsContent value="signup" className="m-0 flex justify-center">
                   <div className="w-full max-w-md">
                     <SignupForm onSuccess={handleSignupSuccess} />
