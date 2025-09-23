@@ -51,7 +51,14 @@ export default function Home() {
         <div className="container max-w-4xl mx-auto text-center">
           <div className="inline-flex items-center rounded-full border px-3 py-1 text-sm font-medium mb-8">
             <Shield className="h-4 w-4 mr-2" />
-            Powered by Intel TDX TEE Technology
+            Powered by{' '}
+            <a href="https://github.com/dstack-tee/dstack" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline mx-1">
+              dstack
+            </a>
+            {' '}Hosted on{' '}
+            <a href="https://phala.com" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline ml-1">
+              Phala Cloud
+            </a>
           </div>
           
           <h1 className="text-4xl md:text-6xl font-bold tracking-tight mb-6">
@@ -63,8 +70,7 @@ export default function Home() {
           </h1>
           
           <p className="text-xl text-muted-foreground mb-12 max-w-2xl mx-auto leading-relaxed">
-            Zero-trust cryptographic operations in a secure enclave. 
-            Deterministic wallet generation with hardware-level security guarantees.
+            Zero-trust cryptographic operations in a secure enclave. Deterministic wallet generation with hardware-level security guarantees.
           </p>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-2xl mx-auto">
