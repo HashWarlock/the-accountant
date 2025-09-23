@@ -209,10 +209,10 @@ export default function Home() {
               className="block hover:opacity-80 transition-opacity"
             >
               <Image 
-                src="/github-logo.png" 
+                src="/github-logo-dark.png" 
                 alt="GitHub"
-                width={90}
-                height={26}
+                width={85}
+                height={24}
                 className="object-contain"
               />
             </a>
