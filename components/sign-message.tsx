@@ -57,23 +57,23 @@ export function SignMessage({ userId: defaultUserId }: SignMessageProps) {
   return (
     <div className="space-y-8">
       <Card>
-        <CardHeader>
-          <div className="flex items-center space-x-3">
-            <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
-              <PenTool className="h-5 w-5 text-blue-600" />
-            </div>
-            <div>
-              <CardTitle>Sign Message</CardTitle>
-              <CardDescription>
-                Cryptographically sign a message using your TEE-backed private key
-              </CardDescription>
+        <CardHeader className="text-center space-y-4">
+          <div className="flex justify-center">
+            <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
+              <PenTool className="h-6 w-6 text-primary" />
             </div>
           </div>
+          <div className="space-y-2">
+            <CardTitle className="text-2xl">Sign Message</CardTitle>
+            <CardDescription className="text-base">
+              Cryptographically sign a message using your TEE-backed private key
+            </CardDescription>
+          </div>
         </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSign} className="space-y-4">
+        <CardContent className="space-y-6">
+          <form onSubmit={handleSign} className="space-y-6">
             <div className="space-y-2">
-              <Label htmlFor="sign-userId">User ID</Label>
+              <Label htmlFor="sign-userId" className="text-sm font-medium">User ID</Label>
               <Input
                 id="sign-userId"
                 placeholder="alice"
@@ -81,10 +81,11 @@ export function SignMessage({ userId: defaultUserId }: SignMessageProps) {
                 onChange={(e) => setUserId(e.target.value)}
                 required
                 disabled={loading}
+                className="h-11"
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="message">Message</Label>
+              <Label htmlFor="message" className="text-sm font-medium">Message</Label>
               <Input
                 id="message"
                 placeholder="Hello, dstack!"
@@ -92,9 +93,10 @@ export function SignMessage({ userId: defaultUserId }: SignMessageProps) {
                 onChange={(e) => setMessage(e.target.value)}
                 required
                 disabled={loading}
+                className="h-11"
               />
             </div>
-            <Button type="submit" className="w-full" disabled={loading}>
+            <Button type="submit" className="w-full h-11" disabled={loading}>
               {loading && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
               {loading ? 'Signing...' : 'Sign Message'}
             </Button>

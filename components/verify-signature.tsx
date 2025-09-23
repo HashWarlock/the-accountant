@@ -65,23 +65,23 @@ export function VerifySignature() {
   return (
     <div className="space-y-8">
       <Card>
-        <CardHeader>
-          <div className="flex items-center space-x-3">
-            <div className="h-10 w-10 rounded-full bg-purple-100 flex items-center justify-center">
-              <Shield className="h-5 w-5 text-purple-600" />
-            </div>
-            <div>
-              <CardTitle>Verify Signature</CardTitle>
-              <CardDescription>
-                Verify a cryptographic signature using an address or user ID
-              </CardDescription>
+        <CardHeader className="text-center space-y-4">
+          <div className="flex justify-center">
+            <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
+              <Shield className="h-6 w-6 text-primary" />
             </div>
           </div>
+          <div className="space-y-2">
+            <CardTitle className="text-2xl">Verify Signature</CardTitle>
+            <CardDescription className="text-base">
+              Verify a cryptographic signature using an address or user ID
+            </CardDescription>
+          </div>
         </CardHeader>
-        <CardContent>
-          <form onSubmit={handleVerify} className="space-y-4">
+        <CardContent className="space-y-6">
+          <form onSubmit={handleVerify} className="space-y-6">
             <div className="space-y-2">
-              <Label htmlFor="verify-message">Message</Label>
+              <Label htmlFor="verify-message" className="text-sm font-medium">Message</Label>
               <Input
                 id="verify-message"
                 placeholder="Hello, dstack!"
@@ -89,10 +89,11 @@ export function VerifySignature() {
                 onChange={(e) => setMessage(e.target.value)}
                 required
                 disabled={loading}
+                className="h-11"
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="signature">Signature</Label>
+              <Label htmlFor="signature" className="text-sm font-medium">Signature</Label>
               <Input
                 id="signature"
                 placeholder="0x..."
@@ -100,10 +101,11 @@ export function VerifySignature() {
                 onChange={(e) => setSignature(e.target.value)}
                 required
                 disabled={loading}
+                className="h-11"
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="addressOrUserId">Address or User ID</Label>
+              <Label htmlFor="addressOrUserId" className="text-sm font-medium">Address or User ID</Label>
               <Input
                 id="addressOrUserId"
                 placeholder="0x... or alice"
@@ -111,9 +113,10 @@ export function VerifySignature() {
                 onChange={(e) => setAddressOrUserId(e.target.value)}
                 required
                 disabled={loading}
+                className="h-11"
               />
             </div>
-            <Button type="submit" className="w-full" disabled={loading}>
+            <Button type="submit" className="w-full h-11" disabled={loading}>
               {loading && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
               {loading ? 'Verifying...' : 'Verify Signature'}
             </Button>

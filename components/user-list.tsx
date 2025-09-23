@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Loader2, Search, ChevronLeft, ChevronRight, Users } from 'lucide-react'
 
@@ -60,28 +61,28 @@ export function UserList() {
 
   return (
     <Card>
-      <CardHeader>
-        <div className="flex items-center space-x-3">
-          <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
-            <Users className="h-5 w-5 text-blue-600" />
-          </div>
-          <div>
-            <CardTitle>Registered Users</CardTitle>
-            <CardDescription>
-              Browse and search all users with TEE-backed wallets
-            </CardDescription>
+      <CardHeader className="text-center space-y-4">
+        <div className="flex justify-center">
+          <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
+            <Users className="h-6 w-6 text-primary" />
           </div>
         </div>
+        <div className="space-y-2">
+          <CardTitle className="text-2xl">Registered Users</CardTitle>
+          <CardDescription className="text-base">
+            Browse and search all users with TEE-backed wallets
+          </CardDescription>
+        </div>
       </CardHeader>
-      <CardContent>
-        <form onSubmit={handleSearch} className="flex gap-2 mb-6">
+      <CardContent className="space-y-6">
+        <form onSubmit={handleSearch} className="flex gap-2">
           <Input
             placeholder="Search by email, user ID, or address..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="flex-1"
+            className="flex-1 h-11"
           />
-          <Button type="submit" variant="secondary" disabled={loading}>
+          <Button type="submit" variant="secondary" disabled={loading} className="h-11">
             <Search className="h-4 w-4" />
             Search
           </Button>

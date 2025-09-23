@@ -1,7 +1,12 @@
 'use client'
 
 import { useState } from 'react'
-import { Shield, CheckCircle, XCircle, Info, Copy, FileText } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { toast } from 'sonner'
+import { Shield, CheckCircle, XCircle, Info, Copy, FileText, Loader2 } from 'lucide-react'
 
 interface VerificationResult {
   verified: boolean
@@ -77,9 +82,9 @@ export function AttestationVerifier() {
   const copyToClipboard = async (text: string, label: string) => {
     try {
       await navigator.clipboard.writeText(text)
-      alert(`${label} copied to clipboard`)
+      toast.success(`${label} copied to clipboard`)
     } catch (err) {
-      alert('Failed to copy to clipboard')
+      toast.error('Failed to copy to clipboard')
     }
   }
 
@@ -93,81 +98,88 @@ export function AttestationVerifier() {
   }
 
   return (
-    <div className="w-full max-w-4xl mx-auto p-6">
-      <div className="bg-white rounded-lg shadow-lg p-6">
-        <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
-          <Shield className="h-6 w-6" />
-          Attestation Quote Verifier
-        </h2>
-
-        <div className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium mb-2">
-              Attestation Quote (Hex)
-            </label>
+    <div className="space-y-8">
+      <Card>
+        <CardHeader className="text-center space-y-4">
+          <div className="flex justify-center">
+            <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
+              <Shield className="h-6 w-6 text-primary" />
+            </div>
+          </div>
+          <div className="space-y-2">
+            <CardTitle className="text-2xl">Attestation Verifier</CardTitle>
+            <CardDescription className="text-base">
+              Verify TEE attestation quotes and validate platform trust
+            </CardDescription>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          <div className="space-y-2">
+            <Label htmlFor="quote" className="text-sm font-medium">Attestation Quote (Hex)</Label>
             <textarea
+              id="quote"
               value={quote}
               onChange={(e) => setQuote(e.target.value)}
               placeholder="Enter hex-encoded attestation quote (with or without 0x prefix)"
-              className="w-full px-3 py-2 border rounded-lg h-32 font-mono text-xs"
+              className="w-full px-3 py-3 border border-input rounded-md h-32 font-mono text-xs resize-none focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
             />
           </div>
 
-          <div>
-            <label className="block text-sm font-medium mb-2">
-              Event Log (Optional)
-            </label>
+          <div className="space-y-2">
+            <Label htmlFor="eventLog" className="text-sm font-medium">Event Log (Optional)</Label>
             <textarea
+              id="eventLog"
               value={eventLog}
               onChange={(e) => setEventLog(e.target.value)}
               placeholder="Enter hex-encoded event log (optional)"
-              className="w-full px-3 py-2 border rounded-lg h-20 font-mono text-xs"
+              className="w-full px-3 py-3 border border-input rounded-md h-20 font-mono text-xs resize-none focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
             />
           </div>
 
-          <button
+          <Button
             onClick={handleVerify}
             disabled={loading}
-            className="w-full py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400 flex items-center justify-center gap-2"
+            className="w-full h-11"
           >
             {loading ? (
               <>
-                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
                 Verifying...
               </>
             ) : (
               <>
-                <Shield className="h-5 w-5" />
+                <Shield className="h-4 w-4 mr-2" />
                 Verify Attestation Quote
               </>
             )}
-          </button>
+          </Button>
 
           {error && (
-            <div className="p-4 bg-red-50 border border-red-200 rounded-lg text-red-600">
+            <div className="p-4 bg-destructive/10 border border-destructive/20 rounded-lg text-destructive">
               {error}
             </div>
           )}
+        </CardContent>
+      </Card>
 
-          {result && (
-            <div className="mt-6 space-y-4">
-              <div className={`p-4 rounded-lg border ${result.verified ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'}`}>
-                <div className="flex items-center gap-3">
-                  {result.verified ? (
-                    <CheckCircle className="h-6 w-6 text-green-600" />
-                  ) : (
-                    <XCircle className="h-6 w-6 text-red-600" />
-                  )}
-                  <div>
-                    <h3 className="font-semibold text-lg">
-                      {result.verified ? 'Quote Verified' : 'Verification Failed'}
-                    </h3>
-                    <p className="text-sm text-gray-600">{result.message}</p>
-                  </div>
-                </div>
-              </div>
+      {result && (
+        <Card className={result.verified ? 'border-green-200 bg-green-50/50' : 'border-red-200 bg-red-50/50'}>
+          <CardHeader>
+            <div className={`flex items-center space-x-2 ${result.verified ? 'text-green-700' : 'text-red-700'}`}>
+              {result.verified ? (
+                <CheckCircle className="h-5 w-5" />
+              ) : (
+                <XCircle className="h-5 w-5" />
+              )}
+              <CardTitle className={result.verified ? 'text-green-900' : 'text-red-900'}>
+                {result.verified ? 'Quote Verified' : 'Verification Failed'}
+              </CardTitle>
+            </div>
+            <CardDescription>{result.message}</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-6">
 
-              <div className="bg-gray-50 rounded-lg p-4">
+            <div className="bg-muted/50 rounded-lg p-4">
                 <h4 className="font-semibold mb-3">Verification Details</h4>
                 
                 <div className="grid grid-cols-2 gap-4">
@@ -268,10 +280,9 @@ export function AttestationVerifier() {
                   </div>
                 </div>
               )}
-            </div>
-          )}
-        </div>
-      </div>
+          </CardContent>
+        </Card>
+      )}
     </div>
   )
 }
