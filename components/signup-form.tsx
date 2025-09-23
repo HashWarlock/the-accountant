@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { toast } from 'sonner'
-import { Loader2, CheckCircle } from 'lucide-react'
+import { Loader2, CheckCircle, Wallet, Copy } from 'lucide-react'
 
 interface SignupFormProps {
   onSuccess?: (data: any) => void
@@ -45,97 +45,153 @@ export function SignupForm({ onSuccess }: SignupFormProps) {
     }
   }
 
-  return (
-    <Card className="w-full max-w-lg border-0 shadow-2xl bg-white/95 backdrop-blur-sm">
-      <CardHeader className="pb-8">
-        <div className="space-y-3">
-          <div className="w-12 h-12 bg-emerald-100 rounded-2xl flex items-center justify-center">
-            <span className="text-2xl">🔐</span>
-          </div>
-          <CardTitle className="text-2xl font-bold text-slate-900">Create Wallet</CardTitle>
-          <CardDescription className="text-slate-600 text-base">
-            Generate your secure TEE-backed wallet with deterministic keys
-          </CardDescription>
-        </div>
-      </CardHeader>
-      <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="space-y-3">
-            <Label htmlFor="email" className="text-slate-700 font-semibold">Email Address</Label>
-            <Input
-              id="email"
-              type="email"
-              placeholder="alice@example.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              disabled={loading}
-              className="h-12 border-2 border-slate-200 rounded-xl focus:border-emerald-400 focus:ring-0 transition-all duration-200"
-            />
-          </div>
-          <div className="space-y-3">
-            <Label htmlFor="userId" className="text-slate-700 font-semibold">User ID</Label>
-            <Input
-              id="userId"
-              placeholder="alice"
-              value={userId}
-              onChange={(e) => setUserId(e.target.value)}
-              required
-              minLength={3}
-              disabled={loading}
-              className="h-12 border-2 border-slate-200 rounded-xl focus:border-emerald-400 focus:ring-0 transition-all duration-200"
-            />
-          </div>
-          <Button 
-            type="submit" 
-            className="w-full h-12 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200" 
-            disabled={loading}
-          >
-            {loading && <Loader2 className="animate-spin mr-2" />}
-            {loading ? 'Creating Wallet...' : 'Create Wallet'}
-          </Button>
-        </form>
+  const copyToClipboard = (text: string, label: string) => {
+    navigator.clipboard.writeText(text)
+    toast.success(`${label} copied to clipboard`)
+  }
 
-        {userData && userData.user && (
-          <div className="mt-8 p-6 bg-emerald-50 rounded-2xl border-2 border-emerald-200 space-y-4">
-            <div className="flex items-center gap-3 text-emerald-700">
-              <CheckCircle className="h-6 w-6" />
-              <span className="font-bold text-lg">Wallet Created Successfully!</span>
+  return (
+    <div className="space-y-8">
+      <Card>
+        <CardHeader>
+          <div className="flex items-center space-x-3">
+            <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
+              <Wallet className="h-5 w-5 text-primary" />
             </div>
-            <div className="space-y-4 text-sm">
-              <div>
-                <span className="text-emerald-700 font-semibold block mb-2">User ID:</span>
-                <p className="font-mono bg-white p-3 rounded-xl border border-emerald-200 text-slate-900">
-                  {userData.user.userId}
-                </p>
+            <div>
+              <CardTitle>Create Wallet</CardTitle>
+              <CardDescription>
+                Generate your secure TEE-backed wallet with deterministic keys
+              </CardDescription>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="email">Email Address</Label>
+              <Input
+                id="email"
+                type="email"
+                placeholder="alice@example.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                disabled={loading}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="userId">User ID</Label>
+              <Input
+                id="userId"
+                placeholder="alice"
+                value={userId}
+                onChange={(e) => setUserId(e.target.value)}
+                required
+                minLength={3}
+                disabled={loading}
+              />
+            </div>
+            <Button type="submit" className="w-full" disabled={loading}>
+              {loading && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
+              {loading ? 'Creating Wallet...' : 'Create Wallet'}
+            </Button>
+          </form>
+        </CardContent>
+      </Card>
+
+      {userData && userData.user && (
+        <Card className="border-green-200 bg-green-50/50">
+          <CardHeader>
+            <div className="flex items-center space-x-2 text-green-700">
+              <CheckCircle className="h-5 w-5" />
+              <CardTitle className="text-green-900">Wallet Created Successfully</CardTitle>
+            </div>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid gap-4">
+              <div className="space-y-2">
+                <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                  User ID
+                </Label>
+                <div className="flex items-center space-x-2">
+                  <code className="flex-1 px-3 py-2 bg-white rounded-md border text-sm font-mono">
+                    {userData.user.userId}
+                  </code>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => copyToClipboard(userData.user.userId, 'User ID')}
+                  >
+                    <Copy className="h-4 w-4" />
+                  </Button>
+                </div>
               </div>
-              <div>
-                <span className="text-emerald-700 font-semibold block mb-2">Email:</span>
-                <p className="font-mono bg-white p-3 rounded-xl border border-emerald-200 text-slate-900">
-                  {userData.user.email}
-                </p>
+
+              <div className="space-y-2">
+                <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                  Email
+                </Label>
+                <div className="flex items-center space-x-2">
+                  <code className="flex-1 px-3 py-2 bg-white rounded-md border text-sm font-mono">
+                    {userData.user.email}
+                  </code>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => copyToClipboard(userData.user.email, 'Email')}
+                  >
+                    <Copy className="h-4 w-4" />
+                  </Button>
+                </div>
               </div>
-              <div>
-                <span className="text-emerald-700 font-semibold block mb-2">ETH Address:</span>
-                <p className="font-mono break-all bg-white p-3 rounded-xl border border-emerald-200 text-xs text-slate-900">
-                  {userData.user.address}
-                </p>
+
+              <div className="space-y-2">
+                <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                  Ethereum Address
+                </Label>
+                <div className="flex items-center space-x-2">
+                  <code className="flex-1 px-3 py-2 bg-white rounded-md border text-xs font-mono break-all">
+                    {userData.user.address}
+                  </code>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => copyToClipboard(userData.user.address, 'Address')}
+                  >
+                    <Copy className="h-4 w-4" />
+                  </Button>
+                </div>
               </div>
-              <div>
-                <span className="text-emerald-700 font-semibold block mb-2">Public Key:</span>
-                <p className="font-mono break-all bg-white p-3 rounded-xl border border-emerald-200 text-xs text-slate-900">
-                  {userData.user.publicKey}
-                </p>
+
+              <div className="space-y-2">
+                <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                  Public Key
+                </Label>
+                <div className="flex items-center space-x-2">
+                  <code className="flex-1 px-3 py-2 bg-white rounded-md border text-xs font-mono break-all">
+                    {userData.user.publicKey}
+                  </code>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => copyToClipboard(userData.user.publicKey, 'Public Key')}
+                  >
+                    <Copy className="h-4 w-4" />
+                  </Button>
+                </div>
               </div>
             </div>
-            <div className="mt-4 p-4 bg-amber-50 border-2 border-amber-200 rounded-xl">
-              <p className="text-sm text-amber-800">
-                <strong>🔐 Security Note:</strong> Your private key is derived deterministically from your User ID within the secure TEE enclave. Save these credentials securely.
+
+            <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+              <p className="text-sm text-blue-800">
+                <strong>🔐 Security Note:</strong> Your private key is derived deterministically 
+                from your User ID within the secure TEE enclave. Save these credentials securely.
               </p>
             </div>
-          </div>
-        )}
-      </CardContent>
-    </Card>
+          </CardContent>
+        </Card>
+      )}
+    </div>
   )
 }

@@ -59,15 +59,19 @@ export function UserList() {
   }
 
   return (
-    <Card className="w-full">
+    <Card>
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Users className="h-5 w-5" />
-          Registered Users
-        </CardTitle>
-        <CardDescription>
-          Browse and search all users with TEE-backed wallets
-        </CardDescription>
+        <div className="flex items-center space-x-3">
+          <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
+            <Users className="h-5 w-5 text-blue-600" />
+          </div>
+          <div>
+            <CardTitle>Registered Users</CardTitle>
+            <CardDescription>
+              Browse and search all users with TEE-backed wallets
+            </CardDescription>
+          </div>
+        </div>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSearch} className="flex gap-2 mb-6">
@@ -89,25 +93,40 @@ export function UserList() {
           </div>
         ) : (
           <>
-            <div className="space-y-2">
+            <div className="grid gap-4">
               {users.map((user) => (
-                <div
-                  key={user.id}
-                  className="p-4 bg-muted/50 rounded-lg space-y-2 hover:bg-muted transition-colors"
-                >
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <p className="font-medium">{user.userId}</p>
-                      <p className="text-sm text-muted-foreground">{user.email}</p>
+                <Card key={user.id} className="hover:shadow-md transition-shadow">
+                  <CardContent className="p-4">
+                    <div className="flex justify-between items-start mb-3">
+                      <div className="space-y-1">
+                        <div className="flex items-center space-x-2">
+                          <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
+                            <span className="text-sm font-semibold text-primary">
+                              {user.userId.charAt(0).toUpperCase()}
+                            </span>
+                          </div>
+                          <div>
+                            <p className="font-semibold">{user.userId}</p>
+                            <p className="text-sm text-muted-foreground">{user.email}</p>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-xs text-muted-foreground">
+                          {formatDate(user.createdAt)}
+                        </p>
+                      </div>
                     </div>
-                    <p className="text-xs text-muted-foreground">
-                      {formatDate(user.createdAt)}
-                    </p>
-                  </div>
-                  <p className="font-mono text-xs break-all text-muted-foreground">
-                    {user.address}
-                  </p>
-                </div>
+                    <div className="space-y-2">
+                      <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                        Ethereum Address
+                      </Label>
+                      <code className="block px-3 py-2 bg-muted rounded-md text-xs font-mono break-all">
+                        {user.address}
+                      </code>
+                    </div>
+                  </CardContent>
+                </Card>
               ))}
             </div>
 
