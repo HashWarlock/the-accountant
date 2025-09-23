@@ -23,17 +23,14 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-white to-[#cdfa50]">
-      {/* Header */}
-      <header className="border-b bg-white/80 backdrop-blur supports-[backdrop-filter]:bg-white/60">
-        <div className="container flex h-16 items-center">
-        </div>
-      </header>
-
       {/* Hero Section */}
-      <section className="py-24 px-4">
+      <section className="pt-16 pb-8 px-4">
         <div className="container max-w-4xl mx-auto text-center">
-          <p className="text-2xl text-gray-800 mb-16 max-w-3xl mx-auto leading-relaxed font-medium">
-            Zero-trust cryptographic operations in a secure enclave. Deterministic wallet generation with hardware-level security guarantees.
+          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+            Secure Wallet Infrastructure
+          </h1>
+          <p className="text-lg text-gray-700 mb-12 max-w-2xl mx-auto leading-relaxed">
+            Enterprise-grade cryptographic operations powered by Intel TDX TEE technology. Create, sign, and verify with hardware-level security guarantees.
           </p>
         </div>
       </section>
@@ -44,87 +41,95 @@ export default function Home() {
           {/* Tab Navigation */}
           <div className="flex flex-wrap justify-center gap-3 mb-8">
             <Tabs defaultValue="signup" className="w-full">
-              <TabsList className="grid grid-cols-3 sm:grid-cols-6 w-full max-w-3xl mx-auto bg-transparent gap-2 h-auto p-0">
+              <TabsList className="grid grid-cols-3 sm:grid-cols-6 w-full max-w-3xl mx-auto bg-transparent gap-3 h-auto p-0">
                 <TabsTrigger 
                   value="signup" 
-                  className="flex flex-col items-center justify-center space-y-2 p-4 bg-white/80 backdrop-blur border border-black/10 rounded-xl shadow-sm data-[state=active]:bg-white data-[state=active]:shadow-md hover:bg-white/90 transition-all duration-200"
+                  className="group flex flex-col items-center justify-center space-y-2 p-4 bg-white/60 backdrop-blur border border-gray-200 rounded-xl shadow-sm data-[state=active]:bg-white data-[state=active]:shadow-lg data-[state=active]:border-blue-200 data-[state=active]:scale-105 hover:bg-white/80 transition-all duration-200"
                 >
-                  <Wallet className="h-5 w-5" />
-                  <span className="text-sm font-medium">Create</span>
+                  <Wallet className="h-5 w-5 group-data-[state=active]:text-blue-600" />
+                  <span className="text-sm font-medium group-data-[state=active]:text-blue-600">Create</span>
                 </TabsTrigger>
                 <TabsTrigger 
                   value="sign" 
-                  className="flex flex-col items-center justify-center space-y-2 p-4 bg-white/80 backdrop-blur border border-black/10 rounded-xl shadow-sm data-[state=active]:bg-white data-[state=active]:shadow-md hover:bg-white/90 transition-all duration-200"
+                  className="group flex flex-col items-center justify-center space-y-2 p-4 bg-white/60 backdrop-blur border border-gray-200 rounded-xl shadow-sm data-[state=active]:bg-white data-[state=active]:shadow-lg data-[state=active]:border-blue-200 data-[state=active]:scale-105 hover:bg-white/80 transition-all duration-200"
                 >
-                  <FileText className="h-5 w-5" />
-                  <span className="text-sm font-medium">Sign</span>
+                  <FileText className="h-5 w-5 group-data-[state=active]:text-blue-600" />
+                  <span className="text-sm font-medium group-data-[state=active]:text-blue-600">Sign</span>
                 </TabsTrigger>
                 <TabsTrigger 
                   value="verify" 
-                  className="flex flex-col items-center justify-center space-y-2 p-4 bg-white/80 backdrop-blur border border-black/10 rounded-xl shadow-sm data-[state=active]:bg-white data-[state=active]:shadow-md hover:bg-white/90 transition-all duration-200"
+                  className="group flex flex-col items-center justify-center space-y-2 p-4 bg-white/60 backdrop-blur border border-gray-200 rounded-xl shadow-sm data-[state=active]:bg-white data-[state=active]:shadow-lg data-[state=active]:border-blue-200 data-[state=active]:scale-105 hover:bg-white/80 transition-all duration-200"
                 >
-                  <Shield className="h-5 w-5" />
-                  <span className="text-sm font-medium">Verify</span>
+                  <Shield className="h-5 w-5 group-data-[state=active]:text-blue-600" />
+                  <span className="text-sm font-medium group-data-[state=active]:text-blue-600">Verify</span>
                 </TabsTrigger>
                 <TabsTrigger 
                   value="users" 
-                  className="flex flex-col items-center justify-center space-y-2 p-4 bg-white/80 backdrop-blur border border-black/10 rounded-xl shadow-sm data-[state=active]:bg-white data-[state=active]:shadow-md hover:bg-white/90 transition-all duration-200"
+                  className="group flex flex-col items-center justify-center space-y-2 p-4 bg-white/60 backdrop-blur border border-gray-200 rounded-xl shadow-sm data-[state=active]:bg-white data-[state=active]:shadow-lg data-[state=active]:border-blue-200 data-[state=active]:scale-105 hover:bg-white/80 transition-all duration-200"
                 >
-                  <Users className="h-5 w-5" />
-                  <span className="text-sm font-medium">Users</span>
+                  <Users className="h-5 w-5 group-data-[state=active]:text-blue-600" />
+                  <span className="text-sm font-medium group-data-[state=active]:text-blue-600">Users</span>
                 </TabsTrigger>
                 <TabsTrigger 
                   value="audit" 
-                  className="flex flex-col items-center justify-center space-y-2 p-4 bg-white/80 backdrop-blur border border-black/10 rounded-xl shadow-sm data-[state=active]:bg-white data-[state=active]:shadow-md hover:bg-white/90 transition-all duration-200"
+                  className="group flex flex-col items-center justify-center space-y-2 p-4 bg-white/60 backdrop-blur border border-gray-200 rounded-xl shadow-sm data-[state=active]:bg-white data-[state=active]:shadow-lg data-[state=active]:border-blue-200 data-[state=active]:scale-105 hover:bg-white/80 transition-all duration-200"
                 >
-                  <Search className="h-5 w-5" />
-                  <span className="text-sm font-medium">Audit</span>
+                  <Search className="h-5 w-5 group-data-[state=active]:text-blue-600" />
+                  <span className="text-sm font-medium group-data-[state=active]:text-blue-600">Audit</span>
                 </TabsTrigger>
                 <TabsTrigger 
                   value="attestation" 
-                  className="flex flex-col items-center justify-center space-y-2 p-4 bg-white/80 backdrop-blur border border-black/10 rounded-xl shadow-sm data-[state=active]:bg-white data-[state=active]:shadow-md hover:bg-white/90 transition-all duration-200"
+                  className="group flex flex-col items-center justify-center space-y-2 p-4 bg-white/60 backdrop-blur border border-gray-200 rounded-xl shadow-sm data-[state=active]:bg-white data-[state=active]:shadow-lg data-[state=active]:border-blue-200 data-[state=active]:scale-105 hover:bg-white/80 transition-all duration-200"
                 >
-                  <Shield className="h-5 w-5" />
-                  <span className="text-sm font-medium">Attest</span>
+                  <Shield className="h-5 w-5 group-data-[state=active]:text-blue-600" />
+                  <span className="text-sm font-medium group-data-[state=active]:text-blue-600">Attest</span>
                 </TabsTrigger>
               </TabsList>
 
               {/* Content Box */}
-              <div className="mt-8 bg-white/90 backdrop-blur rounded-2xl border border-black/10 shadow-xl p-8 mx-auto max-w-2xl">
-                <TabsContent value="signup" className="m-0">
-                  <SignupForm onSuccess={handleSignupSuccess} />
+              <div className="mt-8 bg-white/95 backdrop-blur rounded-2xl border border-gray-200 shadow-xl p-8 mx-auto max-w-3xl">
+                <TabsContent value="signup" className="m-0 flex justify-center">
+                  <div className="w-full max-w-md">
+                    <SignupForm onSuccess={handleSignupSuccess} />
+                  </div>
                 </TabsContent>
 
-                <TabsContent value="sign" className="m-0">
-                  <SignMessage userId={currentUserId} />
+                <TabsContent value="sign" className="m-0 flex justify-center">
+                  <div className="w-full max-w-md">
+                    <SignMessage userId={currentUserId} />
+                  </div>
                 </TabsContent>
 
-                <TabsContent value="verify" className="m-0">
-                  <VerifySignature />
+                <TabsContent value="verify" className="m-0 flex justify-center">
+                  <div className="w-full max-w-md">
+                    <VerifySignature />
+                  </div>
                 </TabsContent>
 
-                <TabsContent value="users" className="m-0">
-                  <UserList />
+                <TabsContent value="users" className="m-0 flex justify-center">
+                  <div className="w-full max-w-4xl">
+                    <UserList />
+                  </div>
                 </TabsContent>
 
                 <TabsContent value="audit" className="m-0">
                   {currentUserId ? (
                     <AuditLogViewer userId={currentUserId} />
                   ) : (
-                    <div className="text-center space-y-6">
-                      <div className="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center mx-auto">
-                        <Search className="h-8 w-8 text-gray-500" />
+                    <div className="text-center space-y-8 py-12">
+                      <div className="w-20 h-20 rounded-2xl bg-blue-50 flex items-center justify-center mx-auto">
+                        <Search className="h-10 w-10 text-blue-600" />
                       </div>
-                      <div className="space-y-3">
-                        <h3 className="text-xl font-semibold text-gray-900">View Audit Logs</h3>
-                        <p className="text-gray-600">
-                          Enter a User ID to view detailed audit logs and transaction history
+                      <div className="space-y-4">
+                        <h3 className="text-2xl font-bold text-gray-900">View Audit Logs</h3>
+                        <p className="text-gray-600 max-w-md mx-auto">
+                          Enter a User ID to view detailed audit logs and transaction history for secure operations
                         </p>
                       </div>
                       <div className="flex space-x-3 max-w-sm mx-auto">
                         <Input
                           placeholder="Enter User ID"
-                          className="flex-1"
+                          className="flex-1 h-12"
                           onKeyDown={(e) => {
                             if (e.key === 'Enter' && e.currentTarget.value) {
                               setCurrentUserId(e.currentTarget.value)
@@ -132,6 +137,7 @@ export default function Home() {
                           }}
                         />
                         <Button
+                          className="h-12 px-6"
                           onClick={(e) => {
                             const input = e.currentTarget.previousElementSibling as HTMLInputElement
                             if (input?.value) {
@@ -139,15 +145,17 @@ export default function Home() {
                             }
                           }}
                         >
-                          View
+                          View Logs
                         </Button>
                       </div>
                     </div>
                   )}
                 </TabsContent>
 
-                <TabsContent value="attestation" className="m-0">
-                  <AttestationVerifier />
+                <TabsContent value="attestation" className="m-0 flex justify-center">
+                  <div className="w-full max-w-2xl">
+                    <AttestationVerifier />
+                  </div>
                 </TabsContent>
               </div>
             </Tabs>
@@ -156,45 +164,46 @@ export default function Home() {
       </main>
 
       {/* Footer */}
-      <footer className="py-12 px-4">
+      <footer className="py-16 px-4">
         <div className="container max-w-4xl mx-auto">
-          <div className="flex items-center justify-center gap-6">
+          <div className="flex flex-wrap items-center justify-center gap-6">
             <a 
               href="https://github.com/dstack-tee/dstack" 
               target="_blank" 
               rel="noopener noreferrer"
-              className="w-10 h-10 rounded-full bg-white/80 backdrop-blur border border-black/10 shadow-sm flex items-center justify-center hover:bg-white/90 transition-all duration-200"
-              title="Powered by dstack"
+              className="flex items-center space-x-3 px-6 py-4 bg-white/90 backdrop-blur border border-gray-200 rounded-xl shadow-sm hover:shadow-md hover:scale-105 transition-all duration-200"
             >
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <circle cx="12" cy="12" r="12" fill="#cdfa50"/>
-                <path d="M8 7h8c1.1 0 2 .9 2 2v6c0 1.1-.9 2-2 2H8c-1.1 0-2-.9-2-2V9c0-1.1.9-2 2-2z" fill="#1E2119"/>
-                <path d="M10 11h4v2h-4v-2z" fill="#cdfa50"/>
-              </svg>
+              <div className="w-8 h-8 rounded-full bg-[#cdfa50] flex items-center justify-center">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                  <path d="M4 4h12c1.1 0 2 .9 2 2v8c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" fill="#1E2119"/>
+                  <path d="M6 8h8v4H6V8z" fill="#cdfa50"/>
+                </svg>
+              </div>
+              <span className="text-lg font-bold text-gray-900">dstack</span>
             </a>
             
             <a 
               href="https://phala.com" 
               target="_blank" 
               rel="noopener noreferrer"
-              className="w-10 h-10 rounded-full bg-white/80 backdrop-blur border border-black/10 shadow-sm flex items-center justify-center hover:bg-white/90 transition-all duration-200"
-              title="Hosted on Phala Cloud"
+              className="flex items-center space-x-3 px-6 py-4 bg-white/90 backdrop-blur border border-gray-200 rounded-xl shadow-sm hover:shadow-md hover:scale-105 transition-all duration-200"
             >
-              <img 
-                src="data:image/svg+xml;charset=utf-8;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTAgNS4xMkMwIDMuMzI3ODMgMCAyLjQzMTc1IDAuMzQ4Nzc5IDEuNzQ3MjNDMC42NTU1NzQgMS4xNDUxMSAxLjE0NTExIDAuNjU1NTczIDEuNzQ3MjMgMC4zNDg3NzlDMi40MzE3NSAwIDMuMzI3ODMgMCA1LjEyIDBIMjYuODhDMjguNjcyMiAwIDI5LjU2ODMgMCAzMC4yNTI4IDAuMzQ4Nzc5QzMwLjg1NDkgMC42NTU1NzMgMzEuMzQ0NCAxLjE0NTExIDMxLjY1MTIgMS43NDcyM0MzMiAyLjQzMTc1IDMyIDMuMzI3ODMgMzIgNS4xMlYyNi44OEMzMiAyOC42NzIxIDMyIDI5LjU2ODIgMzEuNjUxMiAzMC4yNTI3QzMxLjM0NDQgMzAuODU0OSAzMC44NTQ5IDMxLjM0NDQgMzAuMjUyOCAzMS42NTEyQzI5LjU2ODMgMzIgMjguNjcyMiAzMiAyNi44OCAzMkg1LjEyQzMuMzI3ODMgMzIgMi40MzE3NSAzMiAxLjc0NzIzIDMxLjY1MTJDMS4xNDUxMSAzMS4zNDQ0IDAuNjU1NTc0IDMwLjg1NDkgMC4zNDg3NzkgMzAuMjUyN0MwIDI5LjU2ODIgMCAyOC42NzIxIDAgMjYuODhWNS4xMloiIGZpbGw9IiNDREZBNTAiLz4KPHBhdGggZD0iTTcuNDY2NjcgMTkuNTU1OEgxMS4wMjIyVjI0Ljg4OTFINy40NjY2N1YxOS41NTU4WiIgZmlsbD0iIzFFMjExOSIvPgo8cGF0aCBkPSJNMjEuNjg4OSAxMC42NjY5SDI1LjI0NDVWMTYuMDAwMkgyMS42ODg5VjEwLjY2NjlaIiBmaWxsPSIjMUUyMTE5Ii8+CjxwYXRoIGQ9Ik0xMS4wMjIyIDE2LjAwMDJIMjEuNjg4OVYxOS41NTU4SDExLjAyMjJWMTYuMDAwMloiIGZpbGw9IiMxRTIxMTkiLz4KPHBhdGggZD0iTTcuNDY2NjcgNy4xMTEzM0gyMS42ODg5VjEwLjY2NjlIMTEuMDIyMlYxNi4wMDAyTDcuNDY2NjcgMTUuOTU1OFY3LjExMTMzWiIgZmlsbD0iIzFFMjExOSIvPgo8L3N2Zz4K" 
-                alt="Phala Cloud" 
-                className="w-6 h-6"
-              />
+              <div className="w-8 h-8 bg-[#cdfa50] rounded flex items-center justify-center">
+                <span className="text-black font-bold text-lg">P</span>
+              </div>
+              <span className="text-lg font-bold text-gray-900">PHALA</span>
             </a>
 
             <a 
               href="https://github.com/HashWarlock/the-accountant" 
               target="_blank" 
               rel="noopener noreferrer"
-              className="w-10 h-10 rounded-full bg-white/80 backdrop-blur border border-black/10 shadow-sm flex items-center justify-center hover:bg-white/90 transition-all duration-200"
-              title="Source Code"
+              className="flex items-center space-x-3 px-6 py-4 bg-white/90 backdrop-blur border border-gray-200 rounded-xl shadow-sm hover:shadow-md hover:scale-105 transition-all duration-200"
             >
-              <Github className="w-5 h-5 text-gray-700" />
+              <div className="w-8 h-8 rounded-full bg-black flex items-center justify-center">
+                <Github className="w-5 h-5 text-white" />
+              </div>
+              <span className="text-lg font-bold text-gray-900">GitHub</span>
             </a>
           </div>
         </div>
