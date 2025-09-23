@@ -37,58 +37,58 @@ export default function Home() {
       </section>
 
       {/* Main Content */}
-      <main className="flex justify-center px-4 pb-24">
+      <main className="flex justify-center px-4 pb-32">
         <div className="w-full max-w-4xl">
           {/* Tab Navigation */}
-          <div className="flex flex-wrap justify-center gap-3 mb-8">
+          <div className="flex flex-wrap justify-center gap-2 mb-8">
             <Tabs defaultValue="signup" className="w-full">
-              <TabsList className="grid grid-cols-3 sm:grid-cols-6 w-full max-w-3xl mx-auto bg-transparent gap-3 h-auto p-0">
+              <TabsList className="grid grid-cols-6 w-full max-w-3xl mx-auto bg-white/80 backdrop-blur border border-gray-200 rounded-xl p-2 gap-1 h-auto">
                 <TabsTrigger 
                   value="signup" 
-                  className="group flex flex-col items-center justify-center space-y-2 p-4 bg-white/60 backdrop-blur border border-gray-200 rounded-xl shadow-sm data-[state=active]:bg-white data-[state=active]:shadow-lg data-[state=active]:border-blue-200 data-[state=active]:scale-105 hover:bg-white/80 transition-all duration-200"
+                  className="flex flex-col items-center justify-center space-y-1 p-2 rounded-lg text-gray-600 hover:text-gray-900 data-[state=active]:bg-white data-[state=active]:text-blue-600 data-[state=active]:shadow-sm transition-all duration-200"
                 >
-                  <Wallet className="h-5 w-5 group-data-[state=active]:text-blue-600" />
-                  <span className="text-sm font-medium group-data-[state=active]:text-blue-600">Create</span>
+                  <Wallet className="h-4 w-4" />
+                  <span className="text-xs font-medium">Create</span>
                 </TabsTrigger>
                 <TabsTrigger 
                   value="sign" 
-                  className="group flex flex-col items-center justify-center space-y-2 p-4 bg-white/60 backdrop-blur border border-gray-200 rounded-xl shadow-sm data-[state=active]:bg-white data-[state=active]:shadow-lg data-[state=active]:border-blue-200 data-[state=active]:scale-105 hover:bg-white/80 transition-all duration-200"
+                  className="flex flex-col items-center justify-center space-y-1 p-2 rounded-lg text-gray-600 hover:text-gray-900 data-[state=active]:bg-white data-[state=active]:text-blue-600 data-[state=active]:shadow-sm transition-all duration-200"
                 >
-                  <FileText className="h-5 w-5 group-data-[state=active]:text-blue-600" />
-                  <span className="text-sm font-medium group-data-[state=active]:text-blue-600">Sign</span>
+                  <FileText className="h-4 w-4" />
+                  <span className="text-xs font-medium">Sign</span>
                 </TabsTrigger>
                 <TabsTrigger 
                   value="verify" 
-                  className="group flex flex-col items-center justify-center space-y-2 p-4 bg-white/60 backdrop-blur border border-gray-200 rounded-xl shadow-sm data-[state=active]:bg-white data-[state=active]:shadow-lg data-[state=active]:border-blue-200 data-[state=active]:scale-105 hover:bg-white/80 transition-all duration-200"
+                  className="flex flex-col items-center justify-center space-y-1 p-2 rounded-lg text-gray-600 hover:text-gray-900 data-[state=active]:bg-white data-[state=active]:text-blue-600 data-[state=active]:shadow-sm transition-all duration-200"
                 >
-                  <Shield className="h-5 w-5 group-data-[state=active]:text-blue-600" />
-                  <span className="text-sm font-medium group-data-[state=active]:text-blue-600">Verify</span>
+                  <Shield className="h-4 w-4" />
+                  <span className="text-xs font-medium">Verify</span>
                 </TabsTrigger>
                 <TabsTrigger 
                   value="users" 
-                  className="group flex flex-col items-center justify-center space-y-2 p-4 bg-white/60 backdrop-blur border border-gray-200 rounded-xl shadow-sm data-[state=active]:bg-white data-[state=active]:shadow-lg data-[state=active]:border-blue-200 data-[state=active]:scale-105 hover:bg-white/80 transition-all duration-200"
+                  className="flex flex-col items-center justify-center space-y-1 p-2 rounded-lg text-gray-600 hover:text-gray-900 data-[state=active]:bg-white data-[state=active]:text-blue-600 data-[state=active]:shadow-sm transition-all duration-200"
                 >
-                  <Users className="h-5 w-5 group-data-[state=active]:text-blue-600" />
-                  <span className="text-sm font-medium group-data-[state=active]:text-blue-600">Users</span>
+                  <Users className="h-4 w-4" />
+                  <span className="text-xs font-medium">Users</span>
                 </TabsTrigger>
                 <TabsTrigger 
                   value="audit" 
-                  className="group flex flex-col items-center justify-center space-y-2 p-4 bg-white/60 backdrop-blur border border-gray-200 rounded-xl shadow-sm data-[state=active]:bg-white data-[state=active]:shadow-lg data-[state=active]:border-blue-200 data-[state=active]:scale-105 hover:bg-white/80 transition-all duration-200"
+                  className="flex flex-col items-center justify-center space-y-1 p-2 rounded-lg text-gray-600 hover:text-gray-900 data-[state=active]:bg-white data-[state=active]:text-blue-600 data-[state=active]:shadow-sm transition-all duration-200"
                 >
-                  <Search className="h-5 w-5 group-data-[state=active]:text-blue-600" />
-                  <span className="text-sm font-medium group-data-[state=active]:text-blue-600">Audit</span>
+                  <Search className="h-4 w-4" />
+                  <span className="text-xs font-medium">Audit</span>
                 </TabsTrigger>
                 <TabsTrigger 
                   value="attestation" 
-                  className="group flex flex-col items-center justify-center space-y-2 p-4 bg-white/60 backdrop-blur border border-gray-200 rounded-xl shadow-sm data-[state=active]:bg-white data-[state=active]:shadow-lg data-[state=active]:border-blue-200 data-[state=active]:scale-105 hover:bg-white/80 transition-all duration-200"
+                  className="flex flex-col items-center justify-center space-y-1 p-2 rounded-lg text-gray-600 hover:text-gray-900 data-[state=active]:bg-white data-[state=active]:text-blue-600 data-[state=active]:shadow-sm transition-all duration-200"
                 >
-                  <Shield className="h-5 w-5 group-data-[state=active]:text-blue-600" />
-                  <span className="text-sm font-medium group-data-[state=active]:text-blue-600">Attest</span>
+                  <Shield className="h-4 w-4" />
+                  <span className="text-xs font-medium">Attest</span>
                 </TabsTrigger>
               </TabsList>
 
-              {/* Content Box */}
-              <div className="mt-8 bg-white/95 backdrop-blur rounded-2xl border border-gray-200 shadow-xl p-8 mx-auto max-w-3xl">
+              {/* Content Card */}
+              <Card className="mt-6 mx-auto max-w-3xl border-0 shadow-lg p-6">
                 <TabsContent value="signup" className="m-0 flex justify-center">
                   <div className="w-full max-w-md">
                     <SignupForm onSuccess={handleSignupSuccess} />
@@ -158,69 +158,45 @@ export default function Home() {
                     <AttestationVerifier />
                   </div>
                 </TabsContent>
-              </div>
+              </Card>
             </Tabs>
           </div>
         </div>
       </main>
 
       {/* Footer */}
-      <footer className="py-16 px-4">
+      <footer className="py-12 px-4">
         <div className="container max-w-4xl mx-auto">
-          <div className="flex flex-wrap items-center justify-center gap-6">
-            <a 
-              href="https://github.com/dstack-tee/dstack" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="flex items-center space-x-3 px-6 py-4 bg-white/90 backdrop-blur border border-gray-200 rounded-xl shadow-sm hover:shadow-md hover:scale-105 transition-all duration-200"
-            >
-              <div className="h-8 w-auto flex items-center">
-                <Image 
-                  src="/dstack-logo.png" 
-                  alt="dstack"
-                  width={96}
-                  height={32}
-                  className="object-contain"
-                />
-              </div>
-              <span className="text-lg font-bold text-gray-900">dstack</span>
-            </a>
+          <div className="flex items-center justify-center gap-8">
+            <div className="flex items-center space-x-3 px-4 py-3 bg-white/90 backdrop-blur border border-gray-200 rounded-lg shadow-sm">
+              <Image 
+                src="/dstack-logo.png" 
+                alt="dstack"
+                width={80}
+                height={24}
+                className="object-contain"
+              />
+            </div>
             
-            <a 
-              href="https://phala.com" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="flex items-center space-x-3 px-6 py-4 bg-white/90 backdrop-blur border border-gray-200 rounded-xl shadow-sm hover:shadow-md hover:scale-105 transition-all duration-200"
-            >
-              <div className="h-8 w-auto flex items-center">
-                <Image 
-                  src="/phala-logo.png" 
-                  alt="Phala"
-                  width={96}
-                  height={32}
-                  className="object-contain"
-                />
-              </div>
-              <span className="text-lg font-bold text-gray-900">PHALA</span>
-            </a>
+            <div className="flex items-center space-x-3 px-4 py-3 bg-white/90 backdrop-blur border border-gray-200 rounded-lg shadow-sm">
+              <Image 
+                src="/phala-logo.png" 
+                alt="Phala"
+                width={80}
+                height={24}
+                className="object-contain"
+              />
+            </div>
 
-            <a 
-              href="https://github.com/HashWarlock/the-accountant" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="flex items-center space-x-3 px-6 py-4 bg-white/90 backdrop-blur border border-gray-200 rounded-xl shadow-sm hover:shadow-md hover:scale-105 transition-all duration-200"
-            >
-              <div className="h-8 w-auto flex items-center">
-                <Image 
-                  src="/github-logo.png" 
-                  alt="GitHub"
-                  width={96}
-                  height={32}
-                  className="object-contain"
-                />
-              </div>
-              <span className="text-lg font-bold text-gray-900">GitHub</span>
-            </a>
+            <div className="flex items-center space-x-3 px-4 py-3 bg-white/90 backdrop-blur border border-gray-200 rounded-lg shadow-sm">
+              <Image 
+                src="/github-logo.png" 
+                alt="GitHub"
+                width={80}
+                height={24}
+                className="object-contain"
+              />
+            </div>
           </div>
         </div>
       </footer>
