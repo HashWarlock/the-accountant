@@ -211,8 +211,8 @@ export default function Home() {
               <Image 
                 src="/github-logo.png" 
                 alt="GitHub"
-                width={80}
-                height={24}
+                width={90}
+                height={26}
                 className="object-contain"
               />
             </a>
