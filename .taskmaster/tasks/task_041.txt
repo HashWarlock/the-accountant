@@ -1,0 +1,11 @@
+# Task ID: 41
+# Title: Add shadcnblock notification system
+# Status: pending
+# Dependencies: 33
+# Priority: medium
+# Description: Replace current toast notifications with shadcnblock notification blocks for consistent alert patterns
+# Details:
+
+
+# Test Strategy:
+

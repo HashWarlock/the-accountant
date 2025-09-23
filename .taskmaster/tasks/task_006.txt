@@ -1,6 +1,6 @@
 # Task ID: 6
 # Title: Implement User Keys API
-# Status: pending
+# Status: done
 # Dependencies: 2, 5
 # Priority: medium
 # Description: Create GET /api/users/me/keys endpoint to retrieve user's wallet information

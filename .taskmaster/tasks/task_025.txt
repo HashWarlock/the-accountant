@@ -1,0 +1,11 @@
+# Task ID: 25
+# Title: Create Phala Cloud integration module for uploading attestation quotes to Phala Cloud API
+# Status: done
+# Dependencies: 14, 18, 21, 23, 24
+# Priority: high
+# Description: Implement uploadQuoteToPhalaCloud() and getPhalaVerificationStatus() functions with API authentication for storing and verifying attestation quotes via Phala Cloud services.
+# Details:
+Create lib/phala-cloud.ts module implementing integration with Phala Cloud API. The module should include: 1) uploadQuoteToPhalaCloud(quote: string, metadata: object) function that uploads attestation quotes to Phala Cloud storage/verification service, 2) getPhalaVerificationStatus(quoteId: string) function to check verification status of uploaded quotes, 3) API authentication handling using API keys or token-based auth as required by Phala Cloud, 4) Error handling for network failures, authentication errors, and quota limits, 5) TypeScript interfaces for request/response structures, 6) Integration with existing attestation system in lib/dstack.ts:220 where quotes are generated, 7) Configuration via environment variables (PHALA_CLOUD_API_KEY, PHALA_CLOUD_ENDPOINT), 8) Retry logic with exponential backoff for failed uploads, 9) Quote validation before upload to ensure proper format, 10) Logging integration consistent with existing dstack logging patterns. Update existing quote generation flows in getWalletKeyWithAttestation() to optionally upload quotes to Phala Cloud for external verification. Add new API endpoint POST /api/attestation/upload for manual quote uploads if needed.
+
+# Test Strategy:
+Unit tests for uploadQuoteToPhalaCloud() with mock API responses, integration tests with Phala Cloud sandbox/staging environment, error handling tests for network failures and invalid authentication, quote format validation tests, configuration validation tests for missing/invalid API keys, end-to-end tests uploading real quotes from dstack and verifying upload success, performance tests for upload timeouts and retry behavior

@@ -1,0 +1,16 @@
+# Task ID: 31
+# Title: Clean up unnecessary project files
+# Status: pending
+# Dependencies: 30
+# Priority: medium
+# Description: Remove unused files and assets to keep the project organized
+# Details:
+Clean up the following:
+1. Remove unused images in attached_assets folder that are no longer needed
+2. Review and remove any unused SVG files in public folder (file.svg, globe.svg, window.svg, vercel.svg if not used)
+3. Clean up any test or temporary files
+4. Ensure all remaining assets are properly used in the application
+5. Update .gitignore to exclude unnecessary files
+
+# Test Strategy:
+

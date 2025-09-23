@@ -1,0 +1,11 @@
+# Task ID: 34
+# Title: Refactor hero section using shadcnblock hero components
+# Status: pending
+# Dependencies: 33
+# Priority: medium
+# Description: Replace custom hero section with shadcnblock hero block maintaining Phala branding and TEE messaging
+# Details:
+
+
+# Test Strategy:
+

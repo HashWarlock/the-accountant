@@ -1,0 +1,11 @@
+# Task ID: 26
+# Title: Implement t16z explorer integration for attestation verification
+# Status: done
+# Dependencies: 14, 18, 21, 23, 24
+# Priority: medium
+# Description: Create uploadQuoteToT16z() function to submit quotes to t16z.com and generate public verification URLs for attestation verification via the TEE Attestation Explorer.
+# Details:
+Create lib/t16z-explorer.ts module implementing integration with t16z.com's TEE Attestation Explorer for public attestation verification. The module should include: 1) uploadQuoteToT16z(quote: string, metadata?: object) function that uploads attestation quotes to proof.t16z.com verification service, 2) generateVerificationUrl(quote: string) function to create public verification URLs for attestation reports, 3) Error handling for network failures and invalid quotes, 4) TypeScript interfaces for request/response structures, 5) Integration with existing attestation system in lib/dstack.ts:220 where quotes are generated, 6) Configuration via environment variables (T16Z_API_ENDPOINT), 7) Retry logic with exponential backoff for failed uploads, 8) Quote validation before upload to ensure proper Intel TDX format, 9) Logging integration consistent with existing dstack logging patterns, 10) Support for both automatic upload during key operations and manual verification URL generation. Update existing quote generation flows in getWalletKeyWithAttestation() to optionally upload quotes to t16z for public verification. Add new API endpoint POST /api/attestation/verify-t16z for manual quote verification.
+
+# Test Strategy:
+Unit tests for uploadQuoteToT16z() with mock API responses, integration tests with t16z.com staging environment, error handling tests for network failures and invalid quotes, quote format validation tests for Intel TDX compliance, configuration validation tests for missing/invalid API endpoints, end-to-end tests uploading real quotes from dstack and verifying public URLs work correctly, performance tests for upload timeouts and retry behavior, verification of generated URLs redirect to correct t16z explorer pages

@@ -7,10 +7,13 @@ import { UserList } from "@/components/user-list";
 import { AuditLogViewer } from "@/components/audit-log-viewer";
 import { AttestationVerifier } from "@/components/attestation-verifier";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { motion, AnimatePresence } from "framer-motion";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Shield, Wallet, FileText, Users, Search } from "lucide-react";
+import { HeroSection } from "@/components/hero-section";
+import { Footer } from "@/components/footer";
 import { Toaster } from "@/components/ui/toast";
 import { useState } from "react";
 import Image from "next/image";
@@ -23,20 +26,9 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-brand">
+    <div className="min-h-screen bg-gradient-dark">
       {/* Hero Section */}
-      <section className="pt-20 pb-12 px-4">
-        <div className="container max-w-5xl mx-auto text-center">
-          <h1 className="text-5xl md:text-6xl font-bold text-phala-g00 mb-6">
-            Secure Wallet Infrastructure
-          </h1>
-          <p className="text-lg text-phala-g01 mb-12 max-w-2xl mx-auto leading-relaxed">
-            Enterprise-grade cryptographic operations powered by Intel TDX TEE
-            technology. Create, sign, and verify with hardware-level security
-            guarantees.
-          </p>
-        </div>
-      </section>
+      <HeroSection />
 
       {/* Main Content */}
       <main className="flex justify-center px-4 pb-16">
@@ -44,7 +36,7 @@ export default function Home() {
           {/* Tab Navigation */}
           <div className="flex flex-wrap justify-center gap-2 mb-8">
             <Tabs defaultValue="signup" className="w-full">
-              <TabsList className="grid grid-cols-6 w-full max-w-3xl mx-auto bg-phala-g09/20 backdrop-blur-sm rounded-2xl p-2 gap-1 h-auto border border-phala-g08/30">
+              <TabsList className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 w-full max-w-3xl mx-auto bg-black/60 backdrop-blur-sm rounded-2xl p-2 gap-1 h-auto border border-phala-lime/30">
                 <TabsTrigger
                   value="signup"
                   className="flex flex-col items-center justify-center gap-1.5 py-2.5 px-2 rounded-xl text-phala-g03 hover:text-phala-g01 hover:bg-phala-g09/30 data-[state=active]:bg-phala-g01 data-[state=active]:text-phala-g09 data-[state=active]:font-semibold data-[state=active]:shadow-glow transition-all duration-200"
@@ -90,29 +82,54 @@ export default function Home() {
               </TabsList>
 
               {/* Content Area */}
+              <AnimatePresence mode="wait">
               <div className="mt-8">
                 <TabsContent value="signup" className="m-0 flex justify-center px-4">
-                  <div className="w-full max-w-md">
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -20 }}
+                    transition={{ duration: 0.3 }}
+                    className="w-full max-w-md"
+                  >
                     <SignupForm onSuccess={handleSignupSuccess} />
-                  </div>
+                  </motion.div>
                 </TabsContent>
 
                 <TabsContent value="sign" className="m-0 flex justify-center px-4">
-                  <div className="w-full max-w-md">
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -20 }}
+                    transition={{ duration: 0.3 }}
+                    className="w-full max-w-md"
+                  >
                     <SignMessage userId={currentUserId} />
-                  </div>
+                  </motion.div>
                 </TabsContent>
 
                 <TabsContent value="verify" className="m-0 flex justify-center px-4">
-                  <div className="w-full max-w-md">
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -20 }}
+                    transition={{ duration: 0.3 }}
+                    className="w-full max-w-md"
+                  >
                     <VerifySignature />
-                  </div>
+                  </motion.div>
                 </TabsContent>
 
                 <TabsContent value="users" className="m-0 flex justify-center">
-                  <div className="w-full max-w-2xl">
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -20 }}
+                    transition={{ duration: 0.3 }}
+                    className="w-full max-w-2xl"
+                  >
                     <UserList />
-                  </div>
+                  </motion.div>
                 </TabsContent>
 
                 <TabsContent value="audit" className="m-0 flex justify-center">
@@ -163,71 +180,25 @@ export default function Home() {
                   value="attestation"
                   className="m-0 flex justify-center"
                 >
-                  <div className="w-full max-w-md">
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -20 }}
+                    transition={{ duration: 0.3 }}
+                    className="w-full max-w-md"
+                  >
                     <AttestationVerifier />
-                  </div>
+                  </motion.div>
                 </TabsContent>
               </div>
+              </AnimatePresence>
             </Tabs>
           </div>
         </div>
       </main>
 
       {/* Footer */}
-      <footer className="py-20 px-4">
-        <div className="container max-w-4xl mx-auto text-center">
-          <div className="mb-8">
-            <div className="h-px bg-gradient-to-r from-transparent via-phala-g03/30 to-transparent mb-8"></div>
-            <p className="text-xs font-bold text-phala-g03 uppercase tracking-wider mb-8">SOURCES</p>
-          </div>
-          <div className="flex items-center justify-center gap-10">
-            <a
-              href="https://github.com/dstack-tee/dstack"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="group block transform hover:scale-110 transition-all duration-300"
-            >
-              <Image
-                src="/dstack-logo.png"
-                alt="dstack"
-                width={80}
-                height={24}
-                className="object-contain opacity-70 group-hover:opacity-100 transition-opacity duration-300"
-              />
-            </a>
-
-            <a
-              href="https://phala.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="group block transform hover:scale-110 transition-all duration-300"
-            >
-              <Image
-                src="/phala-logo.png"
-                alt="Phala"
-                width={80}
-                height={24}
-                className="object-contain opacity-70 group-hover:opacity-100 transition-opacity duration-300"
-              />
-            </a>
-
-            <a
-              href="https://github.com/HashWarlock/the-accountant"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="group block transform hover:scale-110 transition-all duration-300"
-            >
-              <Image
-                src="/github-logo-dark.png"
-                alt="GitHub"
-                width={80}
-                height={24}
-                className="object-contain opacity-70 group-hover:opacity-100 transition-opacity duration-300"
-              />
-            </a>
-          </div>
-        </div>
-      </footer>
+      <Footer />
 
       <Toaster />
     </div>

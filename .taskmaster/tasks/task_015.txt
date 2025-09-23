@@ -1,0 +1,11 @@
+# Task ID: 15
+# Title: Test Docker Image Build
+# Status: done
+# Dependencies: 12
+# Priority: high
+# Description: Verify the Docker image builds successfully and is production-ready
+# Details:
+Build the Docker image using the multi-stage Dockerfile to ensure all stages complete successfully. Verify standalone Next.js output generation, dependency installation, Prisma client generation, non-root user setup, and health check configuration. Test image size optimization and layer caching.
+
+# Test Strategy:
+Run docker build command, verify build completes without errors, check image size is under 500MB, test container startup, verify health endpoint responds correctly

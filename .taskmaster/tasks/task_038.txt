@@ -1,0 +1,11 @@
+# Task ID: 38
+# Title: Upgrade user list table with shadcnblock data tables
+# Status: pending
+# Dependencies: 33
+# Priority: medium
+# Description: Implement shadcnblock data table blocks with sorting, filtering, and pagination for UserList component
+# Details:
+
+
+# Test Strategy:
+

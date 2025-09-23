@@ -1,0 +1,11 @@
+# Task ID: 18
+# Title: Implement remote attestation quote generation for key access
+# Status: done
+# Dependencies: None
+# Priority: high
+# Description: Add TEE remote attestation quotes whenever a key is accessed or generated
+# Details:
+Implement functionality to generate a remote attestation quote from the TEE (dstack) every time a user's key is accessed. This includes key generation during signup and key retrieval during signing operations. The quote should include the public key/address in the application data field for cryptographic proof of key access within the TEE.
+
+# Test Strategy:
+Test quote generation during signup, signing, and verification operations. Verify quotes contain correct application data. Test quote format and attestation chain validity.

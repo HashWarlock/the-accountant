@@ -7,6 +7,10 @@ import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { toast } from 'sonner'
 import { Loader2, Shield, CheckCircle, X, ExternalLink, Copy } from 'lucide-react'
+import { CollapsibleDetails, DetailItem } from '@/components/ui/collapsible-details'
+import { motion, AnimatePresence } from 'framer-motion'
+import { Badge } from '@/components/ui/badge'
+import { Alert, AlertDescription } from '@/components/ui/alert'
 
 export function VerifySignature() {
   const [loading, setLoading] = useState(false)
@@ -64,226 +68,199 @@ export function VerifySignature() {
 
   return (
     <div className="space-y-8">
-      <div className="text-center space-y-8">
-        <div className="flex justify-center">
-          <div className="h-12 w-12 rounded-full bg-gray-900/10 flex items-center justify-center">
-            <Shield className="h-6 w-6 text-gray-900" />
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="text-center space-y-6"
+      >
+        <motion.div
+          initial={{ scale: 0.8 }}
+          animate={{ scale: 1 }}
+          transition={{ duration: 0.3 }}
+          className="flex justify-center"
+        >
+          <div className="h-16 w-16 rounded-2xl bg-gradient-to-br from-phala-lime/20 to-phala-lime/10 backdrop-blur-sm flex items-center justify-center border border-phala-lime/30 shadow-lg shadow-phala-lime/20">
+            <Shield className="h-8 w-8 text-phala-lime" />
           </div>
-        </div>
+        </motion.div>
         <div className="space-y-2">
-          <h2 className="text-2xl font-semibold text-gray-900">Verify Signature</h2>
-          <p className="text-gray-600">
+          <h2 className="text-3xl font-bold bg-gradient-to-br from-phala-g00 to-phala-g01 bg-clip-text text-transparent">Verify Signature</h2>
+          <p className="text-phala-g02 max-w-md mx-auto">
             Verify a cryptographic signature using an address or user ID
           </p>
         </div>
-        <div className="space-y-6">
-          <form onSubmit={handleVerify} className="space-y-6">
-            <div className="space-y-2">
-              <Label htmlFor="verify-message" className="text-sm font-medium">Message</Label>
-              <Input
-                id="verify-message"
-                placeholder="Hello, dstack!"
-                value={message}
-                onChange={(e) => setMessage(e.target.value)}
-                required
-                disabled={loading}
-                className="h-11 w-80 mx-auto"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="signature" className="text-sm font-medium">Signature</Label>
-              <Input
-                id="signature"
-                placeholder="0x..."
-                value={signature}
-                onChange={(e) => setSignature(e.target.value)}
-                required
-                disabled={loading}
-                className="h-11 w-80 mx-auto"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="addressOrUserId" className="text-sm font-medium">Address or User ID</Label>
-              <Input
-                id="addressOrUserId"
-                placeholder="0x... or alice"
-                value={addressOrUserId}
-                onChange={(e) => setAddressOrUserId(e.target.value)}
-                required
-                disabled={loading}
-                className="h-11 w-80 mx-auto"
-              />
-            </div>
-            <Button type="submit" className="w-80 h-11 mx-auto" disabled={loading}>
-              {loading && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
-              {loading ? 'Verifying...' : 'Verify Signature'}
-            </Button>
-          </form>
-        </div>
-      </div>
+      </motion.div>
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.2, duration: 0.5 }}
+        className="bg-phala-g09/5 backdrop-blur-sm rounded-2xl p-8 border border-phala-g08/20"
+      >
+        <form onSubmit={handleVerify} className="space-y-6">
+          <div className="space-y-2">
+            <Label htmlFor="verify-message" className="flex items-center gap-2 text-phala-g01">Message</Label>
+            <Input
+              id="verify-message"
+              placeholder="Hello, dstack!"
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+              required
+              disabled={loading}
+              className="h-12 bg-phala-g09/10 border-phala-g08/30 focus:border-phala-lime transition-colors"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="signature" className="flex items-center gap-2 text-phala-g01">Signature</Label>
+            <Input
+              id="signature"
+              placeholder="0x..."
+              value={signature}
+              onChange={(e) => setSignature(e.target.value)}
+              required
+              disabled={loading}
+              className="h-12 bg-phala-g09/10 border-phala-g08/30 focus:border-phala-lime transition-colors"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="addressOrUserId" className="flex items-center gap-2 text-phala-g01">Address or User ID</Label>
+            <Input
+              id="addressOrUserId"
+              placeholder="0x... or alice"
+              value={addressOrUserId}
+              onChange={(e) => setAddressOrUserId(e.target.value)}
+              required
+              disabled={loading}
+              className="h-12 bg-phala-g09/10 border-phala-g08/30 focus:border-phala-lime transition-colors"
+            />
+          </div>
+          <Button type="submit" className="w-full h-12" variant="phala" disabled={loading}>
+            {loading && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
+            {loading ? 'Verifying...' : 'Verify Signature'}
+          </Button>
+        </form>
+      </motion.div>
 
-      {verificationResult && (
-        <Card className={verificationResult.valid ? 'border-green-200 bg-green-50/50' : 'border-red-200 bg-red-50/50'}>
-          <CardHeader>
-            <div className={`flex items-center space-x-2 ${verificationResult.valid ? 'text-green-700' : 'text-red-700'}`}>
-              {verificationResult.valid ? (
-                <CheckCircle className="h-5 w-5" />
-              ) : (
-                <X className="h-5 w-5" />
-              )}
-              <CardTitle className={verificationResult.valid ? 'text-green-900' : 'text-red-900'}>
-                {verificationResult.valid ? 'Signature Valid' : 'Signature Invalid'}
-              </CardTitle>
-            </div>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid gap-4">
-              <div className="space-y-2">
-                <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-                  Message
-                </Label>
-                <div className="flex items-center space-x-2">
-                  <code className="flex-1 px-3 py-2 bg-white rounded-md border text-sm font-mono">
-                    "{verificationResult.message}"
-                  </code>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => copyToClipboard(verificationResult.message, 'Message')}
-                  >
-                    <Copy className="h-4 w-4" />
-                  </Button>
-                </div>
-              </div>
+      <AnimatePresence>
+        {verificationResult && (
+          <motion.div
+            initial={{ opacity: 0, y: 20, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -20, scale: 0.95 }}
+            transition={{ duration: 0.3 }}
+          >
+            <CollapsibleDetails
+              title={verificationResult.valid ? 'Signature Valid' : 'Signature Invalid'}
+              summary={verificationResult.valid ? `Verified: ${verificationResult.address.slice(0, 6)}...${verificationResult.address.slice(-4)}` : 'Verification failed'}
+              defaultOpen={true}
+              icon={
+                verificationResult.valid ? (
+                  <CheckCircle className="h-6 w-6 text-phala-lime" />
+                ) : (
+                  <X className="h-6 w-6 text-red-500" />
+                )
+              }
+              badge={
+                <Badge
+                  variant="outline"
+                  className={verificationResult.valid ? "border-phala-lime/30 text-phala-lime bg-phala-lime/10" : "border-red-500/30 text-red-500 bg-red-500/10"}
+                >
+                  {verificationResult.valid ? 'Valid' : 'Invalid'}
+                </Badge>
+              }
+              className={verificationResult.valid ? "border-phala-lime/30 bg-gradient-to-br from-phala-lime/10 to-phala-g09/10" : "border-red-500/30 bg-gradient-to-br from-red-500/10 to-phala-g09/10"}
+            >
+              <div className="grid gap-3">
+                <DetailItem
+                  label="Message"
+                  value={`"${verificationResult.message}"`}
+                  onCopy={() => copyToClipboard(verificationResult.message, 'Message')}
+                />
+                <DetailItem
+                  label="Signature"
+                  value={verificationResult.signature}
+                  onCopy={() => copyToClipboard(verificationResult.signature, 'Signature')}
+                  mono
+                />
 
-              <div className="space-y-2">
-                <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-                  Signature
-                </Label>
-                <div className="flex items-center space-x-2">
-                  <code className="flex-1 px-3 py-2 bg-white rounded-md border text-xs font-mono break-all">
-                    {verificationResult.signature}
-                  </code>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => copyToClipboard(verificationResult.signature, 'Signature')}
-                  >
-                    <Copy className="h-4 w-4" />
-                  </Button>
-                </div>
+                {verificationResult.valid && (
+                  <>
+                    <DetailItem
+                      label="Verified Address"
+                      value={verificationResult.address}
+                      onCopy={() => copyToClipboard(verificationResult.address, 'Address')}
+                      mono
+                    />
+                    {verificationResult.userId && (
+                      <DetailItem
+                        label="User ID"
+                        value={verificationResult.userId}
+                        onCopy={() => copyToClipboard(verificationResult.userId, 'User ID')}
+                      />
+                    )}
+                  </>
+                )}
               </div>
 
               {verificationResult.valid && (
-                <>
-                  <div className="space-y-2">
-                    <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-                      Verified Address
-                    </Label>
-                    <div className="flex items-center space-x-2">
-                      <code className="flex-1 px-3 py-2 bg-white rounded-md border text-xs font-mono break-all">
-                        {verificationResult.address}
-                      </code>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => copyToClipboard(verificationResult.address, 'Address')}
-                      >
-                        <Copy className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </div>
-
-                  {verificationResult.userId && (
-                    <div className="space-y-2">
-                      <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-                        User ID
-                      </Label>
-                      <div className="flex items-center space-x-2">
-                        <code className="flex-1 px-3 py-2 bg-white rounded-md border text-sm font-mono">
-                          {verificationResult.userId}
-                        </code>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => copyToClipboard(verificationResult.userId, 'User ID')}
-                        >
-                          <Copy className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </div>
-                  )}
-
-                  <div className="text-sm text-muted-foreground">
-                    Verified at: {new Date(verificationResult.timestamp).toLocaleString()}
-                  </div>
-                </>
+                <div className="text-sm text-phala-g02">
+                  Verified at: {new Date(verificationResult.timestamp).toLocaleString()}
+                </div>
               )}
-            </div>
 
-            {/* Attestation Verification Links */}
-            {verificationResult.valid && (verificationResult.phalaVerificationUrl || verificationResult.t16zVerificationUrl) && (
-              <Card className="border-blue-200 bg-blue-50/50">
-                <CardHeader className="pb-3">
-                  <div className="flex items-center space-x-2 text-blue-700">
-                    <Shield className="h-4 w-4" />
-                    <CardTitle className="text-sm text-blue-900">TEE Attestation Generated</CardTitle>
-                  </div>
-                </CardHeader>
-                <CardContent className="pt-0 space-y-3">
-                  <div className="flex flex-col gap-2">
-                    {verificationResult.t16zVerificationUrl && (
-                      <Button variant="outline" size="sm" asChild>
-                        <a
-                          href={verificationResult.t16zVerificationUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="justify-start"
-                        >
-                          <ExternalLink className="h-4 w-4 mr-2" />
-                          Verify on t16z Explorer
-                        </a>
-                      </Button>
-                    )}
-                    {verificationResult.phalaVerificationUrl && (
-                      <Button variant="outline" size="sm" asChild>
-                        <a
-                          href={verificationResult.phalaVerificationUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="justify-start"
-                        >
-                          <ExternalLink className="h-4 w-4 mr-2" />
-                          Verify on Phala Cloud
-                        </a>
-                      </Button>
-                    )}
-                  </div>
-                  {verificationResult.attestation?.checksum && (
-                    <div className="space-y-2">
-                      <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-                        Attestation Checksum
-                      </Label>
-                      <div className="flex items-center space-x-2">
-                        <code className="flex-1 px-3 py-2 bg-white rounded-md border text-xs font-mono break-all">
-                          {verificationResult.attestation.checksum}
-                        </code>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => copyToClipboard(verificationResult.attestation.checksum, 'Checksum')}
-                        >
-                          <Copy className="h-4 w-4" />
-                        </Button>
-                      </div>
+              {/* Attestation Verification Links */}
+              {verificationResult.valid && (verificationResult.phalaVerificationUrl || verificationResult.t16zVerificationUrl) && (
+                <Card className="border-phala-lime/30 bg-gradient-to-br from-phala-lime/10 to-phala-g09/10 shadow-lg shadow-phala-lime/10">
+                  <CardHeader className="pb-3">
+                    <div className="flex items-center space-x-2">
+                      <Shield className="h-5 w-5 text-phala-lime" />
+                      <CardTitle className="text-base font-bold text-phala-g00">TEE Attestation Generated</CardTitle>
                     </div>
-                  )}
-                </CardContent>
-              </Card>
-            )}
-          </CardContent>
-        </Card>
-      )}
+                  </CardHeader>
+                  <CardContent className="pt-0 space-y-3">
+                    <div className="flex flex-col gap-2">
+                      {verificationResult.t16zVerificationUrl && (
+                        <Button variant="outline" size="sm" asChild className="border-phala-g08/30 hover:border-phala-lime hover:bg-phala-lime/10">
+                          <a
+                            href={verificationResult.t16zVerificationUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="justify-start text-phala-g01"
+                          >
+                            <ExternalLink className="h-4 w-4 mr-2" />
+                            Verify on t16z Explorer
+                          </a>
+                        </Button>
+                      )}
+                      {verificationResult.phalaVerificationUrl && (
+                        <Button variant="outline" size="sm" asChild className="border-phala-g08/30 hover:border-phala-lime hover:bg-phala-lime/10">
+                          <a
+                            href={verificationResult.phalaVerificationUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="justify-start text-phala-g01"
+                          >
+                            <ExternalLink className="h-4 w-4 mr-2" />
+                            Verify on Phala Cloud
+                          </a>
+                        </Button>
+                      )}
+                    </div>
+                    {verificationResult.attestation?.checksum && (
+                      <DetailItem
+                        label="Attestation Checksum"
+                        value={verificationResult.attestation.checksum}
+                        onCopy={() => copyToClipboard(verificationResult.attestation.checksum, 'Checksum')}
+                        mono
+                      />
+                    )}
+                  </CardContent>
+                </Card>
+              )}
+            </CollapsibleDetails>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   )
 }

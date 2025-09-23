@@ -1,0 +1,11 @@
+# Task ID: 39
+# Title: Implement shadcnblock loading and skeleton states
+# Status: pending
+# Dependencies: 33
+# Priority: medium
+# Description: Add shadcnblock skeleton loaders and loading animations for better UX during async operations
+# Details:
+
+
+# Test Strategy:
+

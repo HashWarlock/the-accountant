@@ -1,0 +1,17 @@
+# Task ID: 14
+# Title: Implement dstack SDK Integration
+# Status: done
+# Dependencies: 1
+# Priority: high
+# Description: Create proper dstack client wrapper for TEE-based key management and signing
+# Details:
+Create lib/dstack.ts wrapper that uses @phala/dstack-sdk for all cryptographic operations. The SDK provides complete key management internally:
+- Use client.getKey('wallet/ethereum', userId) to get deterministic wallet keys
+- The SDK returns complete key objects with signing capabilities built-in
+- All crypto operations happen inside the TEE
+- Connect via Unix socket at /var/run/dstack.sock
+- Implement proper error handling for TEE connection issues
+- Add fallback for local development without TEE
+
+# Test Strategy:
+Integration tests with mock TEE, connection handling tests, key derivation consistency tests

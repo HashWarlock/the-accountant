@@ -1,0 +1,11 @@
+# Task ID: 20
+# Title: Add quote verification endpoint and UI
+# Status: done
+# Dependencies: 18, 19
+# Priority: medium
+# Description: Create API endpoint and UI components to verify attestation quotes
+# Details:
+Implement a verification system that allows users to validate attestation quotes. This includes: API endpoint to verify quote signatures and integrity, UI component to display quote details and verification status, integration with Intel/AMD attestation services for quote validation, and display of attestation report details.
+
+# Test Strategy:
+Test quote verification with valid and invalid quotes, test UI display of attestation details, verify integration with attestation services, test error handling for malformed quotes

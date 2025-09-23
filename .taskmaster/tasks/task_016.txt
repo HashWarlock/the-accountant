@@ -1,0 +1,11 @@
+# Task ID: 16
+# Title: Publish Docker Image to DockerHub
+# Status: done
+# Dependencies: 15
+# Priority: high
+# Description: Build and push production Docker image to DockerHub registry
+# Details:
+Build the Docker image for linux/amd64 platform with proper tagging. Login to DockerHub using docker login. Tag the image with DockerHub username and repository name. Push the image to DockerHub with version tags (latest and v1.0.0). Verify the image is publicly accessible on DockerHub.
+
+# Test Strategy:
+Build image, push to DockerHub, verify image appears in registry, test pulling the image from DockerHub

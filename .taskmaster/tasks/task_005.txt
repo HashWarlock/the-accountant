@@ -1,7 +1,7 @@
 # Task ID: 5
 # Title: Implement User Signup API
-# Status: pending
-# Dependencies: 2, 4
+# Status: done
+# Dependencies: 2
 # Priority: high
 # Description: Create POST /api/signup endpoint for user registration and wallet generation
 # Details:
@@ -11,37 +11,37 @@ Create app/api/signup/route.ts implementing POST handler. Validate request body 
 Integration tests for successful user creation, duplicate prevention, input validation, database persistence verification, and performance testing for 1s p95 requirement
 
 # Subtasks:
-## 1. Create API route structure and basic POST handler [pending]
+## 1. Create API route structure and basic POST handler [done]
 ### Dependencies: None
 ### Description: Set up app/api/signup/route.ts with basic POST handler structure and Next.js API route configuration
 ### Details:
 Create the route.ts file in app/api/signup/ directory. Implement basic POST function with proper TypeScript typing. Set up proper Next.js 13+ app router API route structure. Add basic error handling wrapper and response formatting. Configure proper HTTP methods and CORS if needed.
 
-## 2. Implement request validation with Zod schema [pending]
+## 2. Implement request validation with Zod schema [done]
 ### Dependencies: 5.1
 ### Description: Create and implement Zod validation schema for email and userId request body parameters
 ### Details:
 Define Zod schema for signup request body with email (valid email format) and userId (string, required) validation. Implement request body parsing and validation with proper error responses for invalid input. Add sanitization for email field and userId format validation. Return structured validation errors with field-specific messages.
 
-## 3. Integrate dstack for deterministic key generation [pending]
+## 3. Integrate dstack for deterministic key generation [done]
 ### Dependencies: 5.2
 ### Description: Implement dstack integration to generate deterministic private keys and derive public keys and Ethereum addresses
 ### Details:
 Call dstack service to get deterministic private key for userId. Use crypto utilities to derive uncompressed public key (65 bytes) from private key. Generate Ethereum address from public key using keccak-256 hash. Handle dstack connectivity errors and implement retry logic. Ensure private key is immediately cleared from memory after use.
 
-## 4. Implement database operations with Prisma [pending]
+## 4. Implement database operations with Prisma [done]
 ### Dependencies: 5.3
 ### Description: Set up Prisma database operations for user creation with duplicate prevention
 ### Details:
 Create user record in database with id, email, userId, pubKeyHex, address, and createdAt fields. Implement duplicate email and userId validation using Prisma unique constraints and proper error handling. Use database transactions for atomic user creation. Add proper error handling for database connection issues and constraint violations.
 
-## 5. Implement error handling and response formatting [pending]
+## 5. Implement error handling and response formatting [done]
 ### Dependencies: 5.4
 ### Description: Add comprehensive error handling, logging, and response formatting for all scenarios
 ### Details:
 Implement proper HTTP status codes for different error scenarios (400 for validation, 409 for duplicates, 500 for server errors). Add structured logging for signup events with metrics tracking. Format success response with user object containing only public data (no private keys). Implement proper error response structure with meaningful messages.
 
-## 6. Create comprehensive integration tests [pending]
+## 6. Create comprehensive integration tests [done]
 ### Dependencies: 5.5
 ### Description: Develop complete test suite for signup API covering all scenarios and performance requirements
 ### Details:

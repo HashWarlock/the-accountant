@@ -1,0 +1,11 @@
+# Task ID: 40
+# Title: Refactor footer using shadcnblock footer blocks
+# Status: pending
+# Dependencies: 33
+# Priority: low
+# Description: Replace custom footer with shadcnblock footer components maintaining partner logos and links
+# Details:
+
+
+# Test Strategy:
+

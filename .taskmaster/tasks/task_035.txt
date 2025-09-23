@@ -1,0 +1,11 @@
+# Task ID: 35
+# Title: Replace tab navigation with shadcnblock navigation components
+# Status: pending
+# Dependencies: 33
+# Priority: high
+# Description: Implement shadcnblock navigation blocks for the main tab interface with improved UX and accessibility
+# Details:
+
+
+# Test Strategy:
+

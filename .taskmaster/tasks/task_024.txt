@@ -1,0 +1,11 @@
+# Task ID: 24
+# Title: Fix critical quote handling bug in dstack.ts where quote is incorrectly converted from hex string to bytes
+# Status: done
+# Dependencies: 18, 21, 23
+# Priority: high
+# Description: The dstack SDK's getQuote() method returns a quote property as a Hex string type, but the code incorrectly treats it as bytes and applies Buffer.from() conversion on line 220.
+# Details:
+The bug is in the `getWalletKeyWithAttestation` function at line 220 in `/lib/dstack.ts`. The code currently does `Buffer.from(quoteResponse.quote).toString('hex')` which assumes `quoteResponse.quote` is a Uint8Array or Buffer, but according to the SDK documentation, `getQuote()` returns a quote property that is already a Hex string type. This double conversion is corrupting the quote data. The fix involves removing the `Buffer.from()` wrapper and directly using `quoteResponse.quote` since it's already in hex format. The same issue exists on line 222 for the event_log field. Update both lines to handle the hex string correctly: `const quoteHex = quoteResponse.quote` and `const eventLogHex = quoteResponse.event_log || undefined`. Also update the console logging to reflect that the quote is already a hex string.
+
+# Test Strategy:
+Test quote generation with real TEE environment to verify quote format matches expected attestation structure, compare quote output before and after fix to ensure no data corruption, verify that audit log storage and retrieval works correctly with the fixed quote format, test attestation quote verification endpoints to ensure quotes are properly formatted for validation services, add unit tests that mock the SDK response to verify proper handling of hex string quotes.

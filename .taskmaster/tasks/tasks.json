@@ -776,17 +776,208 @@
         "description": "Remove unused files and assets to keep the project organized",
         "details": "Clean up the following:\n1. Remove unused images in attached_assets folder that are no longer needed\n2. Review and remove any unused SVG files in public folder (file.svg, globe.svg, window.svg, vercel.svg if not used)\n3. Clean up any test or temporary files\n4. Ensure all remaining assets are properly used in the application\n5. Update .gitignore to exclude unnecessary files",
         "testStrategy": "",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
           30
         ],
         "priority": "medium",
         "subtasks": []
+      },
+      {
+        "id": 32,
+        "title": "Research shadcnblock components and templates",
+        "description": "Study shadcnblock documentation, available blocks, templates and best practices to plan UI refactoring strategy",
+        "details": "",
+        "testStrategy": "",
+        "status": "done",
+        "dependencies": [
+          30
+        ],
+        "priority": "high",
+        "subtasks": []
+      },
+      {
+        "id": 33,
+        "title": "Install shadcnblock dependencies and setup",
+        "description": "Install shadcnblock packages, configure build tools, and integrate with existing shadcn/ui setup",
+        "details": "",
+        "testStrategy": "",
+        "status": "done",
+        "dependencies": [
+          32
+        ],
+        "priority": "high",
+        "subtasks": []
+      },
+      {
+        "id": 34,
+        "title": "Refactor hero section using shadcnblock hero components",
+        "description": "Replace custom hero section with shadcnblock hero block maintaining Phala branding and TEE messaging",
+        "details": "",
+        "testStrategy": "",
+        "status": "done",
+        "dependencies": [
+          33
+        ],
+        "priority": "medium",
+        "subtasks": []
+      },
+      {
+        "id": 35,
+        "title": "Replace tab navigation with shadcnblock navigation components",
+        "description": "Implement shadcnblock navigation blocks for the main tab interface with improved UX and accessibility",
+        "details": "",
+        "testStrategy": "",
+        "status": "done",
+        "dependencies": [
+          33
+        ],
+        "priority": "high",
+        "subtasks": []
+      },
+      {
+        "id": 36,
+        "title": "Refactor forms using shadcnblock form blocks",
+        "description": "Replace SignupForm, SignMessage, and VerifySignature forms with shadcnblock form components and validation patterns",
+        "details": "",
+        "testStrategy": "",
+        "status": "done",
+        "dependencies": [
+          33
+        ],
+        "priority": "high",
+        "subtasks": []
+      },
+      {
+        "id": 37,
+        "title": "Implement shadcnblock card layouts for data display",
+        "description": "Replace custom card components with shadcnblock card blocks for user data, wallet info, and audit logs display",
+        "details": "",
+        "testStrategy": "",
+        "status": "done",
+        "dependencies": [
+          33
+        ],
+        "priority": "medium",
+        "subtasks": []
+      },
+      {
+        "id": 38,
+        "title": "Upgrade user list table with shadcnblock data tables",
+        "description": "Implement shadcnblock data table blocks with sorting, filtering, and pagination for UserList component",
+        "details": "",
+        "testStrategy": "",
+        "status": "done",
+        "dependencies": [
+          33
+        ],
+        "priority": "medium",
+        "subtasks": []
+      },
+      {
+        "id": 39,
+        "title": "Implement shadcnblock loading and skeleton states",
+        "description": "Add shadcnblock skeleton loaders and loading animations for better UX during async operations",
+        "details": "",
+        "testStrategy": "",
+        "status": "done",
+        "dependencies": [
+          33
+        ],
+        "priority": "medium",
+        "subtasks": []
+      },
+      {
+        "id": 40,
+        "title": "Refactor footer using shadcnblock footer blocks",
+        "description": "Replace custom footer with shadcnblock footer components maintaining partner logos and links",
+        "details": "",
+        "testStrategy": "",
+        "status": "done",
+        "dependencies": [
+          33
+        ],
+        "priority": "low",
+        "subtasks": []
+      },
+      {
+        "id": 41,
+        "title": "Add shadcnblock notification system",
+        "description": "Replace current toast notifications with shadcnblock notification blocks for consistent alert patterns",
+        "details": "",
+        "testStrategy": "",
+        "status": "done",
+        "dependencies": [
+          33
+        ],
+        "priority": "medium",
+        "subtasks": []
+      },
+      {
+        "id": 42,
+        "title": "Implement responsive layout with shadcnblock grid system",
+        "description": "Apply shadcnblock responsive grid and layout patterns across all pages for better mobile experience",
+        "details": "",
+        "testStrategy": "",
+        "status": "done",
+        "dependencies": [
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40,
+          41
+        ],
+        "priority": "high",
+        "subtasks": []
+      },
+      {
+        "id": 43,
+        "title": "Maintain Phala brand theme with shadcnblock components",
+        "description": "Ensure all shadcnblock components properly integrate with existing Phala color system and brand guidelines",
+        "details": "",
+        "testStrategy": "",
+        "status": "done",
+        "dependencies": [
+          33
+        ],
+        "priority": "high",
+        "subtasks": []
+      },
+      {
+        "id": 44,
+        "title": "Test shadcnblock UI refactoring",
+        "description": "Comprehensive testing of all refactored components for functionality, accessibility, and performance",
+        "details": "",
+        "testStrategy": "",
+        "status": "done",
+        "dependencies": [
+          42,
+          43
+        ],
+        "priority": "high",
+        "subtasks": []
+      },
+      {
+        "id": 45,
+        "title": "Build and deploy shadcnblock refactored version",
+        "description": "Create production build with shadcnblock UI and deploy to Docker registry with updated version tag",
+        "details": "",
+        "testStrategy": "",
+        "status": "done",
+        "dependencies": [
+          44,
+          31
+        ],
+        "priority": "high",
+        "subtasks": []
       }
     ],
     "metadata": {
       "created": "2025-09-09T04:45:44.364Z",
-      "updated": "2025-09-23T07:51:47.116Z",
+      "updated": "2025-09-23T19:35:52.944Z",
       "description": "Tasks for master context"
     }
   }

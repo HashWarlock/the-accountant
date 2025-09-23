@@ -1,6 +1,6 @@
 # Task ID: 2
 # Title: Configure Prisma Database Schema and Setup
-# Status: pending
+# Status: done
 # Dependencies: 1
 # Priority: high
 # Description: Set up SQLite database with Prisma schema for user data storage

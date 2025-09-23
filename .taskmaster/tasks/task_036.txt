@@ -1,0 +1,11 @@
+# Task ID: 36
+# Title: Refactor forms using shadcnblock form blocks
+# Status: pending
+# Dependencies: 33
+# Priority: high
+# Description: Replace SignupForm, SignMessage, and VerifySignature forms with shadcnblock form components and validation patterns
+# Details:
+
+
+# Test Strategy:
+

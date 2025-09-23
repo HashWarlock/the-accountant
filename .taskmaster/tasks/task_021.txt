@@ -1,0 +1,11 @@
+# Task ID: 21
+# Title: Add attestation quote to API responses
+# Status: done
+# Dependencies: 18
+# Priority: high
+# Description: Include attestation quotes in signup, signing, and key retrieval API responses
+# Details:
+Modify existing API endpoints to return attestation quotes alongside normal responses. This includes: Adding quote field to signup response with hex-encoded attestation, Including quote in signing operations response, Returning quote data in key retrieval endpoints, Ensuring backward compatibility with existing clients.
+
+# Test Strategy:
+Test API response structure includes quote fields, verify quote format and encoding, test backward compatibility, validate quote data corresponds to the operation performed

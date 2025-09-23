@@ -1,0 +1,11 @@
+# Task ID: 45
+# Title: Build and deploy shadcnblock refactored version
+# Status: pending
+# Dependencies: 44, 31
+# Priority: high
+# Description: Create production build with shadcnblock UI and deploy to Docker registry with updated version tag
+# Details:
+
+
+# Test Strategy:
+

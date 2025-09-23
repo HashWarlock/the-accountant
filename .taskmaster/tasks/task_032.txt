@@ -1,0 +1,11 @@
+# Task ID: 32
+# Title: Research shadcnblock components and templates
+# Status: pending
+# Dependencies: 30
+# Priority: high
+# Description: Study shadcnblock documentation, available blocks, templates and best practices to plan UI refactoring strategy
+# Details:
+
+
+# Test Strategy:
+

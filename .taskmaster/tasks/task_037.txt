@@ -1,0 +1,11 @@
+# Task ID: 37
+# Title: Implement shadcnblock card layouts for data display
+# Status: pending
+# Dependencies: 33
+# Priority: medium
+# Description: Replace custom card components with shadcnblock card blocks for user data, wallet info, and audit logs display
+# Details:
+
+
+# Test Strategy:
+
