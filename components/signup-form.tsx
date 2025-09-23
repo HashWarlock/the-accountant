@@ -53,23 +53,23 @@ export function SignupForm({ onSuccess }: SignupFormProps) {
   return (
     <div className="space-y-8">
       <Card>
-        <CardHeader>
-          <div className="flex items-center space-x-3">
-            <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
-              <Wallet className="h-5 w-5 text-primary" />
-            </div>
-            <div>
-              <CardTitle>Create Wallet</CardTitle>
-              <CardDescription>
-                Generate your secure TEE-backed wallet with deterministic keys
-              </CardDescription>
+        <CardHeader className="text-center space-y-4">
+          <div className="flex justify-center">
+            <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
+              <Wallet className="h-6 w-6 text-primary" />
             </div>
           </div>
+          <div className="space-y-2">
+            <CardTitle className="text-2xl">Create Wallet</CardTitle>
+            <CardDescription className="text-base">
+              Generate your secure TEE-backed wallet with deterministic keys
+            </CardDescription>
+          </div>
         </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
+        <CardContent className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-2">
-              <Label htmlFor="email">Email Address</Label>
+              <Label htmlFor="email" className="text-sm font-medium">Email Address</Label>
               <Input
                 id="email"
                 type="email"
@@ -78,10 +78,11 @@ export function SignupForm({ onSuccess }: SignupFormProps) {
                 onChange={(e) => setEmail(e.target.value)}
                 required
                 disabled={loading}
+                className="h-11"
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="userId">User ID</Label>
+              <Label htmlFor="userId" className="text-sm font-medium">User ID</Label>
               <Input
                 id="userId"
                 placeholder="alice"
@@ -90,9 +91,10 @@ export function SignupForm({ onSuccess }: SignupFormProps) {
                 required
                 minLength={3}
                 disabled={loading}
+                className="h-11"
               />
             </div>
-            <Button type="submit" className="w-full" disabled={loading}>
+            <Button type="submit" className="w-full h-11" disabled={loading}>
               {loading && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
               {loading ? 'Creating Wallet...' : 'Create Wallet'}
             </Button>
