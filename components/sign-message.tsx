@@ -63,17 +63,22 @@ export function SignMessage({ userId: defaultUserId }: SignMessageProps) {
   }
 
   return (
-    <Card className="w-full max-w-md">
-      <CardHeader>
-        <CardTitle>Sign Message</CardTitle>
-        <CardDescription>
-          Sign a message using your TEE-backed private key
-        </CardDescription>
+    <Card className="w-full max-w-lg border-0 shadow-2xl bg-white/95 backdrop-blur-sm">
+      <CardHeader className="pb-8">
+        <div className="space-y-3">
+          <div className="w-12 h-12 bg-cyan-100 rounded-2xl flex items-center justify-center">
+            <PenTool className="h-6 w-6 text-cyan-700" />
+          </div>
+          <CardTitle className="text-2xl font-bold text-slate-900">Sign Message</CardTitle>
+          <CardDescription className="text-slate-600 text-base">
+            Cryptographically sign a message using your TEE-backed private key
+          </CardDescription>
+        </div>
       </CardHeader>
       <CardContent>
-        <form onSubmit={handleSign} className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="sign-userId">User ID</Label>
+        <form onSubmit={handleSign} className="space-y-6">
+          <div className="space-y-3">
+            <Label htmlFor="sign-userId" className="text-slate-700 font-semibold">User ID</Label>
             <Input
               id="sign-userId"
               placeholder="alice"
@@ -81,10 +86,11 @@ export function SignMessage({ userId: defaultUserId }: SignMessageProps) {
               onChange={(e) => setUserId(e.target.value)}
               required
               disabled={loading}
+              className="h-12 border-2 border-slate-200 rounded-xl focus:border-cyan-400 focus:ring-0 transition-all duration-200"
             />
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="message">Message</Label>
+          <div className="space-y-3">
+            <Label htmlFor="message" className="text-slate-700 font-semibold">Message</Label>
             <Input
               id="message"
               placeholder="Hello, dstack!"
@@ -92,73 +98,78 @@ export function SignMessage({ userId: defaultUserId }: SignMessageProps) {
               onChange={(e) => setMessage(e.target.value)}
               required
               disabled={loading}
+              className="h-12 border-2 border-slate-200 rounded-xl focus:border-cyan-400 focus:ring-0 transition-all duration-200"
             />
           </div>
-          <Button type="submit" className="w-full" disabled={loading}>
-            {loading && <Loader2 className="animate-spin" />}
+          <Button 
+            type="submit" 
+            className="w-full h-12 bg-cyan-600 hover:bg-cyan-700 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200" 
+            disabled={loading}
+          >
+            {loading && <Loader2 className="animate-spin mr-2" />}
             {loading ? 'Signing...' : 'Sign Message'}
           </Button>
         </form>
 
         {signatureData && (
-          <div className="mt-6 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg space-y-3">
-            <div className="flex items-center gap-2 text-blue-600 dark:text-blue-400">
-              <PenTool className="h-5 w-5" />
-              <span className="font-bold">✅ Message Signed Successfully</span>
+          <div className="mt-8 p-6 bg-cyan-50 rounded-2xl border-2 border-cyan-200 space-y-4">
+            <div className="flex items-center gap-3 text-cyan-700">
+              <PenTool className="h-6 w-6" />
+              <span className="font-bold text-lg">Message Signed Successfully</span>
             </div>
             
-            <div className="space-y-2 text-sm">
+            <div className="space-y-4 text-sm">
               <div>
-                <span className="text-muted-foreground">Message:</span>
-                <p className="font-mono bg-background/50 p-2 rounded mt-1">
+                <span className="text-cyan-700 font-semibold block mb-2">Message:</span>
+                <p className="font-mono bg-white p-3 rounded-xl border border-cyan-200 text-slate-900">
                   "{signatureData.message}"
                 </p>
               </div>
               
               <div>
-                <span className="text-muted-foreground">Signature:</span>
-                <p className="font-mono text-xs bg-background/50 p-2 rounded mt-1 break-all">
+                <span className="text-cyan-700 font-semibold block mb-2">Signature:</span>
+                <p className="font-mono text-xs bg-white p-3 rounded-xl border border-cyan-200 break-all text-slate-900">
                   {signatureData.signature}
                 </p>
               </div>
               
               <div>
-                <span className="text-muted-foreground">Signer Address:</span>
-                <p className="font-mono text-xs bg-background/50 p-2 rounded mt-1 break-all">
+                <span className="text-cyan-700 font-semibold block mb-2">Signer Address:</span>
+                <p className="font-mono text-xs bg-white p-3 rounded-xl border border-cyan-200 break-all text-slate-900">
                   {signatureData.address}
                 </p>
               </div>
               
               {signatureData.publicKey && (
                 <div>
-                  <span className="text-muted-foreground">Public Key:</span>
-                  <p className="font-mono text-xs bg-background/50 p-2 rounded mt-1 break-all">
+                  <span className="text-cyan-700 font-semibold block mb-2">Public Key:</span>
+                  <p className="font-mono text-xs bg-white p-3 rounded-xl border border-cyan-200 break-all text-slate-900">
                     {signatureData.publicKey}
                   </p>
                 </div>
               )}
               
-              <div className="text-xs text-muted-foreground pt-2">
+              <div className="text-sm text-cyan-600 pt-2 font-medium">
                 Signed at: {new Date(signatureData.timestamp).toLocaleString()}
               </div>
             </div>
             
             {/* Attestation Verification Links */}
             {(signatureData.phalaVerificationUrl || signatureData.t16zVerificationUrl) && (
-              <div className="mt-3 p-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded space-y-2">
-                <div className="flex items-center gap-2 text-green-700 dark:text-green-300">
-                  <Shield className="h-4 w-4" />
-                  <span className="font-semibold text-sm">TEE Attestation Generated</span>
+              <div className="mt-4 p-4 bg-emerald-50 border-2 border-emerald-200 rounded-xl space-y-3">
+                <div className="flex items-center gap-3 text-emerald-700">
+                  <Shield className="h-5 w-5" />
+                  <span className="font-bold text-sm">TEE Attestation Generated</span>
                 </div>
-                <div className="flex flex-col gap-2">
+                <div className="flex flex-col gap-3">
                   {signatureData.t16zVerificationUrl && (
                     <a
                       href={signatureData.t16zVerificationUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center gap-1 text-xs text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
+                      className="flex items-center gap-2 text-sm text-emerald-600 hover:text-emerald-800 font-medium transition-colors"
                     >
-                      <ExternalLink className="h-3 w-3" />
+                      <ExternalLink className="h-4 w-4" />
                       Verify on t16z Explorer
                     </a>
                   )}
@@ -167,17 +178,17 @@ export function SignMessage({ userId: defaultUserId }: SignMessageProps) {
                       href={signatureData.phalaVerificationUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center gap-1 text-xs text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
+                      className="flex items-center gap-2 text-sm text-emerald-600 hover:text-emerald-800 font-medium transition-colors"
                     >
-                      <ExternalLink className="h-3 w-3" />
+                      <ExternalLink className="h-4 w-4" />
                       Verify on Phala Cloud
                     </a>
                   )}
                 </div>
                 {signatureData.attestation?.checksum && (
-                  <div className="mt-2">
-                    <span className="text-xs text-muted-foreground">Checksum:</span>
-                    <p className="font-mono text-xs bg-background/50 p-1 rounded mt-1 break-all">
+                  <div className="mt-3">
+                    <span className="text-emerald-700 font-semibold block mb-2">Checksum:</span>
+                    <p className="font-mono text-xs bg-white p-2 rounded-lg border border-emerald-200 break-all text-slate-900">
                       {signatureData.attestation.checksum}
                     </p>
                   </div>
@@ -185,8 +196,8 @@ export function SignMessage({ userId: defaultUserId }: SignMessageProps) {
               </div>
             )}
             
-            <div className="mt-3 p-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded">
-              <p className="text-xs text-yellow-800 dark:text-yellow-200">
+            <div className="mt-4 p-4 bg-blue-50 border-2 border-blue-200 rounded-xl">
+              <p className="text-sm text-blue-800">
                 <strong>💡 Tip:</strong> Copy the signature and use it in the Verify tab to test verification!
               </p>
             </div>

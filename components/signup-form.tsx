@@ -46,17 +46,22 @@ export function SignupForm({ onSuccess }: SignupFormProps) {
   }
 
   return (
-    <Card className="w-full max-w-md">
-      <CardHeader>
-        <CardTitle>Create Wallet</CardTitle>
-        <CardDescription>
-          Sign up to generate your secure TEE-backed wallet
-        </CardDescription>
+    <Card className="w-full max-w-lg border-0 shadow-2xl bg-white/95 backdrop-blur-sm">
+      <CardHeader className="pb-8">
+        <div className="space-y-3">
+          <div className="w-12 h-12 bg-emerald-100 rounded-2xl flex items-center justify-center">
+            <span className="text-2xl">🔐</span>
+          </div>
+          <CardTitle className="text-2xl font-bold text-slate-900">Create Wallet</CardTitle>
+          <CardDescription className="text-slate-600 text-base">
+            Generate your secure TEE-backed wallet with deterministic keys
+          </CardDescription>
+        </div>
       </CardHeader>
       <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="space-y-3">
+            <Label htmlFor="email" className="text-slate-700 font-semibold">Email Address</Label>
             <Input
               id="email"
               type="email"
@@ -65,10 +70,11 @@ export function SignupForm({ onSuccess }: SignupFormProps) {
               onChange={(e) => setEmail(e.target.value)}
               required
               disabled={loading}
+              className="h-12 border-2 border-slate-200 rounded-xl focus:border-emerald-400 focus:ring-0 transition-all duration-200"
             />
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="userId">User ID</Label>
+          <div className="space-y-3">
+            <Label htmlFor="userId" className="text-slate-700 font-semibold">User ID</Label>
             <Input
               id="userId"
               placeholder="alice"
@@ -77,49 +83,54 @@ export function SignupForm({ onSuccess }: SignupFormProps) {
               required
               minLength={3}
               disabled={loading}
+              className="h-12 border-2 border-slate-200 rounded-xl focus:border-emerald-400 focus:ring-0 transition-all duration-200"
             />
           </div>
-          <Button type="submit" className="w-full" disabled={loading}>
-            {loading && <Loader2 className="animate-spin" />}
+          <Button 
+            type="submit" 
+            className="w-full h-12 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200" 
+            disabled={loading}
+          >
+            {loading && <Loader2 className="animate-spin mr-2" />}
             {loading ? 'Creating Wallet...' : 'Create Wallet'}
           </Button>
         </form>
 
         {userData && userData.user && (
-          <div className="mt-6 p-4 bg-muted rounded-lg space-y-3">
-            <div className="flex items-center gap-2 text-green-600">
-              <CheckCircle className="h-4 w-4" />
-              <span className="font-medium">Wallet Created Successfully!</span>
+          <div className="mt-8 p-6 bg-emerald-50 rounded-2xl border-2 border-emerald-200 space-y-4">
+            <div className="flex items-center gap-3 text-emerald-700">
+              <CheckCircle className="h-6 w-6" />
+              <span className="font-bold text-lg">Wallet Created Successfully!</span>
             </div>
-            <div className="space-y-2 text-sm">
+            <div className="space-y-4 text-sm">
               <div>
-                <span className="text-muted-foreground block mb-1">User ID:</span>
-                <p className="font-mono bg-background p-2 rounded border">
+                <span className="text-emerald-700 font-semibold block mb-2">User ID:</span>
+                <p className="font-mono bg-white p-3 rounded-xl border border-emerald-200 text-slate-900">
                   {userData.user.userId}
                 </p>
               </div>
               <div>
-                <span className="text-muted-foreground block mb-1">Email:</span>
-                <p className="font-mono bg-background p-2 rounded border">
+                <span className="text-emerald-700 font-semibold block mb-2">Email:</span>
+                <p className="font-mono bg-white p-3 rounded-xl border border-emerald-200 text-slate-900">
                   {userData.user.email}
                 </p>
               </div>
               <div>
-                <span className="text-muted-foreground block mb-1">ETH Address:</span>
-                <p className="font-mono break-all bg-background p-2 rounded border text-xs">
+                <span className="text-emerald-700 font-semibold block mb-2">ETH Address:</span>
+                <p className="font-mono break-all bg-white p-3 rounded-xl border border-emerald-200 text-xs text-slate-900">
                   {userData.user.address}
                 </p>
               </div>
               <div>
-                <span className="text-muted-foreground block mb-1">Public Key:</span>
-                <p className="font-mono break-all bg-background p-2 rounded border text-xs">
+                <span className="text-emerald-700 font-semibold block mb-2">Public Key:</span>
+                <p className="font-mono break-all bg-white p-3 rounded-xl border border-emerald-200 text-xs text-slate-900">
                   {userData.user.publicKey}
                 </p>
               </div>
             </div>
-            <div className="mt-3 p-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded">
-              <p className="text-xs text-yellow-800 dark:text-yellow-200">
-                <strong>⚠️ Important:</strong> Save your credentials! Your private key is derived deterministically from your User ID in the TEE.
+            <div className="mt-4 p-4 bg-amber-50 border-2 border-amber-200 rounded-xl">
+              <p className="text-sm text-amber-800">
+                <strong>🔐 Security Note:</strong> Your private key is derived deterministically from your User ID within the secure TEE enclave. Save these credentials securely.
               </p>
             </div>
           </div>
