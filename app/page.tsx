@@ -39,120 +39,119 @@ export default function Home() {
       </section>
 
       {/* Main Content */}
-      <main className="container max-w-5xl mx-auto px-4 pb-24">
-        <div className="bg-white/90 backdrop-blur rounded-2xl shadow-xl border border-white/20 overflow-hidden">
-          <Tabs defaultValue="signup" className="w-full">
-            <TabsList className="grid w-full grid-cols-6 bg-gray-50/80 h-16 p-2">
-              <TabsTrigger 
-                value="signup" 
-                className="flex items-center justify-center space-x-2 data-[state=active]:bg-white data-[state=active]:shadow-sm rounded-xl transition-all duration-200"
-              >
-                <Wallet className="h-4 w-4" />
-                <span className="hidden sm:inline font-medium">Create</span>
-              </TabsTrigger>
-              <TabsTrigger 
-                value="sign" 
-                className="flex items-center justify-center space-x-2 data-[state=active]:bg-white data-[state=active]:shadow-sm rounded-xl transition-all duration-200"
-              >
-                <FileText className="h-4 w-4" />
-                <span className="hidden sm:inline font-medium">Sign</span>
-              </TabsTrigger>
-              <TabsTrigger 
-                value="verify" 
-                className="flex items-center justify-center space-x-2 data-[state=active]:bg-white data-[state=active]:shadow-sm rounded-xl transition-all duration-200"
-              >
-                <Shield className="h-4 w-4" />
-                <span className="hidden sm:inline font-medium">Verify</span>
-              </TabsTrigger>
-              <TabsTrigger 
-                value="users" 
-                className="flex items-center justify-center space-x-2 data-[state=active]:bg-white data-[state=active]:shadow-sm rounded-xl transition-all duration-200"
-              >
-                <Users className="h-4 w-4" />
-                <span className="hidden sm:inline font-medium">Users</span>
-              </TabsTrigger>
-              <TabsTrigger 
-                value="audit" 
-                className="flex items-center justify-center space-x-2 data-[state=active]:bg-white data-[state=active]:shadow-sm rounded-xl transition-all duration-200"
-              >
-                <Search className="h-4 w-4" />
-                <span className="hidden sm:inline font-medium">Audit</span>
-              </TabsTrigger>
-              <TabsTrigger 
-                value="attestation" 
-                className="flex items-center justify-center space-x-2 data-[state=active]:bg-white data-[state=active]:shadow-sm rounded-xl transition-all duration-200"
-              >
-                <Shield className="h-4 w-4" />
-                <span className="hidden sm:inline font-medium">Attest</span>
-              </TabsTrigger>
-            </TabsList>
+      <main className="flex justify-center px-4 pb-24">
+        <div className="w-full max-w-4xl">
+          {/* Tab Navigation */}
+          <div className="flex flex-wrap justify-center gap-3 mb-8">
+            <Tabs defaultValue="signup" className="w-full">
+              <TabsList className="grid grid-cols-3 sm:grid-cols-6 w-full max-w-3xl mx-auto bg-transparent gap-2 h-auto p-0">
+                <TabsTrigger 
+                  value="signup" 
+                  className="flex flex-col items-center justify-center space-y-2 p-4 bg-white/80 backdrop-blur border border-black/10 rounded-xl shadow-sm data-[state=active]:bg-white data-[state=active]:shadow-md hover:bg-white/90 transition-all duration-200"
+                >
+                  <Wallet className="h-5 w-5" />
+                  <span className="text-sm font-medium">Create</span>
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="sign" 
+                  className="flex flex-col items-center justify-center space-y-2 p-4 bg-white/80 backdrop-blur border border-black/10 rounded-xl shadow-sm data-[state=active]:bg-white data-[state=active]:shadow-md hover:bg-white/90 transition-all duration-200"
+                >
+                  <FileText className="h-5 w-5" />
+                  <span className="text-sm font-medium">Sign</span>
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="verify" 
+                  className="flex flex-col items-center justify-center space-y-2 p-4 bg-white/80 backdrop-blur border border-black/10 rounded-xl shadow-sm data-[state=active]:bg-white data-[state=active]:shadow-md hover:bg-white/90 transition-all duration-200"
+                >
+                  <Shield className="h-5 w-5" />
+                  <span className="text-sm font-medium">Verify</span>
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="users" 
+                  className="flex flex-col items-center justify-center space-y-2 p-4 bg-white/80 backdrop-blur border border-black/10 rounded-xl shadow-sm data-[state=active]:bg-white data-[state=active]:shadow-md hover:bg-white/90 transition-all duration-200"
+                >
+                  <Users className="h-5 w-5" />
+                  <span className="text-sm font-medium">Users</span>
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="audit" 
+                  className="flex flex-col items-center justify-center space-y-2 p-4 bg-white/80 backdrop-blur border border-black/10 rounded-xl shadow-sm data-[state=active]:bg-white data-[state=active]:shadow-md hover:bg-white/90 transition-all duration-200"
+                >
+                  <Search className="h-5 w-5" />
+                  <span className="text-sm font-medium">Audit</span>
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="attestation" 
+                  className="flex flex-col items-center justify-center space-y-2 p-4 bg-white/80 backdrop-blur border border-black/10 rounded-xl shadow-sm data-[state=active]:bg-white data-[state=active]:shadow-md hover:bg-white/90 transition-all duration-200"
+                >
+                  <Shield className="h-5 w-5" />
+                  <span className="text-sm font-medium">Attest</span>
+                </TabsTrigger>
+              </TabsList>
 
-          <TabsContent value="signup" className="p-8">
-            <div className="max-w-lg mx-auto">
-              <SignupForm onSuccess={handleSignupSuccess} />
-            </div>
-          </TabsContent>
+              {/* Content Box */}
+              <div className="mt-8 bg-white/90 backdrop-blur rounded-2xl border border-black/10 shadow-xl p-8 mx-auto max-w-2xl">
+                <TabsContent value="signup" className="m-0">
+                  <SignupForm onSuccess={handleSignupSuccess} />
+                </TabsContent>
 
-          <TabsContent value="sign" className="p-8">
-            <div className="max-w-lg mx-auto">
-              <SignMessage userId={currentUserId} />
-            </div>
-          </TabsContent>
+                <TabsContent value="sign" className="m-0">
+                  <SignMessage userId={currentUserId} />
+                </TabsContent>
 
-          <TabsContent value="verify" className="p-8">
-            <div className="max-w-lg mx-auto">
-              <VerifySignature />
-            </div>
-          </TabsContent>
+                <TabsContent value="verify" className="m-0">
+                  <VerifySignature />
+                </TabsContent>
 
-          <TabsContent value="users" className="p-8">
-            <UserList />
-          </TabsContent>
+                <TabsContent value="users" className="m-0">
+                  <UserList />
+                </TabsContent>
 
-          <TabsContent value="audit" className="p-8">
-            {currentUserId ? (
-              <AuditLogViewer userId={currentUserId} />
-            ) : (
-              <Card className="p-8 max-w-md mx-auto text-center">
-                <div className="space-y-6">
-                  <div className="h-12 w-12 rounded-full bg-muted flex items-center justify-center mx-auto">
-                    <Search className="h-6 w-6 text-muted-foreground" />
-                  </div>
-                  <div className="space-y-2">
-                    <h3 className="text-lg font-semibold">View Audit Logs</h3>
-                    <p className="text-sm text-muted-foreground">
-                      Enter a User ID to view detailed audit logs and transaction history
-                    </p>
-                  </div>
-                  <div className="flex space-x-2">
-                    <Input
-                      placeholder="Enter User ID"
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter' && e.currentTarget.value) {
-                          setCurrentUserId(e.currentTarget.value)
-                        }
-                      }}
-                    />
-                    <Button
-                      onClick={(e) => {
-                        const input = e.currentTarget.previousElementSibling as HTMLInputElement
-                        if (input?.value) {
-                          setCurrentUserId(input.value)
-                        }
-                      }}
-                    >
-                      View
-                    </Button>
-                  </div>
-                </div>
-              </Card>
-            )}
-          </TabsContent>
+                <TabsContent value="audit" className="m-0">
+                  {currentUserId ? (
+                    <AuditLogViewer userId={currentUserId} />
+                  ) : (
+                    <div className="text-center space-y-6">
+                      <div className="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center mx-auto">
+                        <Search className="h-8 w-8 text-gray-500" />
+                      </div>
+                      <div className="space-y-3">
+                        <h3 className="text-xl font-semibold text-gray-900">View Audit Logs</h3>
+                        <p className="text-gray-600">
+                          Enter a User ID to view detailed audit logs and transaction history
+                        </p>
+                      </div>
+                      <div className="flex space-x-3 max-w-sm mx-auto">
+                        <Input
+                          placeholder="Enter User ID"
+                          className="flex-1"
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter' && e.currentTarget.value) {
+                              setCurrentUserId(e.currentTarget.value)
+                            }
+                          }}
+                        />
+                        <Button
+                          onClick={(e) => {
+                            const input = e.currentTarget.previousElementSibling as HTMLInputElement
+                            if (input?.value) {
+                              setCurrentUserId(input.value)
+                            }
+                          }}
+                        >
+                          View
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+                </TabsContent>
 
-          <TabsContent value="attestation" className="p-8">
-            <AttestationVerifier />
-          </TabsContent>
-          </Tabs>
+                <TabsContent value="attestation" className="m-0">
+                  <AttestationVerifier />
+                </TabsContent>
+              </div>
+            </Tabs>
+          </div>
         </div>
       </main>
 
