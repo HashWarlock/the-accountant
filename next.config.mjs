@@ -9,6 +9,8 @@ const nextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
+  // Configure allowed dev origins for Replit proxy
+  allowedDevOrigins: ['127.0.0.1', 'localhost', '*.replit.dev'],
   
   async headers() {
     return [
