@@ -2,18 +2,24 @@
 
 A secure TEE-backed key management system demonstrating the dstack SDK for deterministic wallet generation and cryptographic operations in a Confidential VM environment.
 
-## 🚀 Version 1.3.2 - Critical 64-Byte Attestation Fix
+## 🚀 Version 1.7.4 - Enhanced UI & TEE Attestation
 
-### New Features in v1.3.2
+### Latest Updates (v1.7.4)
+- **TEE Attestation Verification**: Properly integrated attestation quote verification with t16z blockchain
+- **Enhanced UI**: Improved text visibility, button states, and card designs across all components
+- **Audit Log Navigation**: Streamlined user search functionality with "Search Another User" button
+- **Fixed Verify Function**: Resolved signature verification errors and undefined field issues
+- **PostgreSQL Support**: Added database migrations and PostgreSQL compatibility
+- **Docker Optimizations**: Multi-stage builds with proper platform targeting (linux/amd64)
+
+### Key Features (v1.3.2)
 - **Fixed 64-byte limit issue**: SHA256 hash public keys to fit Intel TDX 64-byte report data limit
 - **Phala Cloud PUBLIC API**: No API key required - uses Phala's public attestation service
-- **Corrected API endpoints**: Proper integration with cloud-api.phala.network
 - **t16z Explorer Support**: Public attestation verification via proof.t16z.com
 - **Verification URLs**: Automatic generation of public verification links
-- **Enhanced Audit Logs**: Store attestation checksums and verification URLs
-- **Fixed Quote Handling**: Corrected hex string handling for attestation quotes
+- **Enhanced Audit Logs**: Store attestation checksums and verification URLs with blockchain integration
 
-### Previous Features (v1.2.0)
+### Core Features (v1.2.0)
 - **Remote Attestation**: Intel TDX attestation quote generation for all key operations
 - **Audit Logging System**: Comprehensive audit trail with attestation tracking
 - **Attestation Verifier**: UI and API for verifying attestation quotes
@@ -172,34 +178,36 @@ curl -X POST http://localhost:3000/api/verify \
 
 ### Using Pre-built Image from DockerHub
 
-Pull and run the latest image (v1.2.0):
+Pull and run the latest image (v1.7.4):
 ```bash
-docker pull hashwarlock/the-accountant:v1.2.0
+docker pull hashwarlock/theaccountant:v1.7.4
 docker run -d \
   --name the-accountant \
   -p 3000:3000 \
   -e DATABASE_URL=file:./dev.db \
   -e APP_NAMESPACE=the-accountant-v1 \
-  hashwarlock/the-accountant:v1.2.0
+  -e ENABLE_ATTESTATION_UPLOAD=true \
+  hashwarlock/theaccountant:v1.7.4
 ```
 
-For TEE-enabled environments:
+For TEE-enabled environments with PostgreSQL:
 ```bash
-docker pull hashwarlock/the-accountant:tee-amd64-latest
+docker pull hashwarlock/theaccountant:v1.7.4
 docker run -d \
   --name the-accountant-tee \
   -p 3000:3000 \
   -v /var/run/dstack.sock:/var/run/dstack.sock:ro \
-  -e DATABASE_URL=file:./dev.db \
+  -e DATABASE_URL="postgresql://user:pass@host:5432/dbname" \
   -e APP_NAMESPACE=the-accountant-prod \
-  hashwarlock/the-accountant:tee-amd64-latest
+  -e ENABLE_ATTESTATION_UPLOAD=true \
+  hashwarlock/theaccountant:v1.7.4
 ```
 
 ### Local Docker Build
 
-1. Build the image:
+1. Build the image (required for ARM Macs):
 ```bash
-docker build -t the-accountant .
+docker build --platform=linux/amd64 -t the-accountant .
 ```
 
 2. Run with docker-compose:
@@ -252,9 +260,10 @@ The app will be available at: https://dstack-demo.phala.network
 
 | Variable | Description | Default |
 |----------|-------------|---------|
-| `DATABASE_URL` | Prisma database connection | `file:./dev.db` |
+| `DATABASE_URL` | Prisma database connection (SQLite or PostgreSQL) | `file:./dev.db` |
 | `APP_NAMESPACE` | Namespace for key derivation (CRITICAL) | `the-accountant-v1` |
 | `DSTACK_SOCKET_PATH` | Path to dstack TEE socket | `/var/run/dstack.sock` |
+| `ENABLE_ATTESTATION_UPLOAD` | Enable uploading attestations to t16z blockchain | `false` |
 | `EXPOSE_INFO` | Show detailed info in health endpoint | `false` |
 | `NODE_ENV` | Environment mode | `development` |
 | `PORT` | Server port | `3000` |
