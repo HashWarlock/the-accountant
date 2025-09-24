@@ -5,14 +5,7 @@ import { PrismaClient } from '@prisma/client'
 
 const prisma = new PrismaClient()
 
-// TEE runtime detection
-let runtime: any = null
-try {
-  const { getRuntime } = require('@dstack-js/sdk')
-  runtime = getRuntime()
-} catch (e) {
-  console.log('Running without dstack SDK')
-}
+// TEE runtime will be initialized on demand
 
 // Validation schema for attestation verification request
 const verifyAttestationSchema = z.object({
@@ -53,8 +46,6 @@ export async function POST(request: NextRequest) {
       .update(quote)
       .digest('hex')
 
-    // Use the initialized runtime for TEE attestation
-
     // Create attestation data
     const attestationData = {
       operation: 'attestation_verify',
@@ -71,10 +62,14 @@ export async function POST(request: NextRequest) {
     let phalaVerificationUrl = null
     let t16zVerificationUrl = null
 
-    if (runtime.attestation) {
-      console.log('🔐 Generating TEE attestation...')
+    // Try to get runtime and generate attestation
+    try {
+      const { getRuntime } = require('@dstack-js/sdk')
+      const runtime = await getRuntime()
 
-      try {
+      if (runtime && runtime.attestation) {
+        console.log('🔐 Generating TEE attestation...')
+
         // Generate attestation quote
         const teeAttestation = await runtime.attestation.getQuote(
           JSON.stringify(attestationData)
@@ -94,12 +89,12 @@ export async function POST(request: NextRequest) {
         console.log('✅ TEE attestation generated successfully')
         console.log(`🔗 Phala: ${phalaVerificationUrl}`)
         console.log(`🔗 t16z: ${t16zVerificationUrl}`)
-      } catch (attestError) {
-        console.error('⚠️ TEE attestation failed:', attestError)
-        // Continue without attestation in development
+      } else {
+        console.log('ℹ️ Running without TEE attestation')
       }
-    } else {
-      console.log('ℹ️ Running in non-TEE environment')
+    } catch (attestError) {
+      console.log('ℹ️ Running in non-TEE environment:', attestError.message || 'SDK not available')
+      // Continue without attestation in development
     }
 
     // Perform verification logic
@@ -153,10 +148,10 @@ export async function POST(request: NextRequest) {
             phalaVerificationUrl,
             t16zVerificationUrl,
             verificationStatus: verification.verified ? 'verified' : 'failed',
-            applicationData: {
+            applicationData: JSON.stringify({
               ...attestationData,
               verification
-            }
+            })
           }
         })
         console.log('📝 Verification audit logged')
