@@ -206,14 +206,15 @@ export async function POST(request: NextRequest) {
     const response: any = {
       valid: isValid,
       message,
+      signature,
       expectedAddress,
-      ...(userData && { 
+      ...(userData && {
         userId: userData.userId,
-        publicKey: userData.pubKeyHex 
+        publicKey: userData.pubKeyHex
       }),
-      ...(recoveredAddress && !isValid && { 
+      ...(recoveredAddress && !isValid && {
         recoveredAddress,
-        error: 'Signature does not match expected address' 
+        error: 'Signature does not match expected address'
       }),
       timestamp: new Date().toISOString()
     }

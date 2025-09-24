@@ -120,7 +120,7 @@ export function AttestationVerifier() {
               value={quote}
               onChange={(e) => setQuote(e.target.value)}
               placeholder="Enter hex-encoded attestation quote (with or without 0x prefix)"
-              className="w-full px-3 py-3 border border-input rounded-md h-32 font-mono text-xs resize-none focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+              className="w-full px-3 py-3 border border-input rounded-md h-32 font-mono text-xs text-gray-900 bg-white resize-none focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
             />
           </div>
 
@@ -131,13 +131,13 @@ export function AttestationVerifier() {
               value={eventLog}
               onChange={(e) => setEventLog(e.target.value)}
               placeholder="Enter hex-encoded event log (optional)"
-              className="w-full px-3 py-3 border border-input rounded-md h-20 font-mono text-xs resize-none focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+              className="w-full px-3 py-3 border border-input rounded-md h-20 font-mono text-xs text-gray-900 bg-white resize-none focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
             />
           </div>
 
           <Button
             onClick={handleVerify}
-            disabled={loading}
+            disabled={loading || !quote.trim()}
             className="w-full h-11"
           >
             {loading ? (
@@ -241,7 +241,7 @@ export function AttestationVerifier() {
                     <div>
                       <label className="text-xs text-gray-600">MR Enclave</label>
                       <div className="flex items-center gap-2">
-                        <p className="font-mono text-xs break-all bg-white p-2 rounded border flex-1">
+                        <p className="font-mono text-xs text-gray-900 break-all bg-white p-2 rounded border flex-1">
                           {result.details.measurements.mrEnclave}
                         </p>
                         <button
@@ -255,7 +255,7 @@ export function AttestationVerifier() {
                     <div>
                       <label className="text-xs text-gray-600">MR Signer</label>
                       <div className="flex items-center gap-2">
-                        <p className="font-mono text-xs break-all bg-white p-2 rounded border flex-1">
+                        <p className="font-mono text-xs text-gray-900 break-all bg-white p-2 rounded border flex-1">
                           {result.details.measurements.mrSigner}
                         </p>
                         <button

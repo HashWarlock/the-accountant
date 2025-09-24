@@ -134,7 +134,7 @@ export function UserList() {
               placeholder="Search by email, user ID, or address..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="h-12 pl-10 bg-phala-g09/10 border-phala-g08/30 focus:border-phala-lime"
+              className="h-12 pl-10 text-gray-900 bg-white border-phala-g08/30 focus:border-phala-lime"
             />
           </div>
           <Button

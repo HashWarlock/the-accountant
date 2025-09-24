@@ -151,7 +151,7 @@ export function VerifySignature() {
           >
             <CollapsibleDetails
               title={verificationResult.valid ? 'Signature Valid' : 'Signature Invalid'}
-              summary={verificationResult.valid ? `Verified: ${verificationResult.address.slice(0, 6)}...${verificationResult.address.slice(-4)}` : 'Verification failed'}
+              summary={verificationResult.valid ? `Verified: ${verificationResult.expectedAddress.slice(0, 6)}...${verificationResult.expectedAddress.slice(-4)}` : 'Verification failed'}
               defaultOpen={true}
               icon={
                 verificationResult.valid ? (
@@ -187,8 +187,8 @@ export function VerifySignature() {
                   <>
                     <DetailItem
                       label="Verified Address"
-                      value={verificationResult.address}
-                      onCopy={() => copyToClipboard(verificationResult.address, 'Address')}
+                      value={verificationResult.expectedAddress}
+                      onCopy={() => copyToClipboard(verificationResult.expectedAddress, 'Address')}
                       mono
                     />
                     {verificationResult.userId && (

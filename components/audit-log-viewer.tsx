@@ -1,7 +1,8 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Clock, Shield, Copy, ChevronDown, ChevronUp, Download, Filter } from 'lucide-react'
+import { Clock, Shield, Copy, ChevronDown, ChevronUp, Download, Filter, ArrowLeft, Home } from 'lucide-react'
+import { useRouter } from 'next/navigation'
 
 interface AuditLog {
   id: string
@@ -25,6 +26,7 @@ interface AuditLogViewerProps {
 }
 
 export function AuditLogViewer({ userId }: AuditLogViewerProps) {
+  const router = useRouter()
   const [logs, setLogs] = useState<AuditLog[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -170,18 +172,36 @@ export function AuditLogViewer({ userId }: AuditLogViewerProps) {
   return (
     <div className="p-6 max-w-6xl mx-auto">
       <div className="mb-6">
-        <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
-          <Shield className="h-6 w-6" />
-          Audit Log Trail
-        </h2>
-        
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-2xl font-bold flex items-center gap-2">
+            <Shield className="h-6 w-6" />
+            Audit Log Trail
+          </h2>
+          <div className="flex gap-2">
+            <button
+              onClick={() => router.back()}
+              className="px-3 py-1.5 border border-gray-300 rounded-lg hover:bg-gray-100 flex items-center gap-1.5 text-gray-700 transition-colors"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              Back
+            </button>
+            <button
+              onClick={() => router.push('/')}
+              className="px-3 py-1.5 border border-gray-300 rounded-lg hover:bg-gray-100 flex items-center gap-1.5 text-gray-700 transition-colors"
+            >
+              <Home className="h-4 w-4" />
+              Home
+            </button>
+          </div>
+        </div>
+
         <div className="flex flex-wrap gap-4 mb-4">
           <div className="flex items-center gap-2">
             <Filter className="h-4 w-4 text-gray-600" />
-            <select 
-              value={filter} 
+            <select
+              value={filter}
               onChange={(e) => setFilter(e.target.value)}
-              className="px-3 py-1 border rounded"
+              className="px-3 py-1 border rounded text-gray-900 bg-white"
             >
               <option value="all">All Operations</option>
               <option value="signup">Signup</option>
@@ -195,7 +215,7 @@ export function AuditLogViewer({ userId }: AuditLogViewerProps) {
             placeholder="Search logs..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="px-3 py-1 border rounded flex-1 min-w-[200px]"
+            className="px-3 py-1 border rounded flex-1 min-w-[200px] text-gray-900 bg-white"
           />
           
           <div className="flex gap-2">
@@ -274,7 +294,7 @@ export function AuditLogViewer({ userId }: AuditLogViewerProps) {
                       <div>
                         <label className="text-xs font-semibold text-gray-600">Address</label>
                         <div className="flex items-center gap-2">
-                          <p className="font-mono text-sm break-all">{log.address}</p>
+                          <p className="font-mono text-sm text-gray-900 break-all">{log.address}</p>
                           <button
                             onClick={(e) => {
                               e.stopPropagation()
@@ -292,7 +312,7 @@ export function AuditLogViewer({ userId }: AuditLogViewerProps) {
                       <div>
                         <label className="text-xs font-semibold text-gray-600">Public Key</label>
                         <div className="flex items-center gap-2">
-                          <p className="font-mono text-xs break-all">{log.publicKey.substring(0, 66)}...</p>
+                          <p className="font-mono text-xs text-gray-900 break-all">{log.publicKey.substring(0, 66)}...</p>
                           <button
                             onClick={(e) => {
                               e.stopPropagation()
@@ -310,7 +330,7 @@ export function AuditLogViewer({ userId }: AuditLogViewerProps) {
                   {log.message && (
                     <div>
                       <label className="text-xs font-semibold text-gray-600">Full Message</label>
-                      <p className="font-mono text-sm bg-white p-2 rounded border break-all">{log.message}</p>
+                      <p className="font-mono text-sm text-gray-900 bg-white p-2 rounded border border-gray-300 break-all">{log.message}</p>
                     </div>
                   )}
                   
@@ -318,7 +338,7 @@ export function AuditLogViewer({ userId }: AuditLogViewerProps) {
                     <div>
                       <label className="text-xs font-semibold text-gray-600">Signature</label>
                       <div className="flex items-center gap-2">
-                        <p className="font-mono text-xs bg-white p-2 rounded border break-all flex-1">
+                        <p className="font-mono text-xs text-gray-900 bg-white p-2 rounded border border-gray-300 break-all flex-1">
                           {log.signature}
                         </p>
                         <button
@@ -339,11 +359,11 @@ export function AuditLogViewer({ userId }: AuditLogViewerProps) {
                       <div>
                         <label className="text-xs font-semibold text-gray-600">Attestation Quote</label>
                         <div className="flex items-center gap-2">
-                          <div className="font-mono text-xs bg-yellow-50 p-2 rounded border border-yellow-200 break-all flex-1 max-h-32 overflow-y-auto">
+                          <div className="font-mono text-xs text-gray-900 bg-yellow-50 p-2 rounded border border-yellow-200 break-all flex-1 max-h-32 overflow-y-auto">
                             {log.attestationQuote.substring(0, 200)}...
                             <details className="mt-2">
                               <summary className="cursor-pointer text-blue-600 hover:text-blue-800">Show full quote</summary>
-                              <div className="mt-2">{log.attestationQuote}</div>
+                              <div className="mt-2 text-gray-900">{log.attestationQuote}</div>
                             </details>
                           </div>
                           <button
@@ -361,7 +381,7 @@ export function AuditLogViewer({ userId }: AuditLogViewerProps) {
                       {log.attestationChecksum && (
                         <div>
                           <label className="text-xs font-semibold text-gray-600">Attestation Checksum</label>
-                          <p className="font-mono text-xs bg-gray-50 p-2 rounded border break-all">
+                          <p className="font-mono text-xs text-gray-900 bg-gray-50 p-2 rounded border border-gray-300 break-all">
                             {log.attestationChecksum}
                           </p>
                         </div>
@@ -415,7 +435,7 @@ export function AuditLogViewer({ userId }: AuditLogViewerProps) {
                   {log.applicationData && (
                     <div>
                       <label className="text-xs font-semibold text-gray-600">Application Data</label>
-                      <pre className="text-xs bg-white p-2 rounded border overflow-x-auto">
+                      <pre className="text-xs text-gray-900 bg-white p-2 rounded border border-gray-300 overflow-x-auto">
                         {JSON.stringify(log.applicationData, null, 2)}
                       </pre>
                     </div>
