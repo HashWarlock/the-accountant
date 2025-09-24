@@ -2,55 +2,46 @@
 # Startup script for production deployment
 # Ensures database migrations are applied before starting the app
 
-echo "🚀 Starting The Accountant v1.5.3..."
+echo "🚀 Starting The Accountant v1.5.6..."
 
-# Debug: Show environment
-echo "📝 Database URL: ${DATABASE_URL}"
-echo "📝 Current directory: $(pwd)"
-echo "📝 Directory contents:"
-ls -la
+echo "📝 Database URL configured"
+echo "📝 Working directory: $(pwd)"
 
-# Check if migrations exist
-echo "📝 Checking for migration files..."
-if [ -d "prisma/migrations" ]; then
-  echo "✅ Migration directory exists"
-  ls -la prisma/migrations/
-else
-  echo "❌ Migration directory not found!"
-fi
+# Wait for PostgreSQL to be ready
+echo "⏳ Waiting for database to be ready..."
+for i in $(seq 1 30); do
+  if npx prisma db pull --print 2>/dev/null | grep -q "User"; then
+    echo "✅ Database is ready"
+    break
+  fi
+  if [ $i -eq 30 ]; then
+    echo "⚠️ Database might not be ready, continuing anyway..."
+  fi
+  sleep 1
+done
 
 # Generate Prisma client
 echo "🔧 Generating Prisma client..."
 npx prisma generate
 
-# Apply database migrations
+# Try to apply migrations first
 echo "📊 Applying database migrations..."
-npx prisma migrate deploy
-
-# Check if migrations succeeded
-if [ $? -ne 0 ]; then
-  echo "❌ Failed to apply database migrations"
-
-  # Try to create tables directly as fallback
-  echo "🔧 Attempting to push schema directly..."
-  npx prisma db push --skip-generate
-
-  if [ $? -ne 0 ]; then
+if npx prisma migrate deploy 2>/dev/null; then
+  echo "✅ Migrations applied successfully"
+else
+  echo "⚠️ Migrations failed or don't exist, pushing schema directly..."
+  # Push the schema to create tables
+  if npx prisma db push --skip-generate; then
+    echo "✅ Database schema created successfully"
+  else
     echo "❌ Failed to create database schema"
     exit 1
   fi
 fi
 
-echo "✅ Database setup completed successfully"
-
-# Create cache directory if it doesn't exist (as root)
-mkdir -p /app/.next/cache
-mkdir -p /app/.next/cache/images
-chown -R nextjs:nodejs /app/.next
-chmod -R 755 /app/.next/cache
-
-# Switch to nextjs user for running the app
-echo "👤 Switching to nextjs user..."
+# Verify tables exist
+echo "🔍 Verifying database tables..."
+npx prisma db pull --print | grep -E "(User|AuditLog)" && echo "✅ Tables verified"
 
 # Start the Next.js application as nextjs user
 echo "🌐 Starting Next.js server..."

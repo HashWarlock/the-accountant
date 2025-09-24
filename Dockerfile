@@ -70,10 +70,10 @@ COPY --from=deps --chown=nextjs:nodejs /app/node_modules ./node_modules
 COPY --chown=nextjs:nodejs scripts/startup.sh ./startup.sh
 RUN chmod +x ./startup.sh
 
-# Ensure proper permissions for runtime directories
-RUN chown -R nextjs:nodejs /app && \
-    mkdir -p /app/.next/cache && \
-    chown -R nextjs:nodejs /app/.next
+# Create necessary directories and set permissions
+RUN mkdir -p /app/.next/cache/images /app/.next/cache/fetch /app/prisma && \
+    chown -R nextjs:nodejs /app && \
+    chmod -R 755 /app/.next
 
 # Set environment variables
 ENV NODE_ENV production
