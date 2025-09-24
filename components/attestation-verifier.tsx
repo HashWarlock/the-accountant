@@ -180,13 +180,13 @@ export function AttestationVerifier() {
                 {result.verified ? 'Quote Verified' : 'Verification Failed'}
               </CardTitle>
             </div>
-            <CardDescription>{result.message}</CardDescription>
+            <CardDescription className="text-gray-700">{result.message}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
 
-            <div className="bg-muted/50 rounded-lg p-4">
-                <h4 className="font-semibold mb-3">Verification Details</h4>
-                
+            <div className="bg-gray-100 rounded-lg p-4">
+                <h4 className="font-semibold mb-3 text-gray-900">Verification Details</h4>
+
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="text-xs text-gray-600">Trust Level</label>
@@ -197,31 +197,31 @@ export function AttestationVerifier() {
 
                   <div>
                     <label className="text-xs text-gray-600">TEE Type</label>
-                    <p className="text-sm font-medium">{result.details.teeType}</p>
+                    <p className="text-sm font-medium text-gray-900">{result.details.teeType}</p>
                   </div>
 
                   <div>
                     <label className="text-xs text-gray-600">Quote Status</label>
-                    <p className="text-sm font-medium">{result.details.quoteStatus}</p>
+                    <p className="text-sm font-medium text-gray-900">{result.details.quoteStatus}</p>
                   </div>
 
                   <div>
                     <label className="text-xs text-gray-600">Signature</label>
-                    <p className="text-sm font-medium">
+                    <p className="text-sm font-medium text-gray-900">
                       {result.details.signatureValid ? '✅ Valid' : '❌ Invalid'}
                     </p>
                   </div>
 
                   <div>
                     <label className="text-xs text-gray-600">Timestamp</label>
-                    <p className="text-sm font-medium">
+                    <p className="text-sm font-medium text-gray-900">
                       {new Date(result.details.timestamp).toLocaleString()}
                     </p>
                   </div>
 
                   <div>
                     <label className="text-xs text-gray-600">Freshness</label>
-                    <p className="text-sm font-medium">
+                    <p className="text-sm font-medium text-gray-900">
                       {result.details.isRecent ? '✅ Recent' : '⚠️ Stale'}
                     </p>
                   </div>
@@ -243,7 +243,7 @@ export function AttestationVerifier() {
                 </div>
 
                 <details className="mt-4">
-                  <summary className="cursor-pointer text-sm font-medium">TEE Measurements</summary>
+                  <summary className="cursor-pointer text-sm font-medium text-gray-900">TEE Measurements</summary>
                   <div className="mt-2 space-y-2">
                     <div>
                       <label className="text-xs text-gray-600">MR Enclave</label>

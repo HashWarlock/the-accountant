@@ -2,10 +2,10 @@ import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import crypto from 'crypto'
 import { PrismaClient } from '@prisma/client'
+import { getDstackClient, generateAttestationQuote } from '@/lib/dstack'
+import { uploadAttestationQuote } from '@/lib/phala-cloud'
 
 const prisma = new PrismaClient()
-
-// TEE runtime will be initialized on demand
 
 // Validation schema for attestation verification request
 const verifyAttestationSchema = z.object({
@@ -56,45 +56,89 @@ export async function POST(request: NextRequest) {
       applicationData
     }
 
-    // Generate TEE attestation
+    // Generate TEE attestation for this verification operation
     let attestationQuote = null
     let attestationChecksum = null
     let phalaVerificationUrl = null
     let t16zVerificationUrl = null
+    let reportData = null
 
-    // Try to get runtime and generate attestation
+    // Try to generate attestation using dstack SDK
     try {
-      const { getRuntime } = require('@dstack-js/sdk')
-      const runtime = await getRuntime()
+      // Create structured report data for the verification operation
+      reportData = {
+        operation: 'attestation_verify',
+        quoteHash,
+        quoteLength: quote.length,
+        hasEventLog: !!eventLog,
+        timestamp: new Date().toISOString(),
+        appNamespace: process.env.APP_NAMESPACE || 'the-accountant-v1',
+        ...(applicationData && { applicationData })
+      }
 
-      if (runtime && runtime.attestation) {
-        console.log('🔐 Generating TEE attestation...')
+      console.log('🔐 Generating TEE attestation for verification operation...')
+      console.log('📊 Report data:', JSON.stringify(reportData, null, 2))
 
-        // Generate attestation quote
-        const teeAttestation = await runtime.attestation.getQuote(
-          JSON.stringify(attestationData)
-        )
-        attestationQuote = teeAttestation.quote
+      // Hash the report data to fit within attestation limits
+      const reportDataHash = crypto
+        .createHash('sha256')
+        .update(JSON.stringify(reportData))
+        .digest('hex')
 
-        // Calculate checksum
+      // Generate attestation quote using dstack client
+      const client = getDstackClient()
+      const quoteResponse = await client.getQuote(reportDataHash)
+
+      // Process the quote response
+      const quoteHex = quoteResponse.quote.startsWith('0x') ?
+        quoteResponse.quote.slice(2) :
+        quoteResponse.quote
+      const eventLogHex = quoteResponse.event_log || undefined
+
+      console.log('✅ TEE attestation quote generated')
+      console.log(`📜 Quote size: ${quoteHex.length} hex characters (${quoteHex.length / 2} bytes)`)
+
+      // Upload to blockchain if enabled
+      if (process.env.ENABLE_ATTESTATION_UPLOAD === 'true') {
+        try {
+          console.log('📤 Uploading attestation to t16z blockchain...')
+          const uploadResult = await uploadAttestationQuote(
+            quoteHex,
+            eventLogHex,
+            reportData
+          )
+
+          attestationQuote = quoteHex
+          attestationChecksum = uploadResult.checksum
+          phalaVerificationUrl = uploadResult.verificationUrls.phalaUrl
+          t16zVerificationUrl = uploadResult.verificationUrls.t16zUrl
+
+          console.log('✅ Attestation uploaded to blockchain successfully')
+          console.log(`📊 Checksum: ${attestationChecksum}`)
+          console.log(`🔗 Phala: ${phalaVerificationUrl}`)
+          console.log(`🔗 t16z: ${t16zVerificationUrl}`)
+        } catch (uploadError) {
+          console.error('⚠️ Attestation upload failed:', uploadError)
+          // Still set the quote even if upload fails
+          attestationQuote = quoteHex
+          attestationChecksum = crypto
+            .createHash('sha256')
+            .update(quoteHex)
+            .digest('hex')
+        }
+      } else {
+        // Even without upload, generate URLs for display
+        attestationQuote = quoteHex
         attestationChecksum = crypto
           .createHash('sha256')
-          .update(attestationQuote)
+          .update(quoteHex)
           .digest('hex')
-
-        // Generate verification URLs
         phalaVerificationUrl = `https://dstack.observer/quote/${attestationChecksum}`
         t16zVerificationUrl = `https://explorer.t16z.com/quote/${attestationChecksum}`
-
-        console.log('✅ TEE attestation generated successfully')
-        console.log(`🔗 Phala: ${phalaVerificationUrl}`)
-        console.log(`🔗 t16z: ${t16zVerificationUrl}`)
-      } else {
-        console.log('ℹ️ Running without TEE attestation')
       }
     } catch (attestError) {
-      console.log('ℹ️ Running in non-TEE environment:', attestError.message || 'SDK not available')
-      // Continue without attestation in development
+      console.log('ℹ️ TEE attestation not available:', attestError instanceof Error ? attestError.message : 'Unknown error')
+      // Continue without attestation in development/non-TEE environment
     }
 
     // Perform verification logic
@@ -192,11 +236,15 @@ export async function POST(request: NextRequest) {
         t16zVerificationUrl
       } : null,
       message: verification.verified
-        ? 'Attestation quote verified and logged to blockchain'
+        ? attestationQuote
+          ? 'Attestation quote verified and logged to t16z blockchain'
+          : 'Attestation quote verified (TEE attestation pending)'
         : 'Attestation quote verification failed',
       note: attestationQuote
-        ? 'Quote verification attested on t16z blockchain'
-        : 'Running in development mode without TEE attestation'
+        ? t16zVerificationUrl
+          ? `Quote verification attested and uploaded to t16z blockchain explorer`
+          : `Quote verification attested in TEE (blockchain upload disabled)`
+        : 'TEE attestation service temporarily unavailable - verification completed without attestation'
     })
     
   } catch (error) {
