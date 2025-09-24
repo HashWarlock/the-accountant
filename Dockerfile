@@ -28,6 +28,8 @@ WORKDIR /app
 # Copy dependencies from deps stage
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
+# Ensure prisma directory with migrations is included
+COPY prisma ./prisma
 
 # Generate Prisma client
 RUN npx prisma generate
@@ -58,7 +60,7 @@ COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 # Copy public assets
 COPY --from=builder --chown=nextjs:nodejs /app/public ./public
-# Copy Prisma files with correct ownership
+# Copy Prisma files with correct ownership (including migrations)
 COPY --from=builder --chown=nextjs:nodejs /app/prisma ./prisma
 COPY --from=builder --chown=nextjs:nodejs /app/node_modules/.prisma ./node_modules/.prisma
 COPY --from=builder --chown=nextjs:nodejs /app/node_modules/@prisma ./node_modules/@prisma
@@ -69,7 +71,9 @@ COPY --chown=nextjs:nodejs scripts/startup.sh ./startup.sh
 RUN chmod +x ./startup.sh
 
 # Ensure proper permissions for runtime directories
-RUN chown -R nextjs:nodejs /app
+RUN chown -R nextjs:nodejs /app && \
+    mkdir -p /app/.next/cache && \
+    chown -R nextjs:nodejs /app/.next
 
 # Set environment variables
 ENV NODE_ENV production
@@ -82,8 +86,8 @@ ENV APP_NAMESPACE "the-accountant-v1"
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
   CMD node -e "require('http').get('http://localhost:3000/api/health', (r) => r.statusCode === 200 ? process.exit(0) : process.exit(1))"
 
-# Switch to non-root user
-USER nextjs
+# Don't switch to non-root user yet - startup script needs root for permissions
+# USER nextjs
 
 # Expose port
 EXPOSE 3000

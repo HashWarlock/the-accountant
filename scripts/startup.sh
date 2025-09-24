@@ -43,10 +43,15 @@ fi
 
 echo "✅ Database setup completed successfully"
 
-# Create cache directory if it doesn't exist
+# Create cache directory if it doesn't exist (as root)
 mkdir -p /app/.next/cache
-chown -R nextjs:nodejs /app/.next/cache
+mkdir -p /app/.next/cache/images
+chown -R nextjs:nodejs /app/.next
+chmod -R 755 /app/.next/cache
 
-# Start the Next.js application
+# Switch to nextjs user for running the app
+echo "👤 Switching to nextjs user..."
+
+# Start the Next.js application as nextjs user
 echo "🌐 Starting Next.js server..."
-exec node server.js
+exec su -s /bin/sh nextjs -c "node server.js"
