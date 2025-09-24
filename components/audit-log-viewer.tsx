@@ -179,7 +179,14 @@ export function AuditLogViewer({ userId }: AuditLogViewerProps) {
           </h2>
           <div className="flex gap-2">
             <button
-              onClick={() => router.back()}
+              onClick={() => {
+                // If we're in a route, go back, otherwise go to search
+                if (window.location.pathname.includes('/audit/')) {
+                  router.push('/audit')
+                } else {
+                  router.back()
+                }
+              }}
               className="px-3 py-1.5 border border-gray-300 rounded-lg hover:bg-gray-100 flex items-center gap-1.5 text-gray-700 transition-colors"
             >
               <ArrowLeft className="h-4 w-4" />

@@ -152,7 +152,7 @@ export default function Home() {
                       <div className="flex space-x-3 max-w-sm mx-auto">
                         <Input
                           placeholder="Enter User ID"
-                          className="flex-1 h-12"
+                          className="flex-1 h-12 text-gray-900 bg-white border-phala-g08/30 focus:border-phala-lime"
                           onKeyDown={(e) => {
                             if (e.key === "Enter" && e.currentTarget.value) {
                               setCurrentUserId(e.currentTarget.value);
