@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Clock, Shield, Copy, ChevronDown, ChevronUp, Download, Filter, ArrowLeft, Home } from 'lucide-react'
+import { Clock, Shield, Copy, ChevronDown, ChevronUp, Download, Filter, Search } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 
 interface AuditLog {
@@ -179,25 +179,11 @@ export function AuditLogViewer({ userId }: AuditLogViewerProps) {
           </h2>
           <div className="flex gap-2">
             <button
-              onClick={() => {
-                // If we're in a route, go back, otherwise go to search
-                if (window.location.pathname.includes('/audit/')) {
-                  router.push('/audit')
-                } else {
-                  router.back()
-                }
-              }}
-              className="px-3 py-1.5 border border-gray-300 rounded-lg hover:bg-gray-100 flex items-center gap-1.5 text-gray-700 transition-colors"
+              onClick={() => router.push('/audit')}
+              className="px-3 py-1.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center gap-1.5 transition-colors"
             >
-              <ArrowLeft className="h-4 w-4" />
-              Back
-            </button>
-            <button
-              onClick={() => router.push('/')}
-              className="px-3 py-1.5 border border-gray-300 rounded-lg hover:bg-gray-100 flex items-center gap-1.5 text-gray-700 transition-colors"
-            >
-              <Home className="h-4 w-4" />
-              Home
+              <Search className="h-4 w-4" />
+              Search Another User
             </button>
           </div>
         </div>
@@ -243,9 +229,11 @@ export function AuditLogViewer({ userId }: AuditLogViewerProps) {
           </div>
         </div>
         
-        <p className="text-sm text-gray-600">
-          Found {filteredLogs.length} audit log{filteredLogs.length !== 1 ? 's' : ''} for user: <span className="font-mono font-semibold">{userId}</span>
-        </p>
+        <div className="flex items-center justify-between">
+          <p className="text-sm text-gray-600">
+            Found {filteredLogs.length} audit log{filteredLogs.length !== 1 ? 's' : ''} for user: <span className="font-mono font-semibold bg-blue-100 text-blue-800 px-2 py-1 rounded">{userId}</span>
+          </p>
+        </div>
       </div>
 
       {filteredLogs.length === 0 ? (
