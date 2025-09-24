@@ -11,6 +11,7 @@ import { Shield, CheckCircle, XCircle, Info, Copy, FileText, Loader2 } from 'luc
 interface VerificationResult {
   verified: boolean
   trustLevel: string
+  quoteHash?: string
   details: {
     teeType: string
     quoteStatus: string
@@ -28,6 +29,12 @@ interface VerificationResult {
     }
     timestamp: string
     isRecent: boolean
+  }
+  attestation?: {
+    quote: string
+    checksum: string
+    phalaVerificationUrl: string
+    t16zVerificationUrl: string
   }
   message: string
   note: string
@@ -269,6 +276,57 @@ export function AttestationVerifier() {
                   </div>
                 </details>
               </div>
+
+              {result.attestation && (
+                <div className="p-4 bg-green-50 border border-green-200 rounded-lg space-y-3">
+                  <div className="flex items-center gap-2 text-green-800">
+                    <Shield className="h-5 w-5" />
+                    <h4 className="font-semibold">Blockchain Attestation</h4>
+                  </div>
+
+                  <div>
+                    <label className="text-xs text-gray-600">Quote Hash</label>
+                    <div className="flex items-center gap-2">
+                      <p className="font-mono text-xs text-gray-900 break-all bg-white p-2 rounded border flex-1">
+                        {result.quoteHash}
+                      </p>
+                      <button
+                        onClick={() => copyToClipboard(result.quoteHash || '', 'Quote Hash')}
+                        className="text-gray-400 hover:text-gray-600"
+                      >
+                        <Copy className="h-4 w-4" />
+                      </button>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="text-xs text-gray-600">Attestation Checksum</label>
+                    <p className="font-mono text-xs text-gray-900 break-all bg-white p-2 rounded border">
+                      {result.attestation.checksum}
+                    </p>
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="text-xs text-gray-600">Verification Links</label>
+                    <a
+                      href={result.attestation.phalaVerificationUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="block text-sm text-blue-600 hover:text-blue-800 underline"
+                    >
+                      🔗 Verify on Phala Cloud →
+                    </a>
+                    <a
+                      href={result.attestation.t16zVerificationUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="block text-sm text-blue-600 hover:text-blue-800 underline"
+                    >
+                      🔍 Verify on t16z Explorer →
+                    </a>
+                  </div>
+                </div>
+              )}
 
               {result.note && (
                 <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
