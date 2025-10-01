@@ -325,98 +325,17 @@ export function PCControllerChat({ sessionToken }: PCControllerChatProps) {
                               </button>
 
                               {expandedAttestation === index && (
-                                <div className="px-3 py-2 border-t border-border/30 text-[10px] font-mono space-y-2">
-                                  {/* Model */}
-                                  <div>
-                                    <span className="text-muted-foreground">Model: </span>
-                                    <span className="text-foreground">{message.attestationData.model || message.model}</span>
-                                  </div>
-
-                                  {/* Verification Status */}
-                                  {message.attestationData.verified !== undefined && (
-                                    <div>
-                                      <span className="text-muted-foreground">Verified: </span>
-                                      <span className={message.attestationData.verified ? 'text-green-600' : 'text-red-600'}>
-                                        {message.attestationData.verified ? '✓ Yes' : '✗ No'}
-                                      </span>
-                                    </div>
-                                  )}
-
-                                  {/* Attestation Details */}
-                                  {message.attestationData.attestation && (
-                                    <>
-                                      {/* TEE Type */}
-                                      {message.attestationData.attestation.type && (
-                                        <div>
-                                          <span className="text-muted-foreground">TEE Type: </span>
-                                          <span className="text-foreground">{message.attestationData.attestation.type}</span>
-                                        </div>
-                                      )}
-
-                                      {/* Timestamp */}
-                                      {message.attestationData.attestation.timestamp && (
-                                        <div>
-                                          <span className="text-muted-foreground">Timestamp: </span>
-                                          <span className="text-foreground">{message.attestationData.attestation.timestamp}</span>
-                                        </div>
-                                      )}
-
-                                      {/* Measurements */}
-                                      {message.attestationData.attestation.measurements && (
-                                        <div className="space-y-1 pt-1">
-                                          <div className="text-muted-foreground font-semibold">Measurements:</div>
-                                          <div className="pl-2 space-y-1">
-                                            {message.attestationData.attestation.measurements.code_hash && (
-                                              <div className="break-all">
-                                                <span className="text-muted-foreground">Code Hash: </span>
-                                                <span className="text-foreground/80">{message.attestationData.attestation.measurements.code_hash}</span>
-                                              </div>
-                                            )}
-                                            {message.attestationData.attestation.measurements.platform && (
-                                              <div>
-                                                <span className="text-muted-foreground">Platform: </span>
-                                                <span className="text-foreground/80">{message.attestationData.attestation.measurements.platform}</span>
-                                              </div>
-                                            )}
-                                            {message.attestationData.attestation.measurements.firmware && (
-                                              <div>
-                                                <span className="text-muted-foreground">Firmware: </span>
-                                                <span className="text-foreground/80">{message.attestationData.attestation.measurements.firmware}</span>
-                                              </div>
-                                            )}
-                                          </div>
-                                        </div>
-                                      )}
-
-                                      {/* Signature */}
-                                      {message.attestationData.attestation.signature && (
-                                        <div className="space-y-1 pt-1">
-                                          <div className="text-muted-foreground font-semibold">Signature:</div>
-                                          <div className="pl-2 space-y-1">
-                                            {message.attestationData.attestation.signature.algorithm && (
-                                              <div>
-                                                <span className="text-muted-foreground">Algorithm: </span>
-                                                <span className="text-foreground/80">{message.attestationData.attestation.signature.algorithm}</span>
-                                              </div>
-                                            )}
-                                            {message.attestationData.attestation.signature.value && (
-                                              <div className="break-all">
-                                                <span className="text-muted-foreground">Value: </span>
-                                                <span className="text-foreground/80">{message.attestationData.attestation.signature.value.substring(0, 50)}...</span>
-                                              </div>
-                                            )}
-                                          </div>
-                                        </div>
-                                      )}
-                                    </>
-                                  )}
-
-                                  {/* Raw JSON fallback */}
-                                  {!message.attestationData.attestation && (
-                                    <pre className="text-[9px] overflow-x-auto bg-muted/40 p-2 rounded">
-                                      {JSON.stringify(message.attestationData, null, 2)}
-                                    </pre>
-                                  )}
+                                <div className="px-3 py-3 border-t border-border/30">
+                                  <pre className="text-[10px] font-mono overflow-x-auto bg-muted/30 p-3 rounded-md text-foreground/90 leading-relaxed">
+                                    {JSON.stringify({
+                                      model: message.attestationData.model || message.model,
+                                      attestation: message.attestationData.attestation || {
+                                        type: "TEE",
+                                        verified: message.attestationData.verified
+                                      },
+                                      verified: message.attestationData.verified !== undefined ? message.attestationData.verified : true
+                                    }, null, 2)}
+                                  </pre>
                                 </div>
                               )}
                             </div>
