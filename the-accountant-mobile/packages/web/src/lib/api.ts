@@ -1,4 +1,5 @@
-const API_BASE_URL = 'http://localhost:4000'
+// Use relative URLs so Vite proxy handles routing
+const API_BASE_URL = ''
 
 export interface SignupRequest {
   email: string

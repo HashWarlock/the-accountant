@@ -19,7 +19,25 @@ export default defineConfig({
     },
   },
   server: {
-    port: 8081,
-    allowedHosts: [],
+    host: '0.0.0.0',
+    port: 8000,
+    allowedHosts: [
+      '4de94f417a058019d264f85343647589458fdc91-8000.dstack-pha-prod9.phala.network',
+      '.dstack-pha-prod9.phala.network',
+    ],
+    proxy: {
+      '/api': {
+        target: 'http://localhost:4000',
+        changeOrigin: true,
+        configure: (proxy, options) => {
+          proxy.on('proxyReq', (proxyReq, req, res) => {
+            // Preserve the original host for WebAuthn
+            if (req.headers.host) {
+              proxyReq.setHeader('x-forwarded-host', req.headers.host);
+            }
+          });
+        },
+      },
+    },
   },
 })

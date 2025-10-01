@@ -8,7 +8,8 @@ import type {
   PublicKeyCredentialRequestOptionsJSON,
 } from '@simplewebauthn/browser'
 
-const API_BASE_URL = 'http://localhost:4000'
+// Use relative URLs so Vite proxy handles routing
+const API_BASE_URL = ''
 
 interface RegisterBeginResponse {
   challenge: string
@@ -75,17 +76,22 @@ export function usePasskey() {
 
       if (!beginResponse.ok) {
         const error = await beginResponse.json()
+        if (error.code === 'PASSKEY_ALREADY_REGISTERED') {
+          throw new Error('This user already has a passkey registered. Please use "Login with Passkey" instead.')
+        }
         throw new Error(error.error || 'Failed to initiate passkey registration')
       }
 
-      const options = (await beginResponse.json()) as PublicKeyCredentialCreationOptionsJSON
+      const optionsJSON = (await beginResponse.json()) as PublicKeyCredentialCreationOptionsJSON
+      console.log('[Passkey Debug] Registration options received:', optionsJSON)
 
       // Step 2: Create credential using WebAuthn
       let credential
       try {
-        credential = await startRegistration(options)
+        credential = await startRegistration({ optionsJSON })
       } catch (error) {
         console.error('WebAuthn registration error:', error)
+        console.error('[Passkey Debug] Options that failed:', optionsJSON)
         throw new Error('Failed to create passkey. Make sure your device supports passkeys.')
       }
 
@@ -128,12 +134,12 @@ export function usePasskey() {
         throw new Error(error.error || 'Failed to initiate passkey authentication')
       }
 
-      const options = (await beginResponse.json()) as PublicKeyCredentialRequestOptionsJSON
+      const optionsJSON = (await beginResponse.json()) as PublicKeyCredentialRequestOptionsJSON
 
       // Step 2: Get credential using WebAuthn
       let credential
       try {
-        credential = await startAuthentication(options)
+        credential = await startAuthentication({ optionsJSON })
       } catch (error) {
         console.error('WebAuthn authentication error:', error)
         throw new Error('Failed to authenticate with passkey. Please try again.')

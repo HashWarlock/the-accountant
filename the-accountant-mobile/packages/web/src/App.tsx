@@ -1,415 +1,243 @@
 import { useState } from 'react'
-import { useWallet } from './hooks/useWallet'
-import { Button } from './components/ui/button'
-import { Input } from './components/ui/input'
-import { Textarea } from './components/ui/textarea'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './components/ui/card'
-import { Badge } from './components/ui/badge'
-import { TruncatedAddress } from './components/truncated-address'
-import { CopyButton } from './components/copy-button'
-import { PasskeyCard } from './components/passkey-card'
-import { ExternalLink, Loader2, Shield, Key, Lock } from 'lucide-react'
 import { motion } from 'framer-motion'
+import { WalletManager } from './components/wallet-manager'
+import { NetworkSwitcher, type NetworkConfig, NETWORKS } from './components/network-switcher'
+import { SignMessageCard } from './components/sign-message-card'
+import { MintTokensCard } from './components/mint-tokens-card'
+import { ArrowLeft } from 'lucide-react'
+import { Button } from './components/ui/button'
+
+const API_BASE_URL = ''
 
 function App() {
-  const {
-    signup,
-    signMessage,
-    verifySignature,
-    disconnect,
-    isSigningUp,
-    isSigning,
-    isVerifying,
-    signupData,
-    signData,
-    verifyData,
-  } = useWallet()
+  const [walletAddress, setWalletAddress] = useState<string | null>(null)
+  const [userId, setUserId] = useState<string | null>(null)
+  const [sessionToken, setSessionToken] = useState<string | null>(null)
+  const [currentNetwork, setCurrentNetwork] = useState<NetworkConfig>(NETWORKS[0])
+  const [currentView, setCurrentView] = useState<'home' | 'sign' | 'mint'>('home')
 
-  const [email, setEmail] = useState('')
-  const [userId, setUserId] = useState('')
-  const [message, setMessage] = useState('Hello from The Accountant Mobile in TEE')
-  const [verifyMessage, setVerifyMessage] = useState('')
-  const [verifySignatureInput, setVerifySignatureInput] = useState('')
-  const [verifyUserId, setVerifyUserId] = useState('')
-
-  const handleSignup = async (e: React.FormEvent) => {
-    e.preventDefault()
-    await signup({ email, userId })
+  const handlePasskeySuccess = (data: { userId: string; email: string; walletAddress: string }) => {
+    setWalletAddress(data.walletAddress)
+    setUserId(data.userId)
+    // Session token would be set from the passkey auth response
+    console.log('Passkey auth successful:', data)
   }
 
-  const handleSign = async (e: React.FormEvent) => {
-    e.preventDefault()
-    await signMessage(message)
+  const handleDisconnect = () => {
+    setWalletAddress(null)
+    setUserId(null)
+    setSessionToken(null)
+    setCurrentView('home')
   }
 
-  const handleVerify = async (e: React.FormEvent) => {
-    e.preventDefault()
-    await verifySignature({
-      message: verifyMessage,
-      signature: verifySignatureInput,
-      userId: verifyUserId,
+  const handleSignMessage = async (message: string): Promise<{ signature: string; address: string }> => {
+    if (!userId) throw new Error('No user ID')
+
+    const response = await fetch(`${API_BASE_URL}/api/wallet/sign`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(sessionToken && { 'Authorization': `Bearer ${sessionToken}` }),
+      },
+      body: JSON.stringify({ userId, message }),
+    })
+
+    if (!response.ok) {
+      throw new Error('Failed to sign message')
+    }
+
+    const data = await response.json()
+    return {
+      signature: data.signature,
+      address: walletAddress!,
+    }
+  }
+
+  const handleMintTokens = async (contractAddress: string, amount: number): Promise<{ hash: string }> => {
+    // This would interact with the contract via the backend
+    // For now, simulate a successful transaction
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        resolve({
+          hash: '0x' + Math.random().toString(16).substring(2, 66),
+        })
+      }, 2000)
     })
   }
 
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1,
-      },
-    },
-  }
+  const ActionView = () => {
+    if (currentView === 'sign' && walletAddress) {
+      return (
+        <div className="space-y-6">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setCurrentView('home')}
+            className="mb-2"
+          >
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Back
+          </Button>
+          <SignMessageCard onSign={handleSignMessage} walletAddress={walletAddress} />
+        </div>
+      )
+    }
 
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: { duration: 0.4 },
-    },
+    if (currentView === 'mint' && walletAddress) {
+      return (
+        <div className="space-y-6">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setCurrentView('home')}
+            className="mb-2"
+          >
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Back
+          </Button>
+          <MintTokensCard onMint={handleMintTokens} network={currentNetwork} />
+        </div>
+      )
+    }
+
+    // Home view - show action buttons
+    return (
+      <div className="space-y-3 md:space-y-4">
+        <h2 className="text-lg md:text-xl font-semibold">Actions</h2>
+        <div className="grid gap-3 md:gap-4">
+          <Button
+            variant="outline"
+            className="justify-start h-auto p-3 md:p-4 w-full"
+            onClick={() => setCurrentView('sign')}
+            disabled={!walletAddress}
+          >
+            <div className="text-left w-full">
+              <div className="font-semibold text-sm md:text-base">📝 Sign Message</div>
+              <p className="text-xs text-muted-foreground mt-1 hidden md:block">
+                Sign arbitrary messages to prove ownership of your wallet
+              </p>
+            </div>
+          </Button>
+
+          <Button
+            variant="outline"
+            className="justify-start h-auto p-3 md:p-4 w-full"
+            onClick={() => setCurrentView('mint')}
+            disabled={!walletAddress}
+          >
+            <div className="text-left w-full">
+              <div className="font-semibold text-sm md:text-base">🪙 Mint Tokens</div>
+              <p className="text-xs text-muted-foreground mt-1 hidden md:block">
+                Mint new tokens to your wallet address. This will create new tokens and add them to your balance.
+              </p>
+            </div>
+          </Button>
+
+          <Button
+            variant="outline"
+            className="justify-start h-auto p-3 md:p-4 w-full"
+            disabled={!walletAddress}
+          >
+            <div className="text-left w-full">
+              <div className="font-semibold text-sm md:text-base">🔄 Switch Networks</div>
+              <p className="text-xs text-muted-foreground mt-1">
+                Currently on {currentNetwork.name}
+              </p>
+            </div>
+          </Button>
+        </div>
+      </div>
+    )
   }
 
   return (
-    <div className="min-h-screen bg-background text-foreground p-4 md:p-8">
-      <div className="max-w-6xl mx-auto">
-        {/* Hero Section */}
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="text-center mb-12"
-        >
-          <h1 className="text-4xl md:text-5xl font-bold text-primary mb-4">
-            The Accountant
-          </h1>
-          <p className="text-muted-foreground text-lg">
-            TEE-backed deterministic key management with hardware-level security
-          </p>
-        </motion.div>
+    <div className="min-h-screen bg-background text-foreground">
+      {/* Header */}
+      <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-4 py-3 md:py-4 flex items-center justify-between">
+          <div className="flex items-center gap-2 md:gap-3">
+            <div className="h-8 w-8 md:h-10 md:w-10 rounded-lg bg-primary/10 flex items-center justify-center">
+              <span className="text-xl md:text-2xl">📊</span>
+            </div>
+            <div>
+              <h1 className="text-lg md:text-xl font-bold">
+                The Accountant
+              </h1>
+            </div>
+          </div>
+          <div className="flex items-center gap-3 md:gap-4">
+            <a
+              href="https://dstack.phala.network"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-xs md:text-sm text-muted-foreground hover:text-foreground"
+            >
+              dstack
+            </a>
+            <a
+              href="https://github.com/Phala-Network"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-xs md:text-sm text-muted-foreground hover:text-foreground"
+            >
+              GitHub
+            </a>
+          </div>
+        </div>
+      </header>
 
-        {/* User Info Section */}
-        {signupData && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="mb-8"
-          >
-            <Card>
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <div>
-                    <CardTitle className="text-primary">Connected Wallet</CardTitle>
-                    <CardDescription className="mt-2">
-                      User ID: <span className="font-mono">{signupData.user.userId}</span>
-                    </CardDescription>
-                  </div>
-                  <Button variant="outline" size="sm" onClick={disconnect}>
-                    Disconnect
-                  </Button>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  <div>
-                    <p className="text-sm text-muted-foreground mb-1">Address</p>
-                    <TruncatedAddress address={signupData.user.address} />
-                  </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground mb-1">Email</p>
-                    <p className="text-sm">{signupData.user.email}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground mb-1">TEE Attestation</p>
-                    <a
-                      href={signupData.attestation.verificationUrls.t16z}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-primary text-sm hover:underline inline-flex items-center gap-1"
-                    >
-                      View on t16z <ExternalLink className="h-3 w-3" />
-                    </a>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </motion.div>
-        )}
+      {/* Main Content */}
+      <div className="max-w-7xl mx-auto px-4 py-4 md:py-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
+          {/* Left Column - Wallet & Network */}
+          <div className="space-y-4 md:space-y-6">
+            <WalletManager
+              walletAddress={walletAddress}
+              onDisconnect={handleDisconnect}
+              onPasskeySuccess={handlePasskeySuccess}
+            />
 
-        <motion.div
-          variants={containerVariants}
-          initial="hidden"
-          animate="visible"
-          className="grid grid-cols-1 md:grid-cols-2 gap-6"
-        >
-          {/* Passkey Login Card */}
-          {!signupData && (
-            <motion.div variants={itemVariants}>
-              <PasskeyCard
-                onSuccess={(data) => {
-                  console.log('Passkey auth success:', data)
-                  // User is now authenticated with passkey
-                }}
+            {walletAddress && (
+              <NetworkSwitcher
+                onNetworkChange={setCurrentNetwork}
+                currentNetwork={currentNetwork}
               />
+            )}
+          </div>
+
+          {/* Middle/Right Column - Actions */}
+          <div className="lg:col-span-2">
+            <motion.div
+              key={currentView}
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              transition={{ duration: 0.2 }}
+            >
+              <ActionView />
             </motion.div>
-          )}
-
-          {/* Wallet Creation Card */}
-          {!signupData && (
-            <motion.div variants={itemVariants}>
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Key className="h-5 w-5 text-primary" />
-                    Create Wallet
-                  </CardTitle>
-                  <CardDescription>
-                    Create a new TEE-backed wallet with deterministic key derivation
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <form onSubmit={handleSignup} className="space-y-4">
-                    <div>
-                      <label className="text-sm font-medium mb-2 block">Email</label>
-                      <Input
-                        type="email"
-                        placeholder="your@email.com"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        required
-                      />
-                    </div>
-                    <div>
-                      <label className="text-sm font-medium mb-2 block">User ID</label>
-                      <Input
-                        type="text"
-                        placeholder="unique-user-id"
-                        value={userId}
-                        onChange={(e) => setUserId(e.target.value)}
-                        required
-                      />
-                      <p className="text-xs text-muted-foreground mt-1">
-                        Same user ID always generates the same wallet
-                      </p>
-                    </div>
-                    <Button type="submit" className="w-full" disabled={isSigningUp}>
-                      {isSigningUp ? (
-                        <>
-                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                          Creating Wallet...
-                        </>
-                      ) : (
-                        'Create Wallet'
-                      )}
-                    </Button>
-                  </form>
-                </CardContent>
-              </Card>
-            </motion.div>
-          )}
-
-          {/* Sign Message Card */}
-          {signupData && (
-            <motion.div variants={itemVariants}>
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Lock className="h-5 w-5 text-primary" />
-                    Sign Message
-                  </CardTitle>
-                  <CardDescription>
-                    Sign a message with your TEE-backed private key
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <form onSubmit={handleSign} className="space-y-4">
-                    <div>
-                      <label className="text-sm font-medium mb-2 block">Message</label>
-                      <Textarea
-                        placeholder="Enter message to sign..."
-                        value={message}
-                        onChange={(e) => setMessage(e.target.value)}
-                        required
-                        rows={3}
-                      />
-                    </div>
-                    <Button type="submit" className="w-full" disabled={isSigning}>
-                      {isSigning ? (
-                        <>
-                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                          Signing...
-                        </>
-                      ) : (
-                        'Sign Message'
-                      )}
-                    </Button>
-                  </form>
-
-                  {signData && (
-                    <motion.div
-                      initial={{ opacity: 0, height: 0 }}
-                      animate={{ opacity: 1, height: 'auto' }}
-                      className="mt-4 space-y-3 pt-4 border-t border-border"
-                    >
-                      <div>
-                        <p className="text-sm text-muted-foreground mb-1">Signature</p>
-                        <div className="flex items-center gap-2">
-                          <code className="text-xs bg-card p-2 rounded flex-1 overflow-x-auto">
-                            {signData.signature.slice(0, 20)}...
-                          </code>
-                          <CopyButton text={signData.signature} />
-                        </div>
-                      </div>
-                      <div>
-                        <p className="text-sm text-muted-foreground mb-1">Timestamp</p>
-                        <p className="text-sm font-mono">{new Date(signData.timestamp).toLocaleString()}</p>
-                      </div>
-                      <div>
-                        <p className="text-sm text-muted-foreground mb-1">TEE Attestation</p>
-                        <a
-                          href={signData.attestation.verificationUrls.t16z}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-primary text-sm hover:underline inline-flex items-center gap-1"
-                        >
-                          View on t16z <ExternalLink className="h-3 w-3" />
-                        </a>
-                      </div>
-                    </motion.div>
-                  )}
-                </CardContent>
-              </Card>
-            </motion.div>
-          )}
-
-          {/* Verify Signature Card */}
-          <motion.div variants={itemVariants}>
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Shield className="h-5 w-5 text-primary" />
-                  Verify Signature
-                </CardTitle>
-                <CardDescription>
-                  Verify a signature and recover the signer's address
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <form onSubmit={handleVerify} className="space-y-4">
-                  <div>
-                    <label className="text-sm font-medium mb-2 block">Message</label>
-                    <Textarea
-                      placeholder="Original message..."
-                      value={verifyMessage}
-                      onChange={(e) => setVerifyMessage(e.target.value)}
-                      required
-                      rows={2}
-                    />
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium mb-2 block">Signature</label>
-                    <Input
-                      type="text"
-                      placeholder="0x..."
-                      value={verifySignatureInput}
-                      onChange={(e) => setVerifySignatureInput(e.target.value)}
-                      required
-                    />
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium mb-2 block">User ID</label>
-                    <Input
-                      type="text"
-                      placeholder="user-id"
-                      value={verifyUserId}
-                      onChange={(e) => setVerifyUserId(e.target.value)}
-                      required
-                    />
-                  </div>
-                  <Button type="submit" className="w-full" disabled={isVerifying}>
-                    {isVerifying ? (
-                      <>
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        Verifying...
-                      </>
-                    ) : (
-                      'Verify Signature'
-                    )}
-                  </Button>
-                </form>
-
-                {verifyData && (
-                  <motion.div
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: 'auto' }}
-                    className="mt-4 space-y-3 pt-4 border-t border-border"
-                  >
-                    <div className="flex items-center gap-2">
-                      <Badge variant={verifyData.valid ? 'success' : 'destructive'}>
-                        {verifyData.valid ? '✓ Valid' : '✗ Invalid'}
-                      </Badge>
-                    </div>
-                    {verifyData.valid && (
-                      <>
-                        <div>
-                          <p className="text-sm text-muted-foreground mb-1">Recovered Address</p>
-                          <TruncatedAddress address={verifyData.recoveredAddress} />
-                        </div>
-                        <div>
-                          <p className="text-sm text-muted-foreground mb-1">User Address</p>
-                          <TruncatedAddress address={verifyData.user.address} />
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <p className="text-sm text-green-500">
-                            ✓ Addresses match - Signature is authentic!
-                          </p>
-                        </div>
-                      </>
-                    )}
-                  </motion.div>
-                )}
-              </CardContent>
-            </Card>
-          </motion.div>
-
-          {/* Features Card */}
-          <motion.div variants={itemVariants}>
-            <Card>
-              <CardHeader>
-                <CardTitle>Key Features</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div>
-                  <h3 className="font-semibold text-primary mb-1 flex items-center gap-2">
-                    <Shield className="h-4 w-4" />
-                    TEE-Backed Security
-                  </h3>
-                  <p className="text-sm text-muted-foreground">
-                    Keys derived in Trusted Execution Environment with Intel TDX attestation
-                  </p>
-                </div>
-                <div>
-                  <h3 className="font-semibold text-primary mb-1 flex items-center gap-2">
-                    <Key className="h-4 w-4" />
-                    Deterministic Wallets
-                  </h3>
-                  <p className="text-sm text-muted-foreground">
-                    Same user ID always generates the same wallet address
-                  </p>
-                </div>
-                <div>
-                  <h3 className="font-semibold text-primary mb-1 flex items-center gap-2">
-                    <Lock className="h-4 w-4" />
-                    Remote Attestation
-                  </h3>
-                  <p className="text-sm text-muted-foreground">
-                    Verifiable proof of TEE execution with blockchain verification
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
-          </motion.div>
-        </motion.div>
+          </div>
+        </div>
       </div>
+
+      {/* Footer */}
+      <footer className="mt-8 md:mt-16 border-t border-border bg-card/30 backdrop-blur-sm">
+        <div className="max-w-7xl mx-auto px-4 py-6 md:py-8">
+          <div className="flex flex-col items-center justify-center gap-2">
+            <div className="text-xs md:text-sm text-muted-foreground text-center">
+              Powered by{' '}
+              <a
+                href="https://phala.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-primary hover:underline"
+              >
+                🔒 Phala Cloud
+              </a>
+            </div>
+          </div>
+        </div>
+      </footer>
     </div>
   )
 }

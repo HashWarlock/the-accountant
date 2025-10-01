@@ -12,7 +12,7 @@ import type {
   VerifyAuthenticationResponseOpts,
 } from '@simplewebauthn/server'
 import jwt from 'jsonwebtoken'
-import { deriveAddress } from '@phala/dstack-sdk'
+import { createWallet } from '../lib/wallet.js'
 
 const router = Router()
 
@@ -37,10 +37,31 @@ const passkeys = new Map<string, PasskeyCredential>()
 const challenges = new Map<string, Challenge>()
 const userPasskeys = new Map<string, string[]>() // userId -> credentialIds[]
 
-// RP (Relying Party) configuration
+// RP (Relying Party) configuration - dynamically set based on request
 const rpName = 'The Accountant'
-const rpID = 'localhost'
-const origin = `http://${rpID}:8081`
+
+function getRPConfig(req: Request) {
+  // Check x-forwarded-host first (from Vite proxy), then host header
+  const forwardedHost = req.get('x-forwarded-host')
+  const host = forwardedHost || req.get('host') || 'localhost:8000'
+  const hostname = host.split(':')[0]
+
+  console.log('[Passkey] Host detection:', { host, forwardedHost, originalHost: req.get('host') })
+
+  // For dstack domains, use the full subdomain as rpID
+  if (hostname.includes('dstack-pha-prod9.phala.network')) {
+    return {
+      rpID: hostname, // Use the full subdomain for WebAuthn
+      origin: `https://${host}`
+    }
+  }
+
+  // For localhost
+  return {
+    rpID: 'localhost',
+    origin: `http://${host}`
+  }
+}
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-this'
 
@@ -66,8 +87,18 @@ router.post('/register/begin', async (req: Request, res: Response) => {
       return res.status(400).json({ error: 'userId and email are required' })
     }
 
-    // Get existing credentials for this user (if any)
+    // Check if user already has passkeys registered
     const userCredentialIds = userPasskeys.get(userId) || []
+    if (userCredentialIds.length > 0) {
+      return res.status(409).json({
+        error: 'User already has a passkey registered. Please use "Login with Passkey" instead.',
+        code: 'PASSKEY_ALREADY_REGISTERED'
+      })
+    }
+
+    const { rpID, origin } = getRPConfig(req)
+
+    // Get existing credentials for this user (if any)
     const excludeCredentials = userCredentialIds.map((id) => ({
       id: id,
       type: 'public-key' as const,
@@ -76,7 +107,7 @@ router.post('/register/begin', async (req: Request, res: Response) => {
     const options = await generateRegistrationOptions({
       rpName,
       rpID,
-      userID: userId,
+      userID: new TextEncoder().encode(userId),
       userName: email,
       userDisplayName: email,
       attestationType: 'none',
@@ -108,15 +139,17 @@ router.post('/register/begin', async (req: Request, res: Response) => {
  */
 router.post('/register/complete', async (req: Request, res: Response) => {
   try {
-    const { userId, email, credential } = req.body
+    const { userId, email, credential: credentialResponse } = req.body
 
-    if (!userId || !email || !credential) {
+    if (!userId || !email || !credentialResponse) {
       return res.status(400).json({ error: 'userId, email, and credential are required' })
     }
 
+    const { rpID, origin } = getRPConfig(req)
+
     // Verify the challenge exists
-    const expectedChallenge = challenges.get(credential.response.clientDataJSON ?
-      JSON.parse(Buffer.from(credential.response.clientDataJSON, 'base64').toString()).challenge :
+    const expectedChallenge = challenges.get(credentialResponse.response.clientDataJSON ?
+      JSON.parse(Buffer.from(credentialResponse.response.clientDataJSON, 'base64').toString()).challenge :
       '')
 
     if (!expectedChallenge || expectedChallenge.userId !== userId) {
@@ -124,7 +157,7 @@ router.post('/register/complete', async (req: Request, res: Response) => {
     }
 
     const verification = await verifyRegistrationResponse({
-      response: credential,
+      response: credentialResponse,
       expectedChallenge: expectedChallenge.challenge,
       expectedOrigin: origin,
       expectedRPID: rpID,
@@ -134,17 +167,18 @@ router.post('/register/complete', async (req: Request, res: Response) => {
       return res.status(400).json({ error: 'Passkey verification failed' })
     }
 
-    const { credentialID, credentialPublicKey, counter } = verification.registrationInfo
+    const { credential } = verification.registrationInfo
 
-    // Derive wallet address from userId (deterministic)
-    const walletAddress = await deriveAddress(userId, 0)
+    // Create wallet for user (deterministic from userId)
+    const wallet = await createWallet(userId)
+    const walletAddress = wallet.address
 
     // Store the passkey
-    const credentialIdStr = Buffer.from(credentialID).toString('base64')
-    passkeys.set(credentialIdStr, {
-      id: credentialIdStr,
-      publicKey: credentialPublicKey,
-      counter,
+    // In v11, credential.id is already base64url encoded
+    passkeys.set(credential.id, {
+      id: credential.id,
+      publicKey: credential.publicKey,
+      counter: credential.counter,
       userId,
       email,
       walletAddress,
@@ -152,7 +186,7 @@ router.post('/register/complete', async (req: Request, res: Response) => {
 
     // Update user's passkey list
     const userCreds = userPasskeys.get(userId) || []
-    userCreds.push(credentialIdStr)
+    userCreds.push(credential.id)
     userPasskeys.set(userId, userCreds)
 
     // Clean up challenge
@@ -169,7 +203,7 @@ router.post('/register/complete', async (req: Request, res: Response) => {
       success: true,
       walletAddress,
       sessionToken,
-      credentialId: credentialIdStr,
+      credentialId: credential.id,
     })
   } catch (error) {
     console.error('Error completing registration:', error)
@@ -184,6 +218,8 @@ router.post('/register/complete', async (req: Request, res: Response) => {
 router.post('/auth/begin', async (req: Request, res: Response) => {
   try {
     const { email } = req.body
+
+    const { rpID, origin } = getRPConfig(req)
 
     // Find all credentials for this email
     const allCreds = Array.from(passkeys.values())
@@ -230,8 +266,10 @@ router.post('/auth/complete', async (req: Request, res: Response) => {
       return res.status(400).json({ error: 'credential is required' })
     }
 
-    const credentialIdStr = Buffer.from(credential.id, 'base64').toString('base64')
-    const passkey = passkeys.get(credentialIdStr)
+    const { rpID, origin } = getRPConfig(req)
+
+    // In v11, credential.id is already base64url encoded
+    const passkey = passkeys.get(credential.id)
 
     if (!passkey) {
       return res.status(404).json({ error: 'Passkey not found' })
@@ -252,9 +290,9 @@ router.post('/auth/complete', async (req: Request, res: Response) => {
       expectedChallenge: expectedChallenge.challenge,
       expectedOrigin: origin,
       expectedRPID: rpID,
-      authenticator: {
-        credentialID: Buffer.from(passkey.id, 'base64'),
-        credentialPublicKey: passkey.publicKey,
+      credential: {
+        id: passkey.id,
+        publicKey: passkey.publicKey,
         counter: passkey.counter,
       },
     })

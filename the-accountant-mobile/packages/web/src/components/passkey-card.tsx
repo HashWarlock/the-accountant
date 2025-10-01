@@ -15,6 +15,7 @@ export function PasskeyCard({ onSuccess }: PasskeyCardProps) {
   const [mode, setMode] = useState<'choice' | 'register' | 'login'>('choice')
   const [email, setEmail] = useState('')
   const [userId, setUserId] = useState('')
+  const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
   const {
     registerPasskey,
@@ -34,6 +35,7 @@ export function PasskeyCard({ onSuccess }: PasskeyCardProps) {
     e.preventDefault()
     if (!email || !userId) return
 
+    setErrorMessage(null)
     try {
       const result = await registerPasskey({ userId, email })
       if (onSuccess) {
@@ -45,6 +47,16 @@ export function PasskeyCard({ onSuccess }: PasskeyCardProps) {
       }
     } catch (error) {
       console.error('Registration failed:', error)
+      const message = error instanceof Error ? error.message : 'Registration failed'
+      setErrorMessage(message)
+
+      // If the error is about passkey already registered, switch to login mode
+      if (message.includes('already has a passkey registered')) {
+        setTimeout(() => {
+          setMode('login')
+          setErrorMessage(null)
+        }, 3000)
+      }
     }
   }
 
@@ -52,6 +64,7 @@ export function PasskeyCard({ onSuccess }: PasskeyCardProps) {
     e.preventDefault()
     if (!email) return
 
+    setErrorMessage(null)
     try {
       const result = await authenticatePasskey({ email })
       if (onSuccess) {
@@ -63,6 +76,8 @@ export function PasskeyCard({ onSuccess }: PasskeyCardProps) {
       }
     } catch (error) {
       console.error('Authentication failed:', error)
+      const message = error instanceof Error ? error.message : 'Authentication failed'
+      setErrorMessage(message)
     }
   }
 
@@ -245,11 +260,11 @@ export function PasskeyCard({ onSuccess }: PasskeyCardProps) {
               </p>
             </div>
 
-            {registerError && (
+            {(registerError || errorMessage) && (
               <div className="flex items-center gap-2 p-3 bg-destructive/10 border border-destructive/20 rounded-md">
                 <AlertCircle className="w-4 h-4 text-destructive" />
                 <p className="text-sm text-destructive">
-                  {registerError instanceof Error ? registerError.message : 'Registration failed'}
+                  {errorMessage || (registerError instanceof Error ? registerError.message : 'Registration failed')}
                 </p>
               </div>
             )}
@@ -317,11 +332,11 @@ export function PasskeyCard({ onSuccess }: PasskeyCardProps) {
             />
           </div>
 
-          {authError && (
+          {(authError || errorMessage) && (
             <div className="flex items-center gap-2 p-3 bg-destructive/10 border border-destructive/20 rounded-md">
               <AlertCircle className="w-4 h-4 text-destructive" />
               <p className="text-sm text-destructive">
-                {authError instanceof Error ? authError.message : 'Authentication failed'}
+                {errorMessage || (authError instanceof Error ? authError.message : 'Authentication failed')}
               </p>
             </div>
           )}
