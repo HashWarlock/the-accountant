@@ -1,4 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
+import { ChevronDown, ChevronRight } from 'lucide-react'
+import ReactMarkdown from 'react-markdown'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card'
 import { Button } from './ui/button'
 import { Input } from './ui/input'
@@ -6,13 +8,17 @@ import { Label } from './ui/label'
 import { Textarea } from './ui/textarea'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs'
 import { TerminalComponent } from './terminal'
-import { Loader2, Send, Settings, Terminal as TerminalIcon } from 'lucide-react'
+import { Loader2, Send, Settings, Terminal as TerminalIcon, Shield } from 'lucide-react'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select'
 
 interface Message {
   role: 'user' | 'assistant' | 'system'
   content: string
   timestamp: Date
   toolCalls?: ToolCall[]
+  attestationUrl?: string
+  attestationData?: any
+  model?: string
 }
 
 interface ToolCall {
@@ -30,9 +36,13 @@ export function PCControllerChat({ sessionToken }: PCControllerChatProps) {
   const [pcUrl, setPcUrl] = useState('http://localhost:8000')
   const [username, setUsername] = useState('admin')
   const [password, setPassword] = useState('admin123')
+  const [aiProvider, setAiProvider] = useState<'redpill' | 'anthropic'>('redpill')
+  const [aiModel, setAiModel] = useState('phala/deepseek-chat-v3-0324')
   const [messages, setMessages] = useState<Message[]>([])
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
+  const [showSettings, setShowSettings] = useState(false)
+  const [expandedAttestation, setExpandedAttestation] = useState<number | null>(null)
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
   const scrollToBottom = () => {
@@ -69,6 +79,8 @@ export function PCControllerChat({ sessionToken }: PCControllerChatProps) {
           pcUrl,
           username,
           password,
+          aiProvider,
+          aiModel,
           history: messages.map((m) => ({
             role: m.role,
             content: m.content,
@@ -87,6 +99,9 @@ export function PCControllerChat({ sessionToken }: PCControllerChatProps) {
         content: data.response,
         timestamp: new Date(),
         toolCalls: data.toolCalls,
+        attestationUrl: data.attestationUrl,
+        attestationData: data.attestationData,
+        model: aiModel,
       }
 
       setMessages((prev) => [...prev, assistantMessage])
@@ -109,158 +124,367 @@ export function PCControllerChat({ sessionToken }: PCControllerChatProps) {
     }
   }
 
+  const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setInput(e.target.value)
+    // Auto-resize textarea
+    e.target.style.height = 'auto'
+    e.target.style.height = Math.min(e.target.scrollHeight, 200) + 'px'
+  }
+
   return (
-    <Card className="w-full max-w-4xl mx-auto">
-      <CardHeader className="pb-3">
-        <CardTitle>PC Controller Chat</CardTitle>
-        <CardDescription>Chat with AI to control your development environment</CardDescription>
+    <Card className="w-full max-w-4xl mx-auto border-0 shadow-none">
+      <CardHeader className="pb-2 px-4">
+        <CardTitle className="text-lg">PC Controller</CardTitle>
+        <CardDescription className="text-xs">AI-powered development environment control</CardDescription>
       </CardHeader>
       <CardContent className="p-0">
         <Tabs defaultValue="chat" className="w-full">
-          <div className="px-6 pb-3">
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="chat">Chat</TabsTrigger>
-              <TabsTrigger value="terminal">
+          <div className="px-4 pb-2">
+            <TabsList className="grid w-full grid-cols-2 bg-muted/50">
+              <TabsTrigger value="chat" className="text-sm">Chat</TabsTrigger>
+              <TabsTrigger value="terminal" className="text-sm">
                 <TerminalIcon className="h-4 w-4 mr-2" />
                 Terminal
               </TabsTrigger>
             </TabsList>
           </div>
 
-          <TabsContent value="chat" className="mt-0 space-y-4">
-            {/* Settings Section */}
-            <div className="px-4 py-3 border-y bg-muted/30 space-y-2">
-              <div className="space-y-1.5">
-                <Label htmlFor="pc-url" className="text-xs font-medium text-muted-foreground flex items-center gap-1.5">
-                  <Settings className="h-3 w-3" />
-                  PC URL
-                </Label>
-                <Input
-                  id="pc-url"
-                  value={pcUrl}
-                  onChange={(e) => setPcUrl(e.target.value)}
-                  placeholder="https://sandbox-url.phala.network"
-                  className="h-8 text-xs"
-                />
-              </div>
-              <div className="grid grid-cols-2 gap-2">
-                <div className="space-y-1.5">
-                  <Label htmlFor="chat-username" className="text-xs font-medium text-muted-foreground">
-                    Username
-                  </Label>
-                  <Input
-                    id="chat-username"
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
-                    placeholder="admin"
-                    className="h-8 text-xs"
-                  />
-                </div>
-                <div className="space-y-1.5">
-                  <Label htmlFor="chat-password" className="text-xs font-medium text-muted-foreground">
-                    Password
-                  </Label>
-                  <Input
-                    id="chat-password"
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder="admin123"
-                    className="h-8 text-xs"
-                  />
-                </div>
-              </div>
+          <TabsContent value="chat" className="mt-0">
+            {/* Settings Toggle */}
+            <div className="px-4 py-2.5 border-b bg-muted/10">
+              <button
+                onClick={() => setShowSettings(!showSettings)}
+                className="flex items-center gap-2 text-xs text-muted-foreground hover:text-foreground w-full transition-colors"
+              >
+                <Settings className="h-3.5 w-3.5" />
+                <span className="font-medium">Settings</span>
+                <span className="ml-auto text-[10px] font-mono">{showSettings ? '▼' : '▶'}</span>
+              </button>
             </div>
 
+            {/* Settings Section - Collapsible */}
+            {showSettings && (
+              <div className="px-4 py-3 border-b bg-muted/20 space-y-3">
+                <div className="space-y-1.5">
+                  <Label className="text-[11px] font-medium text-muted-foreground">
+                    AI Provider
+                  </Label>
+                  <Select
+                    value={aiProvider}
+                    onValueChange={(value: 'redpill' | 'anthropic') => {
+                      setAiProvider(value)
+                      // Set default model for provider
+                      if (value === 'redpill') {
+                        setAiModel('phala/deepseek-chat-v3-0324')
+                      } else {
+                        setAiModel('claude-3-5-sonnet-20241022')
+                      }
+                    }}
+                  >
+                    <SelectTrigger className="h-9 text-sm">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="redpill">
+                        <div className="flex items-center gap-2">
+                          <Shield className="h-3 w-3 text-green-600" />
+                          <span>Redpill (Confidential)</span>
+                        </div>
+                      </SelectItem>
+                      <SelectItem value="anthropic">Anthropic (Direct)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-1.5">
+                  <Label className="text-[11px] font-medium text-muted-foreground">
+                    {aiProvider === 'redpill' ? 'Model (TEE-Protected)' : 'Model'}
+                  </Label>
+                  <Select value={aiModel} onValueChange={setAiModel}>
+                    <SelectTrigger className="h-9 text-sm">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {aiProvider === 'redpill' ? (
+                        <>
+                          <SelectItem value="phala/deepseek-chat-v3-0324">DeepSeek Chat v3 (685B)</SelectItem>
+                          <SelectItem value="phala/gpt-oss-120b">GPT-OSS 120B</SelectItem>
+                          <SelectItem value="phala/gpt-oss-20b">GPT-OSS 20B</SelectItem>
+                          <SelectItem value="phala/qwen2.5-vl-72b-instruct">Qwen2.5 VL 72B</SelectItem>
+                          <SelectItem value="phala/qwen-2.5-7b-instruct">Qwen 2.5 7B</SelectItem>
+                          <SelectItem value="phala/gemma-3-27b-it">Gemma 3 27B</SelectItem>
+                        </>
+                      ) : (
+                        <>
+                          <SelectItem value="claude-3-5-sonnet-20241022">Claude 3.5 Sonnet</SelectItem>
+                          <SelectItem value="claude-3-7-sonnet-20250219">Claude 3.7 Sonnet</SelectItem>
+                          <SelectItem value="claude-3-opus-20240229">Claude 3 Opus</SelectItem>
+                          <SelectItem value="claude-3-haiku-20240307">Claude 3 Haiku</SelectItem>
+                        </>
+                      )}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="pc-url" className="text-[11px] font-medium text-muted-foreground">
+                    PC URL
+                  </Label>
+                  <Input
+                    id="pc-url"
+                    value={pcUrl}
+                    onChange={(e) => setPcUrl(e.target.value)}
+                    placeholder="https://sandbox-url.phala.network"
+                    className="h-9 text-sm"
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="space-y-1.5">
+                    <Label htmlFor="chat-username" className="text-[11px] font-medium text-muted-foreground">
+                      Username
+                    </Label>
+                    <Input
+                      id="chat-username"
+                      value={username}
+                      onChange={(e) => setUsername(e.target.value)}
+                      placeholder="admin"
+                      className="h-9 text-sm"
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label htmlFor="chat-password" className="text-[11px] font-medium text-muted-foreground">
+                      Password
+                    </Label>
+                    <Input
+                      id="chat-password"
+                      type="password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      placeholder="admin123"
+                      className="h-9 text-sm"
+                    />
+                  </div>
+                </div>
+              </div>
+            )}
+
             {/* Messages */}
-            <div className="h-[400px] overflow-y-auto px-6 space-y-4">
+            <div className="h-[500px] overflow-y-auto px-4 py-4 space-y-4 bg-background">
               {messages.length === 0 && (
-                <div className="text-center text-muted-foreground text-sm py-12">
-                  <p className="font-medium">Start a conversation to control your PC</p>
-                  <p className="text-xs mt-2 text-muted-foreground/80">
-                    Try: "List files in the current directory" or "Execute 'ls -la' in terminal"
+                <div className="text-center text-muted-foreground/60 text-sm py-16 px-6">
+                  <p className="text-base font-normal">Start a conversation to control your PC</p>
+                  <p className="text-xs mt-3 text-muted-foreground/50 leading-relaxed">
+                    Try: "What project are we in?" or "List files in the current directory"
                   </p>
                 </div>
               )}
 
               {messages.map((message, index) => (
-                <div
-                  key={index}
-                  className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
-                >
-                  <div
-                    className={`max-w-[90%] sm:max-w-[80%] rounded-2xl px-3 py-2 ${
-                      message.role === 'user'
-                        ? 'bg-primary text-primary-foreground'
-                        : message.role === 'system'
-                        ? 'bg-destructive/10 text-destructive border border-destructive/20'
-                        : 'bg-muted'
-                    }`}
-                  >
-                    <div className="text-sm whitespace-pre-wrap break-words leading-relaxed">
+                <div key={index} className="space-y-2">
+                  {message.role === 'user' && (
+                    <div className="text-sm text-muted-foreground/80 font-normal leading-relaxed">
                       {message.content}
                     </div>
-                    {message.toolCalls && message.toolCalls.length > 0 && (
-                      <div className="mt-2 pt-2 border-t border-border/20 space-y-2">
-                        <div className="text-[10px] font-semibold opacity-60 uppercase tracking-wide">
-                          Executed Commands
-                        </div>
-                        {message.toolCalls.map((call, i) => (
-                          <div key={i} className="bg-background/60 rounded-lg p-2 space-y-1.5">
-                            <div className="flex items-center gap-2">
-                              <span className="text-[10px] font-mono font-bold text-blue-600 dark:text-blue-400 bg-blue-100 dark:bg-blue-900/30 px-1.5 py-0.5 rounded">
-                                {call.tool}
-                              </span>
-                            </div>
-                            {call.result && (
-                              <div className="text-[11px] font-mono text-muted-foreground bg-black/5 dark:bg-white/5 p-2 rounded overflow-x-auto max-h-32 overflow-y-auto leading-relaxed">
-                                {typeof call.result === 'string'
-                                  ? call.result
-                                  : JSON.stringify(call.result, null, 2)}
-                              </div>
-                            )}
-                            {call.error && (
-                              <div className="text-[11px] font-mono text-destructive bg-destructive/10 p-2 rounded">
-                                ⚠️ {call.error}
-                              </div>
-                            )}
+                  )}
+                  {message.role !== 'user' && (
+                    <div className="space-y-3">
+                      {/* Trust Badge */}
+                      {message.attestationUrl && (
+                        <div className="space-y-2">
+                          <div className="flex items-center gap-2">
+                            <a
+                              href={message.attestationUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center gap-1.5 px-2.5 py-1 text-[10px] font-semibold bg-green-500/10 text-green-700 dark:text-green-400 rounded-md border border-green-500/30 hover:bg-green-500/20 transition-colors"
+                            >
+                              <Shield className="h-3 w-3" />
+                              <span>Verified</span>
+                            </a>
+                            <span className="text-[10px] text-muted-foreground">
+                              {message.model?.split('/')[1]?.replace(/-/g, ' ') || 'AI'}
+                            </span>
                           </div>
-                        ))}
+
+                          {/* Expandable Attestation Details */}
+                          {message.attestationData && (
+                            <div className="border border-border/30 rounded-lg overflow-hidden bg-muted/20">
+                              <button
+                                onClick={() => setExpandedAttestation(expandedAttestation === index ? null : index)}
+                                className="w-full flex items-center justify-between px-3 py-2 text-[11px] font-medium text-muted-foreground hover:bg-muted/40 transition-colors"
+                              >
+                                <span className="flex items-center gap-1.5">
+                                  {expandedAttestation === index ? (
+                                    <ChevronDown className="h-3 w-3" />
+                                  ) : (
+                                    <ChevronRight className="h-3 w-3" />
+                                  )}
+                                  Signed Message (Attestation)
+                                </span>
+                                <span className="text-[10px] text-muted-foreground/60">
+                                  {message.attestationData.attestation?.type || 'TEE'}
+                                </span>
+                              </button>
+
+                              {expandedAttestation === index && (
+                                <div className="px-3 py-2 border-t border-border/30 text-[10px] font-mono space-y-2">
+                                  {/* Model */}
+                                  <div>
+                                    <span className="text-muted-foreground">Model: </span>
+                                    <span className="text-foreground">{message.attestationData.model || message.model}</span>
+                                  </div>
+
+                                  {/* Verification Status */}
+                                  {message.attestationData.verified !== undefined && (
+                                    <div>
+                                      <span className="text-muted-foreground">Verified: </span>
+                                      <span className={message.attestationData.verified ? 'text-green-600' : 'text-red-600'}>
+                                        {message.attestationData.verified ? '✓ Yes' : '✗ No'}
+                                      </span>
+                                    </div>
+                                  )}
+
+                                  {/* Attestation Details */}
+                                  {message.attestationData.attestation && (
+                                    <>
+                                      {/* TEE Type */}
+                                      {message.attestationData.attestation.type && (
+                                        <div>
+                                          <span className="text-muted-foreground">TEE Type: </span>
+                                          <span className="text-foreground">{message.attestationData.attestation.type}</span>
+                                        </div>
+                                      )}
+
+                                      {/* Timestamp */}
+                                      {message.attestationData.attestation.timestamp && (
+                                        <div>
+                                          <span className="text-muted-foreground">Timestamp: </span>
+                                          <span className="text-foreground">{message.attestationData.attestation.timestamp}</span>
+                                        </div>
+                                      )}
+
+                                      {/* Measurements */}
+                                      {message.attestationData.attestation.measurements && (
+                                        <div className="space-y-1 pt-1">
+                                          <div className="text-muted-foreground font-semibold">Measurements:</div>
+                                          <div className="pl-2 space-y-1">
+                                            {message.attestationData.attestation.measurements.code_hash && (
+                                              <div className="break-all">
+                                                <span className="text-muted-foreground">Code Hash: </span>
+                                                <span className="text-foreground/80">{message.attestationData.attestation.measurements.code_hash}</span>
+                                              </div>
+                                            )}
+                                            {message.attestationData.attestation.measurements.platform && (
+                                              <div>
+                                                <span className="text-muted-foreground">Platform: </span>
+                                                <span className="text-foreground/80">{message.attestationData.attestation.measurements.platform}</span>
+                                              </div>
+                                            )}
+                                            {message.attestationData.attestation.measurements.firmware && (
+                                              <div>
+                                                <span className="text-muted-foreground">Firmware: </span>
+                                                <span className="text-foreground/80">{message.attestationData.attestation.measurements.firmware}</span>
+                                              </div>
+                                            )}
+                                          </div>
+                                        </div>
+                                      )}
+
+                                      {/* Signature */}
+                                      {message.attestationData.attestation.signature && (
+                                        <div className="space-y-1 pt-1">
+                                          <div className="text-muted-foreground font-semibold">Signature:</div>
+                                          <div className="pl-2 space-y-1">
+                                            {message.attestationData.attestation.signature.algorithm && (
+                                              <div>
+                                                <span className="text-muted-foreground">Algorithm: </span>
+                                                <span className="text-foreground/80">{message.attestationData.attestation.signature.algorithm}</span>
+                                              </div>
+                                            )}
+                                            {message.attestationData.attestation.signature.value && (
+                                              <div className="break-all">
+                                                <span className="text-muted-foreground">Value: </span>
+                                                <span className="text-foreground/80">{message.attestationData.attestation.signature.value.substring(0, 50)}...</span>
+                                              </div>
+                                            )}
+                                          </div>
+                                        </div>
+                                      )}
+                                    </>
+                                  )}
+
+                                  {/* Raw JSON fallback */}
+                                  {!message.attestationData.attestation && (
+                                    <pre className="text-[9px] overflow-x-auto bg-muted/40 p-2 rounded">
+                                      {JSON.stringify(message.attestationData, null, 2)}
+                                    </pre>
+                                  )}
+                                </div>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      )}
+                      <div className="text-sm prose prose-sm dark:prose-invert max-w-none prose-pre:bg-muted/50 prose-pre:text-foreground prose-code:text-foreground">
+                        <ReactMarkdown>{message.content}</ReactMarkdown>
                       </div>
-                    )}
-                    <div className="text-[10px] opacity-40 mt-1.5">
-                      {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+
+                      {/* Tool Call Results */}
+                      {message.toolCalls && message.toolCalls.length > 0 && (
+                        <div className="mt-3 space-y-2 pt-2 border-t border-border/30">
+                          {message.toolCalls.map((call, i) => (
+                            <div key={i} className="space-y-1.5">
+                              {call.result && (
+                                <div className="text-xs font-mono leading-relaxed text-foreground/80 bg-muted/30 p-2.5 rounded-lg overflow-x-auto max-h-64 overflow-y-auto whitespace-pre-wrap">
+                                  {typeof call.result === 'object' && call.result.data?.output
+                                    ? call.result.data.output
+                                    : typeof call.result === 'object' && call.result.data?.content
+                                    ? call.result.data.content
+                                    : typeof call.result === 'string'
+                                    ? call.result
+                                    : JSON.stringify(call.result, null, 2)}
+                                </div>
+                              )}
+                              {call.error && (
+                                <div className="text-xs font-mono text-red-500 dark:text-red-400 bg-red-500/10 p-2.5 rounded-lg border border-red-500/30">
+                                  ✗ {call.error}
+                                </div>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      )}
                     </div>
-                  </div>
+                  )}
                 </div>
               ))}
               <div ref={messagesEndRef} />
             </div>
 
             {/* Input */}
-            <div className="px-4 pb-4 border-t pt-3">
+            <div className="px-4 pb-4 pt-3">
               <div className="flex gap-2 items-end">
-                <Textarea
-                  value={input}
-                  onChange={(e) => setInput(e.target.value)}
-                  onKeyDown={handleKeyDown}
-                  placeholder="Type your message..."
-                  className="resize-none min-h-[60px] text-sm"
-                  rows={2}
-                  disabled={loading}
-                />
-                <Button
-                  onClick={handleSendMessage}
-                  disabled={loading || !input.trim()}
-                  size="icon"
-                  className="h-[60px] w-[60px] rounded-full flex-shrink-0"
-                >
-                  {loading ? (
-                    <Loader2 className="h-5 w-5 animate-spin" />
-                  ) : (
-                    <Send className="h-5 w-5" />
-                  )}
-                </Button>
+                <div className="flex-1 relative">
+                  <Textarea
+                    value={input}
+                    onChange={handleInputChange}
+                    onKeyDown={handleKeyDown}
+                    placeholder="Message..."
+                    className="resize-none min-h-[42px] max-h-[200px] text-sm rounded-xl border border-border/60 px-4 py-3 pr-12 focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:border-primary bg-background shadow-sm transition-all"
+                    rows={1}
+                    disabled={loading}
+                  />
+                  <Button
+                    onClick={handleSendMessage}
+                    disabled={loading || !input.trim()}
+                    size="icon"
+                    className="absolute bottom-2 right-2 h-[32px] w-[32px] rounded-lg"
+                  >
+                    {loading ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <Send className="h-4 w-4" />
+                    )}
+                  </Button>
+                </div>
               </div>
             </div>
           </TabsContent>

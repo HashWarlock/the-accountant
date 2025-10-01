@@ -31,6 +31,8 @@ interface PCChatRequest {
   history: ChatMessage[]
   username?: string
   password?: string
+  aiProvider?: 'redpill' | 'anthropic'
+  aiModel?: string
 }
 
 // Map tool names to actual PC API endpoints
@@ -51,11 +53,23 @@ function getApiEndpoint(toolName: string): string {
  */
 router.post('/chat', async (req: Request, res: Response) => {
   try {
-    const { message, pcUrl, history = [], username, password }: PCChatRequest = req.body
+    const {
+      message,
+      pcUrl,
+      history = [],
+      username,
+      password,
+      aiProvider = 'redpill',
+      aiModel,
+    }: PCChatRequest = req.body
 
     if (!message || !pcUrl) {
       return res.status(400).json({ error: 'message and pcUrl are required' })
     }
+
+    // Set default model based on provider
+    const selectedModel =
+      aiModel || (aiProvider === 'redpill' ? 'phala/deepseek-chat-v3-0324' : 'claude-3-5-sonnet-20241022')
 
     // Prepare auth headers if credentials provided
     const authHeaders: Record<string, string> = { 'Content-Type': 'application/json' }
@@ -66,8 +80,10 @@ router.post('/chat', async (req: Request, res: Response) => {
 
     const toolCalls: any[] = []
     let response = ''
+    let attestationUrl: string | undefined
+    let attestationData: any = undefined
 
-    // Use Redpill AI (TEE-protected) if available
+    // Use Redpill AI (TEE-protected) if selected
     if (aiProvider === 'redpill' && redpill) {
       try {
         // Define tools in OpenAI format for Redpill
@@ -97,12 +113,12 @@ router.post('/chat', async (req: Request, res: Response) => {
               parameters: {
                 type: 'object',
                 properties: {
-                  path: {
+                  file: {
                     type: 'string',
                     description: 'The path to the file to read',
                   },
                 },
-                required: ['path'],
+                required: ['file'],
               },
             },
           },
@@ -114,7 +130,7 @@ router.post('/chat', async (req: Request, res: Response) => {
               parameters: {
                 type: 'object',
                 properties: {
-                  path: {
+                  file: {
                     type: 'string',
                     description: 'The path to the file to write',
                   },
@@ -123,7 +139,7 @@ router.post('/chat', async (req: Request, res: Response) => {
                     description: 'The content to write to the file',
                   },
                 },
-                required: ['path', 'content'],
+                required: ['file', 'content'],
               },
             },
           },
@@ -157,10 +173,26 @@ router.post('/chat', async (req: Request, res: Response) => {
           },
         ]
 
-        const systemPrompt = `You are a helpful AI assistant that can control a development environment.
-The target PC is accessible at: ${pcUrl}
+        const systemPrompt = `You are an AI assistant for controlling a development environment at ${pcUrl}.
 
-Use the available tools to help the user accomplish their tasks. Be clear and concise in your responses.`
+RESPONSE FORMAT:
+- Lead with key findings or status
+- Use bullet points for lists
+- Include relevant technical details (file paths, line numbers, error codes)
+- Show actual output when it's concise and relevant
+- Be direct - engineers want facts, not fluff
+
+EXAMPLES:
+
+Good: "Found 3 TypeScript errors:
+• src/app.ts:42 - Type 'string' not assignable to 'number'
+• src/utils.ts:15 - Missing return type
+• tests/api.test.ts:89 - Unused variable 'result'"
+
+Good: "Server running on port 3000.
+Logs show 2 warnings about deprecated dependencies."
+
+Bad: "I've checked the server and it seems to be working well! Everything looks good!"`
 
         const redpillMessages: OpenAI.ChatCompletionMessageParam[] = [
           { role: 'system', content: systemPrompt },
@@ -177,7 +209,7 @@ Use the available tools to help the user accomplish their tasks. Be clear and co
         ]
 
         const completion = await redpill.chat.completions.create({
-          model: 'anthropic/claude-3-5-sonnet-20241022',
+          model: selectedModel,
           messages: redpillMessages,
           tools,
           tool_choice: 'auto',
@@ -191,8 +223,10 @@ Use the available tools to help the user accomplish their tasks. Be clear and co
             response = assistantMessage.content
           }
 
-          // Extract tool calls
+          // Extract tool calls and execute them
           if (assistantMessage.tool_calls) {
+            const toolResults: any[] = []
+
             for (const toolCall of assistantMessage.tool_calls) {
               const functionName = toolCall.function.name
               const functionArgs = JSON.parse(toolCall.function.arguments)
@@ -226,20 +260,68 @@ Use the available tools to help the user accomplish their tasks. Be clear and co
                   params: functionArgs,
                   result,
                 })
+
+                toolResults.push({
+                  tool_call_id: toolCall.id,
+                  role: 'tool' as const,
+                  name: functionName,
+                  content: JSON.stringify(result),
+                })
               } catch (error) {
                 console.error(`[PC API] Error:`, error)
+                const errorMsg = error instanceof Error ? error.message : 'Unknown error'
                 toolCalls.push({
                   tool: functionName,
                   params: functionArgs,
-                  error: error instanceof Error ? error.message : 'Unknown error',
+                  error: errorMsg,
+                })
+
+                toolResults.push({
+                  tool_call_id: toolCall.id,
+                  role: 'tool' as const,
+                  name: functionName,
+                  content: `Error: ${errorMsg}`,
                 })
               }
             }
-          }
 
-          if (!response && toolCalls.length > 0) {
-            response = `I executed ${toolCalls.length} tool(s) for you. Check the results below.`
+            // If there were tool calls, send results back to AI for interpretation
+            if (toolResults.length > 0) {
+              const followUpMessages: OpenAI.ChatCompletionMessageParam[] = [
+                ...redpillMessages,
+                {
+                  role: 'assistant',
+                  content: assistantMessage.content,
+                  tool_calls: assistantMessage.tool_calls,
+                },
+                ...toolResults,
+              ]
+
+              const followUpCompletion = await redpill.chat.completions.create({
+                model: selectedModel,
+                messages: followUpMessages,
+              })
+
+              // Use the AI's interpretation of the tool results
+              response = followUpCompletion.choices[0]?.message?.content || response
+            }
           }
+        }
+
+        // Fetch attestation report for the model
+        try {
+          const attestationResponse = await fetch(
+            `https://api.redpill.ai/v1/attestation/report?model=${encodeURIComponent(selectedModel)}`
+          )
+          if (attestationResponse.ok) {
+            attestationData = await attestationResponse.json()
+            attestationUrl =
+              attestationData.url ||
+              `https://api.redpill.ai/v1/attestation/report?model=${encodeURIComponent(selectedModel)}`
+          }
+        } catch (attestationError) {
+          console.warn('Failed to fetch attestation report:', attestationError)
+          // Non-critical, continue without attestation
         }
       } catch (error) {
         console.error('Redpill API error:', error)
@@ -269,12 +351,12 @@ Use the available tools to help the user accomplish their tasks. Be clear and co
             input_schema: {
               type: 'object',
               properties: {
-                path: {
+                file: {
                   type: 'string',
                   description: 'The path to the file to read',
                 },
               },
-              required: ['path'],
+              required: ['file'],
             },
           },
           {
@@ -283,7 +365,7 @@ Use the available tools to help the user accomplish their tasks. Be clear and co
             input_schema: {
               type: 'object',
               properties: {
-                path: {
+                file: {
                   type: 'string',
                   description: 'The path to the file to write',
                 },
@@ -292,7 +374,7 @@ Use the available tools to help the user accomplish their tasks. Be clear and co
                   description: 'The content to write to the file',
                 },
               },
-              required: ['path', 'content'],
+              required: ['file', 'content'],
             },
           },
           {
@@ -319,10 +401,26 @@ Use the available tools to help the user accomplish their tasks. Be clear and co
           },
         ]
 
-        const systemPrompt = `You are a helpful AI assistant that can control a development environment.
-The target PC is accessible at: ${pcUrl}
+        const systemPrompt = `You are an AI assistant for controlling a development environment at ${pcUrl}.
 
-Use the available tools to help the user accomplish their tasks. Be clear and concise in your responses.`
+RESPONSE FORMAT:
+- Lead with key findings or status
+- Use bullet points for lists
+- Include relevant technical details (file paths, line numbers, error codes)
+- Show actual output when it's concise and relevant
+- Be direct - engineers want facts, not fluff
+
+EXAMPLES:
+
+Good: "Found 3 TypeScript errors:
+• src/app.ts:42 - Type 'string' not assignable to 'number'
+• src/utils.ts:15 - Missing return type
+• tests/api.test.ts:89 - Unused variable 'result'"
+
+Good: "Server running on port 3000.
+Logs show 2 warnings about deprecated dependencies."
+
+Bad: "I've checked the server and it seems to be working well! Everything looks good!"`
 
         const claudeMessages = [
           ...history
@@ -335,7 +433,7 @@ Use the available tools to help the user accomplish their tasks. Be clear and co
         ]
 
         const claudeResponse = await anthropic.messages.create({
-          model: 'claude-3-5-sonnet-20241022',
+          model: selectedModel,
           max_tokens: 1024,
           system: systemPrompt,
           tools,
@@ -343,10 +441,20 @@ Use the available tools to help the user accomplish their tasks. Be clear and co
         })
 
         // Extract response and tool calls
+        const toolUseBlocks: any[] = []
         for (const block of claudeResponse.content) {
           if (block.type === 'text') {
             response += block.text
           } else if (block.type === 'tool_use') {
+            toolUseBlocks.push(block)
+          }
+        }
+
+        // Execute tool calls if any
+        if (toolUseBlocks.length > 0) {
+          const toolResults: any[] = []
+
+          for (const block of toolUseBlocks) {
             // Call the actual PC API endpoint
             try {
               const endpoint = getApiEndpoint(block.name)
@@ -376,19 +484,51 @@ Use the available tools to help the user accomplish their tasks. Be clear and co
                 params: block.input,
                 result,
               })
+
+              toolResults.push({
+                type: 'tool_result' as const,
+                tool_use_id: block.id,
+                content: JSON.stringify(result),
+              })
             } catch (error) {
               console.error(`[PC API] Error:`, error)
+              const errorMsg = error instanceof Error ? error.message : 'Unknown error'
               toolCalls.push({
                 tool: block.name,
                 params: block.input,
-                error: error instanceof Error ? error.message : 'Unknown error',
+                error: errorMsg,
+              })
+
+              toolResults.push({
+                type: 'tool_result' as const,
+                tool_use_id: block.id,
+                content: `Error: ${errorMsg}`,
+                is_error: true,
               })
             }
           }
-        }
 
-        if (!response && toolCalls.length > 0) {
-          response = `I executed ${toolCalls.length} tool(s) for you. Check the results below.`
+          // Send tool results back to Claude for interpretation
+          const followUpMessages = [
+            ...claudeMessages,
+            { role: 'assistant' as const, content: claudeResponse.content },
+            { role: 'user' as const, content: toolResults },
+          ]
+
+          const followUpResponse = await anthropic.messages.create({
+            model: selectedModel,
+            max_tokens: 1024,
+            system: systemPrompt,
+            messages: followUpMessages,
+          })
+
+          // Use Claude's interpretation of the tool results
+          response = ''
+          for (const block of followUpResponse.content) {
+            if (block.type === 'text') {
+              response += block.text
+            }
+          }
         }
       } catch (error) {
         console.error('Anthropic API error:', error)
@@ -435,6 +575,8 @@ The PC would be controlled via: ${pcUrl}`
     res.json({
       response,
       toolCalls,
+      attestationUrl,
+      attestationData,
     })
   } catch (error) {
     console.error('Error in PC chat:', error)

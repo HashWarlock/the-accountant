@@ -163,14 +163,14 @@ function App() {
       try {
         // Import viem dynamically
         const { createPublicClient, http } = await import('viem')
-        const { mainnet, sepolia, polygon, polygonAmoy } = await import('viem/chains')
+        const { mainnet, sepolia, base, baseSepolia } = await import('viem/chains')
 
         // Map network IDs to chains
         const chainMap: Record<number, any> = {
           1: mainnet,
           11155111: sepolia,
-          137: polygon,
-          80002: polygonAmoy,
+          8453: base,
+          84532: baseSepolia,
         }
 
         const chain = chainMap[currentNetwork.chainId] || sepolia
