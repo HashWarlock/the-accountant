@@ -13,6 +13,8 @@ import type {
 } from '@simplewebauthn/server'
 import jwt from 'jsonwebtoken'
 import { createWallet } from '../lib/wallet.js'
+import { generateSessionToken } from '../middleware/auth.js'
+import { prisma } from '../lib/db.js'
 
 const router = Router()
 
@@ -173,6 +175,22 @@ router.post('/register/complete', async (req: Request, res: Response) => {
     const wallet = await createWallet(userId)
     const walletAddress = wallet.address
 
+    // Store user in database
+    await prisma.user.upsert({
+      where: { userId },
+      update: {
+        email,
+        address: walletAddress,
+        pubKeyHex: wallet.publicKey,
+      },
+      create: {
+        userId,
+        email,
+        address: walletAddress,
+        pubKeyHex: wallet.publicKey,
+      },
+    })
+
     // Store the passkey
     // In v11, credential.id is already base64url encoded
     passkeys.set(credential.id, {
@@ -192,15 +210,13 @@ router.post('/register/complete', async (req: Request, res: Response) => {
     // Clean up challenge
     challenges.delete(expectedChallenge.challenge)
 
-    // Generate session token
-    const sessionToken = jwt.sign(
-      { userId, email, walletAddress },
-      JWT_SECRET,
-      { expiresIn: '7d' }
-    )
+    // Generate session token with proper format
+    const sessionToken = generateSessionToken(userId)
 
     res.json({
       success: true,
+      userId,
+      email,
       walletAddress,
       sessionToken,
       credentialId: credential.id,
@@ -307,12 +323,8 @@ router.post('/auth/complete', async (req: Request, res: Response) => {
     // Clean up challenge
     challenges.delete(expectedChallenge.challenge)
 
-    // Generate session token
-    const sessionToken = jwt.sign(
-      { userId: passkey.userId, email: passkey.email, walletAddress: passkey.walletAddress },
-      JWT_SECRET,
-      { expiresIn: '7d' }
-    )
+    // Generate session token with proper format
+    const sessionToken = generateSessionToken(passkey.userId)
 
     res.json({
       success: true,

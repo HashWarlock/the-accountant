@@ -8,6 +8,7 @@ import walletRoutes from './routes/wallet.js';
 import auditRoutes from './routes/audit.js';
 import adminRoutes from './routes/admin.js';
 import passkeyRoutes from './routes/passkey.js';
+import pcRoutes from './routes/pc.js';
 import { prisma } from './lib/db.js';
 import { isTeeAvailable, getTeeInfo } from './lib/dstack.js';
 
@@ -100,6 +101,7 @@ app.use('/api/wallet', walletRoutes);
 app.use('/api/audit', auditRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/passkey', passkeyRoutes);
+app.use('/api/pc', pcRoutes);
 
 // 404 handler
 app.use((req, res) => {
@@ -161,6 +163,17 @@ app.listen(PORT, () => {
       console.warn(`⚠️  TEE not available - using development fallback`);
     }
   });
+
+  // Check AI provider configuration
+  if (process.env.REDPILL_API_KEY) {
+    console.log(`🤖 AI Provider: Redpill AI (TEE-Protected)`);
+    console.log(`🔗 Provider: https://redpill.ai`);
+  } else if (process.env.ANTHROPIC_API_KEY) {
+    console.log(`🤖 AI Provider: Anthropic Claude`);
+  } else {
+    console.log(`⚠️  AI Provider: Not configured (demo mode)`);
+    console.log(`   Set REDPILL_API_KEY or ANTHROPIC_API_KEY to enable LLM chat`);
+  }
 });
 
 export default app;
