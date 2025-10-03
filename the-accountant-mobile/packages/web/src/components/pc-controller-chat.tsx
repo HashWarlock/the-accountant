@@ -19,6 +19,21 @@ interface Message {
   attestationUrl?: string
   attestationData?: any
   model?: string
+  signatureData?: {
+    messageId: string
+    requestHash?: string
+    responseHash?: string
+    signature?: string
+    publicKey?: string
+    signingAddress?: string
+    algorithm?: string
+    curve?: string
+    messageHash?: string
+    timestamp?: string
+    teeInstance?: string
+    model?: string
+    verified?: boolean
+  }
 }
 
 interface ToolCall {
@@ -43,6 +58,8 @@ export function PCControllerChat({ sessionToken }: PCControllerChatProps) {
   const [loading, setLoading] = useState(false)
   const [showSettings, setShowSettings] = useState(false)
   const [expandedAttestation, setExpandedAttestation] = useState<number | null>(null)
+  const [expandedSignature, setExpandedSignature] = useState<number | null>(null)
+  const [expandedToolCalls, setExpandedToolCalls] = useState<number | null>(null)
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
   const scrollToBottom = () => {
@@ -102,6 +119,7 @@ export function PCControllerChat({ sessionToken }: PCControllerChatProps) {
         attestationUrl: data.attestationUrl,
         attestationData: data.attestationData,
         model: aiModel,
+        signatureData: data.signatureData,
       }
 
       setMessages((prev) => [...prev, assistantMessage])
@@ -325,17 +343,62 @@ export function PCControllerChat({ sessionToken }: PCControllerChatProps) {
                               </button>
 
                               {expandedAttestation === index && (
-                                <div className="px-3 py-3 border-t border-border/30">
-                                  <pre className="text-[10px] font-mono overflow-x-auto bg-muted/30 p-3 rounded-md text-foreground/90 leading-relaxed">
-                                    {JSON.stringify({
-                                      model: message.attestationData.model || message.model,
-                                      attestation: message.attestationData.attestation || {
-                                        type: "TEE",
-                                        verified: message.attestationData.verified
-                                      },
-                                      verified: message.attestationData.verified !== undefined ? message.attestationData.verified : true
-                                    }, null, 2)}
-                                  </pre>
+                                <div className="px-3 py-3 border-t border-border/30 space-y-3">
+                                  {/* Model */}
+                                  <div className="space-y-1">
+                                    <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-wide">Model</p>
+                                    <code className="text-[11px] font-mono text-foreground/90 break-all block">
+                                      {message.model || message.attestationData?.model || 'Unknown'}
+                                    </code>
+                                  </div>
+
+                                  {/* Attestation Type */}
+                                  {message.attestationData?.attestation?.type && (
+                                    <div className="space-y-1">
+                                      <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-wide">Type</p>
+                                      <code className="text-[11px] font-mono text-foreground/90">
+                                        {message.attestationData.attestation.type}
+                                      </code>
+                                    </div>
+                                  )}
+
+                                  {/* Report Data */}
+                                  {message.attestationData?.report_data && (
+                                    <div className="space-y-1">
+                                      <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-wide">Report Data</p>
+                                      <code className="text-[11px] font-mono text-foreground/90 break-all block">
+                                        {message.attestationData.report_data}
+                                      </code>
+                                    </div>
+                                  )}
+
+                                  {/* Quote (shortened) */}
+                                  {message.attestationData?.quote && (
+                                    <div className="space-y-1">
+                                      <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-wide">Quote</p>
+                                      <code className="text-[11px] font-mono text-foreground/90 break-all block">
+                                        {message.attestationData.quote.substring(0, 100)}...
+                                      </code>
+                                    </div>
+                                  )}
+
+                                  {/* Verification Status */}
+                                  <div className="pt-2 border-t border-border/30">
+                                    <div className="flex items-center justify-between">
+                                      <span className="text-[10px] font-medium text-muted-foreground uppercase tracking-wide">
+                                        Verification
+                                      </span>
+                                      {message.attestationData?.verified || message.attestationData?.attestation?.verified ? (
+                                        <span className="text-[11px] font-medium text-green-600">
+                                          ✓ Verified
+                                        </span>
+                                      ) : (
+                                        <span className="text-[11px] font-medium text-yellow-600">
+                                          ⚠ Unverified
+                                        </span>
+                                      )}
+                                    </div>
+                                  </div>
                                 </div>
                               )}
                             </div>
@@ -346,29 +409,194 @@ export function PCControllerChat({ sessionToken }: PCControllerChatProps) {
                         <ReactMarkdown>{message.content}</ReactMarkdown>
                       </div>
 
+                      {/* Signature Verification */}
+                      {message.signatureData && (
+                        <div className="mt-3 border border-border/30 rounded-lg overflow-hidden bg-muted/20">
+                          <button
+                            onClick={() => setExpandedSignature(expandedSignature === index ? null : index)}
+                            className="w-full flex items-center justify-between px-3 py-2 text-[11px] font-medium text-muted-foreground hover:bg-muted/40 transition-colors"
+                          >
+                            <span className="flex items-center gap-1.5">
+                              {expandedSignature === index ? (
+                                <ChevronDown className="h-3 w-3" />
+                              ) : (
+                                <ChevronRight className="h-3 w-3" />
+                              )}
+                              Signature Details
+                            </span>
+                            <span className="text-[10px] text-muted-foreground/60">
+                              {message.signatureData.algorithm?.toUpperCase() || 'ECDSA'}
+                            </span>
+                          </button>
+
+                          {expandedSignature === index && (
+                            <div className="px-3 py-3 border-t border-border/30 space-y-3">
+                              {/* Message ID */}
+                              <div className="space-y-1">
+                                <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-wide">Request ID</p>
+                                <code className="text-[11px] font-mono text-foreground/90 break-all block">
+                                  {message.signatureData.messageId}
+                                </code>
+                              </div>
+
+                              {/* Model */}
+                              {message.signatureData.model && (
+                                <div className="space-y-1">
+                                  <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-wide">Model</p>
+                                  <code className="text-[11px] font-mono text-foreground/90 break-all block">
+                                    {message.signatureData.model}
+                                  </code>
+                                </div>
+                              )}
+
+                              {/* Timestamp */}
+                              {message.signatureData.timestamp && (
+                                <div className="space-y-1">
+                                  <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-wide">Timestamp</p>
+                                  <code className="text-[11px] font-mono text-foreground/90 break-all block">
+                                    {new Date(message.signatureData.timestamp).toISOString()}
+                                  </code>
+                                </div>
+                              )}
+
+                              {/* Request Hash */}
+                              {message.signatureData.requestHash && (
+                                <div className="space-y-1">
+                                  <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-wide">Request Hash</p>
+                                  <code className="text-[11px] font-mono text-foreground/90 break-all block">
+                                    {message.signatureData.requestHash}
+                                  </code>
+                                </div>
+                              )}
+
+                              {/* Response Hash */}
+                              {message.signatureData.responseHash && (
+                                <div className="space-y-1">
+                                  <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-wide">Response Hash</p>
+                                  <code className="text-[11px] font-mono text-foreground/90 break-all block">
+                                    {message.signatureData.responseHash}
+                                  </code>
+                                </div>
+                              )}
+
+                              {/* Signature */}
+                              {message.signatureData.signature && (
+                                <div className="space-y-1">
+                                  <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-wide">ECDSA Signature</p>
+                                  <code className="text-[11px] font-mono text-foreground/90 break-all block">
+                                    {message.signatureData.signature}
+                                  </code>
+                                </div>
+                              )}
+
+                              {/* Public Key */}
+                              {message.signatureData.publicKey && (
+                                <div className="space-y-1">
+                                  <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-wide">Public Key</p>
+                                  <code className="text-[11px] font-mono text-foreground/90 break-all block">
+                                    {message.signatureData.publicKey}
+                                  </code>
+                                </div>
+                              )}
+
+                              {/* Signing Address */}
+                              {message.signatureData.signingAddress && (
+                                <div className="space-y-1">
+                                  <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-wide">Signing Address</p>
+                                  <code className="text-[11px] font-mono text-foreground/90 break-all block">
+                                    {message.signatureData.signingAddress}
+                                  </code>
+                                </div>
+                              )}
+
+                              {/* Curve */}
+                              {message.signatureData.curve && (
+                                <div className="space-y-1">
+                                  <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-wide">Curve</p>
+                                  <code className="text-[11px] font-mono text-foreground/90">
+                                    {message.signatureData.curve}
+                                  </code>
+                                </div>
+                              )}
+
+                              {/* TEE Instance */}
+                              {message.signatureData.teeInstance && (
+                                <div className="space-y-1">
+                                  <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-wide">TEE Instance</p>
+                                  <code className="text-[11px] font-mono text-foreground/90">
+                                    {message.signatureData.teeInstance}
+                                  </code>
+                                </div>
+                              )}
+
+                              {/* Verification Status */}
+                              <div className="pt-2 border-t border-border/30">
+                                <div className="flex items-center justify-between">
+                                  <span className="text-[10px] font-medium text-muted-foreground uppercase tracking-wide">
+                                    TEE Verification
+                                  </span>
+                                  {message.signatureData.verified ? (
+                                    <span className="text-[11px] font-medium text-green-600">
+                                      ✓ Verified
+                                    </span>
+                                  ) : (
+                                    <span className="text-[11px] font-medium text-yellow-600">
+                                      ⚠ Unverified
+                                    </span>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      )}
+
                       {/* Tool Call Results */}
                       {message.toolCalls && message.toolCalls.length > 0 && (
-                        <div className="mt-3 space-y-2 pt-2 border-t border-border/30">
-                          {message.toolCalls.map((call, i) => (
-                            <div key={i} className="space-y-1.5">
-                              {call.result && (
-                                <div className="text-xs font-mono leading-relaxed text-foreground/80 bg-muted/30 p-2.5 rounded-lg overflow-x-auto max-h-64 overflow-y-auto whitespace-pre-wrap">
-                                  {typeof call.result === 'object' && call.result.data?.output
-                                    ? call.result.data.output
-                                    : typeof call.result === 'object' && call.result.data?.content
-                                    ? call.result.data.content
-                                    : typeof call.result === 'string'
-                                    ? call.result
-                                    : JSON.stringify(call.result, null, 2)}
-                                </div>
+                        <div className="mt-3 border border-border/30 rounded-lg overflow-hidden bg-muted/20">
+                          <button
+                            onClick={() => setExpandedToolCalls(expandedToolCalls === index ? null : index)}
+                            className="w-full flex items-center justify-between px-3 py-2 text-[11px] font-medium text-muted-foreground hover:bg-muted/40 transition-colors"
+                          >
+                            <span className="flex items-center gap-1.5">
+                              {expandedToolCalls === index ? (
+                                <ChevronDown className="h-3 w-3" />
+                              ) : (
+                                <ChevronRight className="h-3 w-3" />
                               )}
-                              {call.error && (
-                                <div className="text-xs font-mono text-red-500 dark:text-red-400 bg-red-500/10 p-2.5 rounded-lg border border-red-500/30">
-                                  ✗ {call.error}
+                              Tool Results ({message.toolCalls.length})
+                            </span>
+                          </button>
+
+                          {expandedToolCalls === index && (
+                            <div className="border-t border-border/30 px-3 py-3 space-y-2">
+                              {message.toolCalls.map((call, i) => (
+                                <div key={i} className="space-y-1">
+                                  {call.tool && (
+                                    <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-wide">
+                                      {call.tool}
+                                    </p>
+                                  )}
+                                  {call.result && (
+                                    <div className="text-[10px] font-mono leading-relaxed text-foreground/80 bg-muted/30 p-2 rounded overflow-x-auto max-h-48 overflow-y-auto whitespace-pre-wrap">
+                                      {typeof call.result === 'object' && call.result.data?.output
+                                        ? call.result.data.output
+                                        : typeof call.result === 'object' && call.result.data?.content
+                                        ? call.result.data.content
+                                        : typeof call.result === 'string'
+                                        ? call.result
+                                        : JSON.stringify(call.result, null, 2)}
+                                    </div>
+                                  )}
+                                  {call.error && (
+                                    <div className="text-[10px] font-mono text-red-500 dark:text-red-400 bg-red-500/10 p-2 rounded border border-red-500/30">
+                                      ✗ {call.error}
+                                    </div>
+                                  )}
                                 </div>
-                              )}
+                              ))}
                             </div>
-                          ))}
+                          )}
                         </div>
                       )}
                     </div>

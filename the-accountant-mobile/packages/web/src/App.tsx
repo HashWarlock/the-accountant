@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { WalletManager } from './components/wallet-manager'
-import { NetworkSwitcher, type NetworkConfig, NETWORKS } from './components/network-switcher'
+import { ProfileCard } from './components/profile-card'
+import { type NetworkConfig, NETWORKS } from './components/network-switcher'
 import { SignMessageCard } from './components/sign-message-card'
 import { VerifySignatureCard } from './components/verify-signature-card'
 import { DeployTokenCard } from './components/deploy-token-card'
@@ -476,14 +477,6 @@ function App() {
             <div className="font-semibold text-xs md:text-sm text-center">Audit Log</div>
           </Button>
 
-          <Button
-            variant="outline"
-            className="flex flex-col items-center justify-center h-24 md:h-32 p-3 md:p-4 col-span-2 md:col-span-1"
-            disabled={!walletAddress}
-          >
-            <div className="text-2xl md:text-3xl mb-2">🔄</div>
-            <div className="font-semibold text-xs md:text-sm text-center">{currentNetwork.name}</div>
-          </Button>
         </div>
       </div>
     )
@@ -526,36 +519,38 @@ function App() {
       </header>
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 py-4 md:py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
-          {/* Left Column - Wallet & Network */}
-          <div className="space-y-4 md:space-y-6">
+      <div className="max-w-5xl mx-auto px-4 py-4 md:py-8">
+        <div className="space-y-4 md:space-y-6">
+          {/* Top Profile Card */}
+          {walletAddress ? (
+            <ProfileCard
+              walletAddress={walletAddress}
+              userId={userId}
+              currentNetwork={currentNetwork}
+              networks={NETWORKS}
+              onNetworkChange={setCurrentNetwork}
+              onDisconnect={handleDisconnect}
+            />
+          ) : (
             <WalletManager
               walletAddress={walletAddress}
               onDisconnect={handleDisconnect}
               onPasskeySuccess={handlePasskeySuccess}
             />
+          )}
 
-            {walletAddress && (
-              <NetworkSwitcher
-                onNetworkChange={setCurrentNetwork}
-                currentNetwork={currentNetwork}
-              />
-            )}
-          </div>
-
-          {/* Middle/Right Column - Actions */}
-          <div className="lg:col-span-2">
+          {/* Main Actions */}
+          {walletAddress && (
             <motion.div
               key={currentView}
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.2 }}
             >
               <ActionView />
             </motion.div>
-          </div>
+          )}
         </div>
       </div>
 

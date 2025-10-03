@@ -17,20 +17,11 @@ export function WalletManager({ walletAddress, onDisconnect, onPasskeySuccess }:
 
   if (!walletAddress) {
     return (
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Shield className="h-5 w-5 text-primary" />
-            Passkey Login
-          </CardTitle>
-          <CardDescription>
-            Secure your wallet with biometric authentication
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
+      <div className="flex justify-center">
+        <div className="w-full max-w-md">
           <PasskeyCard onSuccess={onPasskeySuccess} />
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     )
   }
 

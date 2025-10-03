@@ -274,6 +274,38 @@ router.post('/verify', async (req, res) => {
 
     console.log(`✅ [Wallet] Verification ${isValid ? 'successful' : 'failed'}`);
 
+    // Create audit log for verification with attestation if user is matched
+    if (matchedUser) {
+      // Generate attestation for the verification action
+      const wallet = await createWalletWithAttestation(matchedUser.userId, 'verify', {
+        message,
+        signature,
+        recoveredAddress,
+        isValid
+      });
+
+      await createAuditLog({
+        userId: matchedUser.userId,
+        operation: 'verify',
+        attestationQuote: wallet.attestationQuote,
+        eventLog: wallet.eventLog,
+        attestationChecksum: wallet.attestationChecksum,
+        phalaVerificationUrl: wallet.phalaVerificationUrl,
+        t16zVerificationUrl: wallet.t16zVerificationUrl,
+        applicationData: {
+          namespace: process.env.APP_NAMESPACE || 'the-accountant-mobile',
+          timestamp: new Date().toISOString(),
+          messageLength: message.length,
+          isValid,
+          recoveredAddress,
+        },
+        address: matchedUser.address,
+        publicKey: null,
+        message,
+        signature,
+      });
+    }
+
     return res.status(200).json({
       valid: isValid,
       recoveredAddress,

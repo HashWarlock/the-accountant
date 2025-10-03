@@ -60,7 +60,7 @@ export function AuditLog({ sessionToken }: AuditLogProps) {
       setLoading(true)
       setError(null)
 
-      const response = await fetch(`/api/wallet/audit-logs?limit=50&offset=${offset}`, {
+      const response = await fetch(`/api/audit/logs?limit=50&offset=${offset}`, {
         headers: {
           ...(sessionToken && { 'Authorization': `Bearer ${sessionToken}` }),
         },

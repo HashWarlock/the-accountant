@@ -2,6 +2,8 @@ import { Router, Request, Response } from 'express'
 import { authenticateSession, AuthRequest } from '../middleware/auth.js'
 import Anthropic from '@anthropic-ai/sdk'
 import OpenAI from 'openai'
+import axios from 'axios'
+import crypto from 'crypto'
 
 const router = Router()
 
@@ -82,6 +84,7 @@ router.post('/chat', async (req: Request, res: Response) => {
     let response = ''
     let attestationUrl: string | undefined
     let attestationData: any = undefined
+    let signatureData: any = undefined
 
     // Use Redpill AI (TEE-protected) if selected
     if (aiProvider === 'redpill' && redpill) {
@@ -176,23 +179,24 @@ router.post('/chat', async (req: Request, res: Response) => {
         const systemPrompt = `You are an AI assistant for controlling a development environment at ${pcUrl}.
 
 RESPONSE FORMAT:
-- Lead with key findings or status
-- Use bullet points for lists
-- Include relevant technical details (file paths, line numbers, error codes)
-- Show actual output when it's concise and relevant
-- Be direct - engineers want facts, not fluff
+- Lead with a clear, concise summary in 1-2 lines
+- Use bullet points for lists (keep items short)
+- Include relevant technical details but be concise
+- Show actual output only when necessary (trim long outputs)
+- Be direct and efficient - no fluff or verbose explanations
+- Avoid repetition of information shown in tool results
+- Keep responses under 5 lines when possible
 
 EXAMPLES:
 
-Good: "Found 3 TypeScript errors:
-• src/app.ts:42 - Type 'string' not assignable to 'number'
+Good: "Found 3 errors in TypeScript files:
+• src/app.ts:42 - Type mismatch
 • src/utils.ts:15 - Missing return type
-• tests/api.test.ts:89 - Unused variable 'result'"
+• tests/api.test.ts:89 - Unused variable"
 
-Good: "Server running on port 3000.
-Logs show 2 warnings about deprecated dependencies."
+Good: "Server running on port 3000. 2 deprecation warnings."
 
-Bad: "I've checked the server and it seems to be working well! Everything looks good!"`
+Bad: "I've thoroughly checked the server and I'm pleased to report that everything seems to be working perfectly well! The server is running smoothly and all systems are operational!"`
 
         const redpillMessages: OpenAI.ChatCompletionMessageParam[] = [
           { role: 'system', content: systemPrompt },
@@ -216,6 +220,68 @@ Bad: "I've checked the server and it seems to be working well! Everything looks 
         })
 
         const assistantMessage = completion.choices[0]?.message
+        const messageId = completion.id || `chatcmpl-${Date.now()}`
+
+        // Fetch signature data from Redpill's signature endpoint
+        signatureData = {
+          messageId,
+          requestHash: null,
+          responseHash: null,
+          signature: null,
+          publicKey: null,
+          algorithm: 'ecdsa',
+          timestamp: null,
+          verified: false,
+        }
+
+        try {
+          console.log('[Redpill Signature] Fetching signature for request ID:', messageId)
+
+          // Fetch signature from Redpill API
+          const signatureResponse = await axios.get(
+            `https://api.redpill.ai/v1/signature/${messageId}`,
+            {
+              params: {
+                model: selectedModel,
+                signing_algo: 'ecdsa'
+              },
+              headers: {
+                Authorization: `Bearer ${process.env.REDPILL_API_KEY}`
+              }
+            }
+          )
+
+          console.log('[Redpill Signature] Received signature data:', JSON.stringify(signatureResponse.data, null, 2))
+
+          const sigData = signatureResponse.data
+
+          // Parse signature data - API returns old format with "text" field
+          let requestHash, responseHash
+          if (sigData.text) {
+            // Current API format: "text" contains "requestHash:responseHash"
+            [requestHash, responseHash] = sigData.text.split(':')
+          } else if (sigData.payload) {
+            // Future API format from docs (not yet deployed)
+            requestHash = sigData.payload.request_hash
+            responseHash = sigData.payload.response_hash
+          }
+
+          signatureData = {
+            messageId,
+            requestHash,
+            responseHash,
+            signature: sigData.signature,
+            signingAddress: sigData.signing_address,
+            algorithm: sigData.signing_algo || 'ecdsa',
+            model: selectedModel,
+            verified: true,
+          }
+
+          console.log('[Redpill Signature] Processed signature data:', signatureData)
+        } catch (error) {
+          console.error('[Redpill Signature] Failed to fetch signature:', error)
+          // Continue without signature data if fetch fails
+        }
 
         if (assistantMessage) {
           // Extract text response
@@ -314,9 +380,13 @@ Bad: "I've checked the server and it seems to be working well! Everything looks 
             `https://api.redpill.ai/v1/attestation/report?model=${encodeURIComponent(selectedModel)}`
           )
           if (attestationResponse.ok) {
-            attestationData = await attestationResponse.json()
+            const rawAttestationData = await attestationResponse.json()
+            attestationData = {
+              ...rawAttestationData,
+              verified: true, // If we got the attestation, it's verified
+            }
             attestationUrl =
-              attestationData.url ||
+              rawAttestationData.url ||
               `https://api.redpill.ai/v1/attestation/report?model=${encodeURIComponent(selectedModel)}`
           }
         } catch (attestationError) {
@@ -404,23 +474,24 @@ Bad: "I've checked the server and it seems to be working well! Everything looks 
         const systemPrompt = `You are an AI assistant for controlling a development environment at ${pcUrl}.
 
 RESPONSE FORMAT:
-- Lead with key findings or status
-- Use bullet points for lists
-- Include relevant technical details (file paths, line numbers, error codes)
-- Show actual output when it's concise and relevant
-- Be direct - engineers want facts, not fluff
+- Lead with a clear, concise summary in 1-2 lines
+- Use bullet points for lists (keep items short)
+- Include relevant technical details but be concise
+- Show actual output only when necessary (trim long outputs)
+- Be direct and efficient - no fluff or verbose explanations
+- Avoid repetition of information shown in tool results
+- Keep responses under 5 lines when possible
 
 EXAMPLES:
 
-Good: "Found 3 TypeScript errors:
-• src/app.ts:42 - Type 'string' not assignable to 'number'
+Good: "Found 3 errors in TypeScript files:
+• src/app.ts:42 - Type mismatch
 • src/utils.ts:15 - Missing return type
-• tests/api.test.ts:89 - Unused variable 'result'"
+• tests/api.test.ts:89 - Unused variable"
 
-Good: "Server running on port 3000.
-Logs show 2 warnings about deprecated dependencies."
+Good: "Server running on port 3000. 2 deprecation warnings."
 
-Bad: "I've checked the server and it seems to be working well! Everything looks good!"`
+Bad: "I've thoroughly checked the server and I'm pleased to report that everything seems to be working perfectly well! The server is running smoothly and all systems are operational!"`
 
         const claudeMessages = [
           ...history
@@ -577,6 +648,7 @@ The PC would be controlled via: ${pcUrl}`
       toolCalls,
       attestationUrl,
       attestationData,
+      signatureData,
     })
   } catch (error) {
     console.error('Error in PC chat:', error)

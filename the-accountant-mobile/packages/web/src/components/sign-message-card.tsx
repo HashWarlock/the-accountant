@@ -11,7 +11,7 @@ interface SignMessageCardProps {
 }
 
 export function SignMessageCard({ onSign, walletAddress }: SignMessageCardProps) {
-  const [message, setMessage] = useState('Hello, Openfort!')
+  const [message, setMessage] = useState('Hello, dstack!')
   const [signature, setSignature] = useState<string | null>(null)
   const [isSigning, setIsSigning] = useState(false)
 
